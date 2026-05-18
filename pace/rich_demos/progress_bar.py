@@ -4,6 +4,7 @@ import time
 from random import randint
 from threading import Thread
 
+from rich.console import Console
 from rich.progress import Progress, TaskID
 
 
@@ -14,10 +15,11 @@ def _task(progress: Progress, task_id: TaskID, sleep_time: float) -> None:
         time.sleep(sleep_time / 100)
 
 
-def run() -> None:
-    """Run the progress bar demo.
+def run(_console: Console) -> None:
+    """This demo includes 8 different progress bars, each executing tasks on different threads.
 
-    This demo includes 8 different progress bars, each executing tasks on different threads.
+    Args:
+        _console: Rich console instance for output (unused, kept for API compatibility)
     """
     with Progress() as progress:
         threads: list[Thread] = []

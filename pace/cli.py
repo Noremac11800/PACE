@@ -4,6 +4,8 @@ import argparse
 import sys
 from argparse import Namespace
 
+import rich
+from rich.console import Console
 from rich.traceback import install
 
 from pace.commands import dotnet
@@ -22,7 +24,9 @@ def main() -> int:
     """
     # Enable rich traceback printing
     # Suppress stack frames from these modules:
-    install(show_locals=True, suppress=[])
+    install(show_locals=True, suppress=[rich])
+
+    console = Console()
 
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
@@ -43,9 +47,9 @@ def main() -> int:
 
     match args.command:
         case "dotnet":
-            dotnet.run(args)
+            dotnet.run(console, args)
         case "demo":
-            _DEMOS[args.name]()
+            _DEMOS[args.name](console)
         case _:
             parser.print_help()
     return 0
