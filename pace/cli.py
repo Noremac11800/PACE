@@ -4,6 +4,8 @@ import argparse
 import sys
 from argparse import Namespace
 
+from rich.traceback import install
+
 from pace.commands import dotnet
 from pace.rich_demos import progress_bar
 
@@ -18,6 +20,10 @@ def main() -> int:
     Returns:
         Exit code (0 for success, non-zero for failure)
     """
+    # Enable rich traceback printing
+    # Suppress stack frames from these modules:
+    install(show_locals=True, suppress=[])
+
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
     )
