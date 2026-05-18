@@ -5,6 +5,11 @@ import sys
 from argparse import Namespace
 
 from pace.commands import dotnet
+from pace.rich_demos import progress_bar
+
+_DEMOS = {
+    "progress_bar": progress_bar.run,
+}
 
 
 def main() -> int:
@@ -16,17 +21,27 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
     )
-    parser.add_argument("command", help="Command to execute")
-    args: Namespace = parser.parse_args()
+    subparsers = parser.add_subparsers(dest="command", metavar="command")
 
-    print("PACE - Project Automation and Configuration Engine")
-    print(f"Command: {args.command}")
+    subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
+
+    demo_parser = subparsers.add_parser("demo", help="Run a built-in demo")
+    demo_parser.add_argument(
+        "name",
+        choices=list(_DEMOS),
+        metavar="name",
+        help=f"Demo to run. Choices: {', '.join(_DEMOS)}",
+    )
+
+    args: Namespace = parser.parse_args()
 
     match args.command:
         case "dotnet":
             dotnet.run(args)
+        case "demo":
+            _DEMOS[args.name]()
         case _:
-            print("CLI not yet implemented")
+            parser.print_help()
     return 0
 
 

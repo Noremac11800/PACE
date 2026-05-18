@@ -61,6 +61,7 @@ ignore = [
     "T201",   # print-found
     "S101",   # assert-used
     "D415",   # first-line-should-end-with-period
+    "S311",   # stdlib-random-used
 ]
 
 [lint.mccabe]
