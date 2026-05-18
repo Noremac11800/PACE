@@ -138,6 +138,9 @@ ruff format .
 # Check code style
 ruff check .
 
+# or for safe fixes
+ruff check --fix .
+
 # Type check
 pyright
 ```

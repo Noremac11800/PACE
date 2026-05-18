@@ -1,3 +1,1 @@
-"""
-PACE test suite.
-"""
+"""PACE test suite."""

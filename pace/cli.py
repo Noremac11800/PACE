@@ -1,6 +1,4 @@
-"""
-CLI entry point for PACE.
-"""
+"""CLI entry point for PACE."""
 
 import argparse
 import sys
@@ -9,9 +7,8 @@ from argparse import Namespace
 from pace.commands import dotnet
 
 
-def main():
-    """
-    Main entry point for the PACE CLI.
+def main() -> int:
+    """Main entry point for the PACE CLI.
 
     Returns:
         Exit code (0 for success, non-zero for failure)

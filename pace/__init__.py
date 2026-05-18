@@ -1,5 +1,4 @@
-"""
-PACE - Project Automation and Configuration Engine
+"""PACE - Project Automation and Configuration Engine
 
 A Python CLI tool for bulk management of C# .NET project ecosystems.
 """

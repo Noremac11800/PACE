@@ -1,6 +1,4 @@
-"""
-pace test command - Run tests across all projects.
-"""
+"""pace test command - Run tests across all projects."""
 
 
 def run() -> None:

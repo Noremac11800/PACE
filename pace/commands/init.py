@@ -1,6 +1,4 @@
-"""
-pace init command - Initialize a pace.toml manifest in the workspace root.
-"""
+"""pace init command - Initialize a pace.toml manifest in the workspace root."""
 
 
 def run() -> None:
