@@ -3,13 +3,13 @@ CLI entry point for PACE.
 """
 
 import argparse
-from argparse import Namespace
 import sys
+from argparse import Namespace
 
 from pace.commands import dotnet
 
 
-def main() -> int:
+def main():
     """
     Main entry point for the PACE CLI.
 

@@ -2,9 +2,13 @@
 Tests for the CLI entry point.
 """
 
+import sys
+from unittest.mock import patch
+
 from pace.cli import main
 
 
 def test_main_returns_zero():
     """Test that main returns 0."""
-    assert main() == 0
+    with patch.object(sys, "argv", ["pace", "init"]):
+        assert main() == 0

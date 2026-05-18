@@ -123,6 +123,25 @@ depends_on = ["appmodule-core"]
 
 ---
 
+## Development
+
+```bash
+# Install in development mode
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+ruff format .
+
+# Check code style
+ruff check .
+
+# Type check
+pyright
+```
+
 ## License
 
 [MIT](./LICENSE)
