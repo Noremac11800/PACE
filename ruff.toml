@@ -62,6 +62,10 @@ ignore = [
     "S101",   # assert-used
     "D415",   # first-line-should-end-with-period
     "S311",   # stdlib-random-used
+    "S108",   # hardcoded-temp-file/dir
+    "S603",   # subprocess.run() without vetting user input
+    "S607",   # starting a process with a partial executable path
+    "TRY300", # consider moving this statement to an else block
 ]
 
 [lint.mccabe]

@@ -1,11 +1,9 @@
 """pace dotnet command - Execute dotnet commands across the project graph."""
 
-from argparse import Namespace
-
 from rich.console import Console
 
 
-def run(console: Console, args: Namespace) -> None:
+def run(console: Console, args: list[str]) -> None:
     """Execute dotnet commands across all projects.
 
     Args:

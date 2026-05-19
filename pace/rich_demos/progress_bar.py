@@ -15,11 +15,12 @@ def _task(progress: Progress, task_id: TaskID, sleep_time: float) -> None:
         time.sleep(sleep_time / 100)
 
 
-def run(_console: Console) -> None:
+def run(_console: Console, _args: list[str]) -> None:
     """This demo includes 8 different progress bars, each executing tasks on different threads.
 
     Args:
         _console: Rich console instance for output (unused, kept for API compatibility)
+        _args: Command line arguments (unused, kept for API compatibility)
     """
     with Progress() as progress:
         threads: list[Thread] = []

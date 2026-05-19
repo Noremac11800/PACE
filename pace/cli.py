@@ -8,10 +8,11 @@ import rich
 from rich.console import Console
 from rich.traceback import install
 
-from pace.commands import dotnet
-from pace.rich_demos import progress_bar
+from pace.commands import dotnet, git
+from pace.rich_demos import columns, progress_bar
 
 _DEMOS = {
+    "columns": columns.run,
     "progress_bar": progress_bar.run,
 }
 
@@ -34,6 +35,7 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
     subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
+    subparsers.add_parser("git", help="Execute git commands across all repositories")
 
     demo_parser = subparsers.add_parser("demo", help="Run a built-in demo")
     demo_parser.add_argument(
@@ -43,13 +45,17 @@ def main() -> int:
         help=f"Demo to run. Choices: {', '.join(_DEMOS)}",
     )
 
-    args: Namespace = parser.parse_args()
+    args: Namespace
+    unknownargs: list[str]
+    args, unknownargs = parser.parse_known_args()
 
     match args.command:
         case "dotnet":
-            dotnet.run(console, args)
+            dotnet.run(console, unknownargs)
+        case "git":
+            git.run(console, unknownargs)
         case "demo":
-            _DEMOS[args.name](console)
+            _DEMOS[args.name](console, unknownargs)
         case _:
             parser.print_help()
     return 0
