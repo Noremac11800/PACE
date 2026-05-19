@@ -102,7 +102,7 @@ def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> tupl
         if result.returncode == 0:
             statuses.set(repo_name, Text("Done ✓", style="green"))
             return repo_url, f"[green]Cloned: {repo_name}[/green]", True
-        statuses.set(repo_name, Text(f"Failed: {result.stderr}", style="red"))
+        statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
         return repo_url, f"[red]Failed: {repo_name} - {result.stderr}[/red]", False
     except subprocess.TimeoutExpired:
         statuses.set(repo_name, Text("Timeout", style="red"))
