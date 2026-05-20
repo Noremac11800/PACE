@@ -5,7 +5,7 @@
 > A Python CLI tool for bulk management of C# .NET project ecosystems — from single class libraries to complex multi-project hierarchies with MAUI applications.
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)](https://python.org)
-[![.NET](https://img.shields.io/badge/.NET-8.0+-purple?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com)
+[![.NET](https://img.shields.io/badge/.NET-10.0+-purple?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com)
 [![MAUI](https://img.shields.io/badge/MAUI-supported-blueviolet?logo=dotnet)](https://dotnet.microsoft.com/apps/maui)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 

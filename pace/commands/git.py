@@ -5,12 +5,16 @@ import tempfile
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 REPOS = [
     # "git@github.com:Noremac11800/pantry.git",
@@ -22,7 +26,7 @@ REPOS = [
     # "git@github.com:Noremac11800/Godot.git",
     "git@devtopia.esri.com:Melbourne/toolkit-core.git",
     "git@devtopia.esri.com:Melbourne/toolkit-data.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-.git",
+    "git@devtopia.esri.com:Melbourne/toolkit-maui.git",
     "git@devtopia.esri.com:Melbourne/toolkit-maui-appconfig.git",
     "git@devtopia.esri.com:Melbourne/toolkit-maui-calcite.git",
     "git@devtopia.esri.com:Melbourne/toolkit-maui-controls.git",
@@ -48,7 +52,6 @@ REPOS = [
     "git@devtopia.esri.com:Melbourne/appmodule-survey123.git",
     "git@devtopia.esri.com:Melbourne/Survey123-Mobile.git",
     "git@devtopia.esri.com:Melbourne/Survey123-Studio.git",
-    "git@devtopia.esri.com:Melbourne/Survey123-NOEXIST.git",
 ]
 
 
@@ -76,18 +79,51 @@ class ReposGitStatus:
             return table
 
 
-def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> tuple[str, str, bool]:
+def _pull_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None:
+    """Pull a single repo and update its status.
+
+    Args:
+        repo_url: URL of the repository to pull
+        dest_dir: Directory to pull the repository into
+        statuses: ReposGitStatus instance to update
+    """
+    repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
+    repo_path = dest_dir / repo_name
+
+    statuses.set(repo_name, Spinner("dots", text="Pulling...", style="cyan"))
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_path), "pull"],
+            capture_output=True,
+            text=True,
+            timeout=300,
+            check=False,
+        )
+        if result.returncode == 0:
+            statuses.set(repo_name, Text("Done ✓", style="green"))
+        else:
+            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
+    except subprocess.TimeoutExpired:
+        statuses.set(repo_name, Text("Timeout", style="red"))
+    except OSError as e:
+        statuses.set(repo_name, Text(f"Error: {e}", style="red"))
+
+
+def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None:
     """Clone a single repo and update its status.
 
-    Returns:
-        Tuple of (repo_url, message, success)
+    Args:
+        repo_url: URL of the repository to clone
+        dest_dir: Directory to clone the repository into
+        statuses: ReposGitStatus instance to update
     """
     repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
     repo_path = dest_dir / repo_name
 
     if repo_path.exists():
         statuses.set(repo_name, Text("Skipped (already exists)", style="yellow"))
-        return repo_url, f"[yellow]Skipped: {repo_name} (already exists)[/yellow]", True
+        return
 
     statuses.set(repo_name, Spinner("dots", text="Cloning...", style="cyan"))
 
@@ -101,15 +137,12 @@ def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> tupl
         )
         if result.returncode == 0:
             statuses.set(repo_name, Text("Done ✓", style="green"))
-            return repo_url, f"[green]Cloned: {repo_name}[/green]", True
-        statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
-        return repo_url, f"[red]Failed: {repo_name} - {result.stderr}[/red]", False
+        else:
+            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
     except subprocess.TimeoutExpired:
         statuses.set(repo_name, Text("Timeout", style="red"))
-        return repo_url, f"[red]Timeout: {repo_name}[/red]", False
     except OSError as e:
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
-        return repo_url, f"[red]Error: {repo_name} - {e}[/red]", False
 
 
 def run(console: Console, _args: list[str]) -> None:
@@ -119,8 +152,22 @@ def run(console: Console, _args: list[str]) -> None:
         console: Rich console instance for output
         args: Additional arguments to pass to git (unused)
     """
+    command: Callable[[str, Path, ReposGitStatus], None] | None = None
+    if len(_args) > 0:
+        if _args[0] == "pull":
+            command = _pull_repo
+        elif _args[0] == "clone":
+            command = _clone_repo
+        else:
+            console.print(f"Unknown command: {_args[0]}", style="red")
+            return
+    else:
+        console.print("No command specified", style="red")
+        return
+
     tmp_dir = Path(tempfile.gettempdir()) / "PACE"
     tmp_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Using temp directory: {tmp_dir}")
 
     statuses = ReposGitStatus()
     for repo in REPOS:
@@ -131,6 +178,6 @@ def run(console: Console, _args: list[str]) -> None:
         Live(statuses.get_table(), console=console, refresh_per_second=10) as live,
         ThreadPoolExecutor() as executor,
     ):
-        futures = {executor.submit(_clone_repo, repo, tmp_dir, statuses): repo for repo in REPOS}
+        futures = {executor.submit(command, repo, tmp_dir, statuses): repo for repo in REPOS}
         for _ in as_completed(futures):
             live.update(statuses.get_table())
