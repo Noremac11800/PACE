@@ -1,0 +1,157 @@
+repodir = "/tmp/PACE"
+
+[[projects]]
+name = "toolkit-core"
+csproj_path = "src/Esri.Toolkit.Core/Esri.Toolkit.Core.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-data"
+csproj_path = "src/Esri.Toolkit.Data/Esri.Toolkit.Data.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui"
+csproj_path = "src/Esri.Toolkit.Maui/Esri.Toolkit.Maui.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-appconfig"
+csproj_path = "src/Esri.Toolkit.Maui.AppConfig/Esri.Toolkit.Maui.AppConfig.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-calcite"
+csproj_path = "src/Esri.Toolkit.Maui.Calcite/Esri.Toolkit.Maui.Calcite.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-controls"
+csproj_path = "src/Esri.Toolkit.Maui.Controls/Esri.Toolkit.Maui.Controls.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-core"
+csproj_path = "src/Esri.Toolkit.Maui.Core/Esri.Toolkit.Maui.Core.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-devices"
+csproj_path = "src/Esri.Toolkit.Maui.Devices/Esri.Toolkit.Maui.Devices.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-localization"
+csproj_path = "src/Esri.Toolkit.Maui.Localization/Esri.Toolkit.Maui.Localization.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-maps"
+csproj_path = "src/Esri.Toolkit.Maui.Maps/Esri.Toolkit.Maui.Maps.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-media"
+csproj_path = "src/Esri.Toolkit.Maui.Media/Esri.Toolkit.Maui.Media.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-mvvm"
+csproj_path = "src/Esri.Toolkit.Maui.Mvvm/Esri.Toolkit.Maui.Mvvm.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-maui-sensors"
+csproj_path = "src/Esri.Toolkit.Maui.Sensors/Esri.Toolkit.Maui.Sensors.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-msbuild"
+csproj_path = "src/Esri.Toolkit.MSBuild/Esri.Toolkit.MSBuild.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "toolkit-versioning"
+csproj_path = "src/Esri.Toolkit.Versioning/Esri.Toolkit.Versioning.csproj"
+sln_group = "Toolkits"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-core"
+csproj_path = "src/Esri.AppModule.Core/Esri.AppModule.Core.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-content"
+csproj_path = "src/Esri.AppModule.Content/Esri.AppModule.Content.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-data"
+csproj_path = "src/Esri.AppModule.Data/Esri.AppModule.Data.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-featureforms"
+csproj_path = "src/Esri.AppModule.FeatureForms/Esri.AppModule.FeatureForms.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-location"
+csproj_path = "src/Esri.AppModule.Location/Esri.AppModule.Location.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-mapping"
+csproj_path = "src/Esri.AppModule.Mapping/Esri.AppModule.Mapping.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-quickcapture"
+csproj_path = "src/Esri.AppModule.QuickCapture/Esri.AppModule.QuickCapture.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-resources"
+csproj_path = "src/Esri.AppModule.Resources/Esri.AppModule.Resources.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-survey123"
+csproj_path = "src/Esri.AppModule.Survey123/Esri.AppModule.Survey123.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-toolkit"
+csproj_path = "src/Esri.AppModule.Toolkit/Esri.AppModule.Toolkit.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
+
+[[projects]]
+name = "appmodule-webforms"
+csproj_path = "src/Esri.AppModule.WebForms/Esri.AppModule.WebForms.csproj"
+sln_group = "AppModules"
+explicit_frameworks = []
