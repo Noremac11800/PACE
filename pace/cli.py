@@ -6,7 +6,6 @@ from argparse import Namespace
 from pathlib import Path
 
 import rich
-from rich import inspect
 from rich.console import Console
 from rich.traceback import install
 
@@ -31,9 +30,7 @@ def main() -> int:
     install(show_locals=True, suppress=[rich])
 
     console = Console()
-
     config = load_config(Path("pace.toml"))
-    inspect(config)
 
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
@@ -57,9 +54,9 @@ def main() -> int:
 
     match args.command:
         case "dotnet":
-            dotnet.run(console, unknownargs)
+            dotnet.run(console, config, unknownargs)
         case "git":
-            git.run(console, unknownargs)
+            git.run(console, config, unknownargs)
         case "demo":
             _DEMOS[args.name](console, unknownargs)
         case _:

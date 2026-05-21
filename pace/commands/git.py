@@ -1,7 +1,6 @@
 """pace git command - Execute git commands across all repositories."""
 
 import subprocess
-import tempfile
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -12,6 +11,8 @@ from rich.live import Live
 from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
+
+from pace.config import Config
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -145,11 +146,12 @@ def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
 
 
-def run(console: Console, _args: list[str]) -> None:
+def run(console: Console, config: Config, _args: list[str]) -> None:
     """Clone all repositories in parallel.
 
     Args:
         console: Rich console instance for output
+        config: PACE configuration
         args: Additional arguments to pass to git (unused)
     """
     command: Callable[[str, Path, ReposGitStatus], None] | None = None
@@ -165,10 +167,6 @@ def run(console: Console, _args: list[str]) -> None:
         console.print("No command specified", style="red")
         return
 
-    tmp_dir = Path(tempfile.gettempdir()) / "PACE"
-    tmp_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Using temp directory: {tmp_dir}")
-
     statuses = ReposGitStatus()
     for repo in REPOS:
         repo_name = repo.rsplit("/", maxsplit=1)[-1].replace(".git", "")
@@ -178,6 +176,6 @@ def run(console: Console, _args: list[str]) -> None:
         Live(statuses.get_table(), console=console, refresh_per_second=10) as live,
         ThreadPoolExecutor() as executor,
     ):
-        futures = {executor.submit(command, repo, tmp_dir, statuses): repo for repo in REPOS}
+        futures = {executor.submit(command, repo, config.repodir, statuses): repo for repo in REPOS}
         for _ in as_completed(futures):
             live.update(statuses.get_table())
