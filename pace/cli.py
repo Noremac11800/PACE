@@ -3,12 +3,15 @@
 import argparse
 import sys
 from argparse import Namespace
+from pathlib import Path
 
 import rich
+from rich import inspect
 from rich.console import Console
 from rich.traceback import install
 
 from pace.commands import dotnet, git
+from pace.config import load_config
 from pace.rich_demos import columns, progress_bar
 
 _DEMOS = {
@@ -28,6 +31,9 @@ def main() -> int:
     install(show_locals=True, suppress=[rich])
 
     console = Console()
+
+    config = load_config(Path("pace.toml"))
+    inspect(config)
 
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
