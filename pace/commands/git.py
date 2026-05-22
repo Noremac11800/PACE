@@ -17,44 +17,6 @@ from pace.config import Config
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-REPOS = [
-    # "git@github.com:Noremac11800/pantry.git",
-    # "git@github.com:Noremac11800/Ward-of-Whispers.git",
-    # "git@github.com:Noremac11800/TkDesktop.git",
-    # "git@github.com:Noremac11800/PoolPy.git",
-    # "git@github.com:Noremac11800/SDLCanvas.jl.git",
-    # "git@github.com:Noremac11800/harpoon.git",
-    # "git@github.com:Noremac11800/Godot.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-core.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-data.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-appconfig.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-calcite.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-controls.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-core.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-devices.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-localization.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-maps.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-media.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-mvvm.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-maui-sensors.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-msbuild.git",
-    "git@devtopia.esri.com:Melbourne/toolkit-versioning.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-core.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-content.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-data.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-resources.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-featureforms.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-webforms.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-toolkit.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-mapping.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-location.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-quickcapture.git",
-    "git@devtopia.esri.com:Melbourne/appmodule-survey123.git",
-    "git@devtopia.esri.com:Melbourne/Survey123-Mobile.git",
-    "git@devtopia.esri.com:Melbourne/Survey123-Studio.git",
-]
-
 
 class ReposGitStatus:
     """Thread-safe status tracker for each repository."""
@@ -168,14 +130,17 @@ def run(console: Console, config: Config, _args: list[str]) -> None:
         return
 
     statuses = ReposGitStatus()
-    for repo in REPOS:
-        repo_name = repo.rsplit("/", maxsplit=1)[-1].replace(".git", "")
-        statuses.set(repo_name, Spinner("dots", text="Dispatching to thread...", style="dim"))
+    for project in config.projects:
+        statuses.set(project.name, Spinner("dots", text="Dispatching to thread...", style="dim"))
 
     with (
         Live(statuses.get_table(), console=console, refresh_per_second=10) as live,
         ThreadPoolExecutor() as executor,
     ):
-        futures = {executor.submit(command, repo, config.repodir, statuses): repo for repo in REPOS}
+        futures = {
+            executor.submit(command, project.repo_url, config.repodir, statuses): project
+            for project in config.projects
+            if project.repo_url is not None
+        }
         for _ in as_completed(futures):
             live.update(statuses.get_table())

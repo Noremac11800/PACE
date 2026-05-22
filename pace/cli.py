@@ -30,15 +30,26 @@ def main() -> int:
     install(show_locals=True, suppress=[rich])
 
     console = Console()
-    config = load_config(Path("pace.toml"))
 
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
     )
+
+    parser.add_argument(
+        "-C",
+        "--config",
+        metavar="<path>",
+        help="Path to configuration file. Defaults to an internal pace.toml file.",
+        type=Path,
+    )
+    parser.add_argument(
+        "--print-config", action="store_true", help="Print the loaded configuration", default=False
+    )
+
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
     subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
-    subparsers.add_parser("git", help="Execute git commands across all repositories")
+    _git_parser = subparsers.add_parser("git", help="Execute git commands across all repositories")
 
     demo_parser = subparsers.add_parser("demo", help="Run a built-in demo")
     demo_parser.add_argument(
@@ -51,6 +62,18 @@ def main() -> int:
     args: Namespace
     unknownargs: list[str]
     args, unknownargs = parser.parse_known_args()
+
+    if args.config is not None:
+        if args.config.exists():
+            config = load_config(args.config)
+        else:
+            console.print(f"Configuration file {args.config} does not exist")
+            return 1
+    else:
+        config = load_config()
+
+    if args.print_config:
+        console.print(config)
 
     match args.command:
         case "dotnet":

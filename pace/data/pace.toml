@@ -1,4 +1,4 @@
-repodir = "/tmp/PACE"
+# repodir = "/tmp/PACE"
 
 [[projects]]
 name = "toolkit-core"
@@ -9,149 +9,174 @@ explicit_frameworks = []
 [[projects]]
 name = "toolkit-data"
 csproj_path = "src/Esri.Toolkit.Data/Esri.Toolkit.Data.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-data.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui"
 csproj_path = "src/Esri.Toolkit.Maui/Esri.Toolkit.Maui.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-appconfig"
 csproj_path = "src/Esri.Toolkit.Maui.AppConfig/Esri.Toolkit.Maui.AppConfig.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-appconfig.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-calcite"
 csproj_path = "src/Esri.Toolkit.Maui.Calcite/Esri.Toolkit.Maui.Calcite.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-calcite.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-controls"
 csproj_path = "src/Esri.Toolkit.Maui.Controls/Esri.Toolkit.Maui.Controls.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-controls.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-core"
 csproj_path = "src/Esri.Toolkit.Maui.Core/Esri.Toolkit.Maui.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-core.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-devices"
 csproj_path = "src/Esri.Toolkit.Maui.Devices/Esri.Toolkit.Maui.Devices.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-devices.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-localization"
 csproj_path = "src/Esri.Toolkit.Maui.Localization/Esri.Toolkit.Maui.Localization.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-localization.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-maps"
 csproj_path = "src/Esri.Toolkit.Maui.Maps/Esri.Toolkit.Maui.Maps.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-maps.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-media"
 csproj_path = "src/Esri.Toolkit.Maui.Media/Esri.Toolkit.Maui.Media.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-media.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-mvvm"
 csproj_path = "src/Esri.Toolkit.Maui.Mvvm/Esri.Toolkit.Maui.Mvvm.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-mvvm.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-maui-sensors"
 csproj_path = "src/Esri.Toolkit.Maui.Sensors/Esri.Toolkit.Maui.Sensors.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-sensors.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-msbuild"
 csproj_path = "src/Esri.Toolkit.MSBuild/Esri.Toolkit.MSBuild.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-msbuild.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "toolkit-versioning"
 csproj_path = "src/Esri.Toolkit.Versioning/Esri.Toolkit.Versioning.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-versioning.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-core"
 csproj_path = "src/Esri.AppModule.Core/Esri.AppModule.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-core.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-content"
 csproj_path = "src/Esri.AppModule.Content/Esri.AppModule.Content.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-content.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-data"
 csproj_path = "src/Esri.AppModule.Data/Esri.AppModule.Data.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-data.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-featureforms"
 csproj_path = "src/Esri.AppModule.FeatureForms/Esri.AppModule.FeatureForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-featureforms.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-location"
 csproj_path = "src/Esri.AppModule.Location/Esri.AppModule.Location.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-location.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-mapping"
 csproj_path = "src/Esri.AppModule.Mapping/Esri.AppModule.Mapping.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-mapping.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-quickcapture"
 csproj_path = "src/Esri.AppModule.QuickCapture/Esri.AppModule.QuickCapture.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-quickcapture.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-resources"
 csproj_path = "src/Esri.AppModule.Resources/Esri.AppModule.Resources.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-resources.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-survey123"
 csproj_path = "src/Esri.AppModule.Survey123/Esri.AppModule.Survey123.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-survey123.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-toolkit"
 csproj_path = "src/Esri.AppModule.Toolkit/Esri.AppModule.Toolkit.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-toolkit.git"
 sln_group = "AppModules"
 explicit_frameworks = []
 
 [[projects]]
 name = "appmodule-webforms"
 csproj_path = "src/Esri.AppModule.WebForms/Esri.AppModule.WebForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-webforms.git"
 sln_group = "AppModules"
 explicit_frameworks = []
