@@ -25,16 +25,15 @@ def main() -> int:
     Returns:
         Exit code (0 for success, non-zero for failure)
     """
-    # Enable rich traceback printing
-    # Suppress stack frames from these modules:
-    install(show_locals=True, suppress=[rich])
-
     console = Console()
 
     parser = argparse.ArgumentParser(
         description="PACE - Project Automation and Configuration Engine"
     )
 
+    parser.add_argument(
+        "--debug", action="store_true", default=False, help="Enable debug mode with full tracebacks"
+    )
     parser.add_argument(
         "-C",
         "--config",
@@ -63,6 +62,21 @@ def main() -> int:
     unknownargs: list[str]
     args, unknownargs = parser.parse_known_args()
 
+    if args.debug:
+        install(show_locals=True, suppress=[rich])
+
+    try:
+        return _run(console, args, unknownargs, parser)
+    except Exception as e:
+        if args.debug:
+            raise
+        console.print(f"[red]error:[/red] {e}")
+        return 1
+
+
+def _run(
+    console: Console, args: Namespace, unknownargs: list[str], parser: argparse.ArgumentParser
+) -> int:
     if args.config is not None:
         if args.config.exists():
             config = load_config(args.config)

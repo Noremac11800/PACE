@@ -31,7 +31,7 @@ class Config(BaseModel):
         projects: List of projects.
     """
 
-    repodir: Path
+    repodir: Path = Path()
     projects: list[Project]
 
     @model_validator(mode="after")
@@ -41,7 +41,7 @@ class Config(BaseModel):
         if env_repodir is not None:
             self.repodir = Path(env_repodir)
 
-        if self.repodir.exists():
+        if self.repodir.exists() and self.repodir != Path():
             return self
 
         raise ValueError(f"Repository directory {self.repodir} does not exist")
