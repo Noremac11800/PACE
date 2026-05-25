@@ -23,6 +23,7 @@
   let { class: classname = "" } = $props();
 
   const MIN_PYTHON_VERSION = "3.11";
+  const EXEC_DELAY = 250;
 
   let pythonFound: boolean | undefined = $state(undefined);
   let pythonVersion = $state("");
@@ -39,26 +40,26 @@
 
   async function checkPython() {
     pythonFound = undefined;
-    await sleep(500);
+    await sleep(EXEC_DELAY);
     pythonFound = await isPythonInstalled(MIN_PYTHON_VERSION);
     pythonVersion = await getPythonVersion();
   }
 
   async function checkGit() {
     gitFound = undefined;
-    await sleep(500);
+    await sleep(EXEC_DELAY);
     gitFound = await isGitInstalled();
   }
 
   async function checkPipx() {
     pipxFound = undefined;
-    await sleep(500);
+    await sleep(EXEC_DELAY);
     pipxFound = await isPipxInstalled();
   }
 
   async function installPACE() {
     isInstalling = true;
-    await sleep(500);
+    await sleep(EXEC_DELAY);
     paceInstallResult = await installPace(paceRepoPath);
     isInstalling = false;
   }
@@ -66,7 +67,7 @@
   async function runPACEHelp() {
     try {
       isRunningHelp = true;
-      await sleep(500);
+      await sleep(EXEC_DELAY);
       let helpResult = await Command.create("pace", ["--help"]).execute();
       paceHelpResult = helpResult.stdout;
     } catch (error) {
@@ -133,12 +134,12 @@
           <Loader size={20} class="animate-spin text-surface-500" />
         {:else if pythonFound}
           <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={12} />
+            <Check size={16} />
             Ready
           </span>
         {:else}
           <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={12} />
+            <X size={16} />
             Missing
           </span>
         {/if}
@@ -171,12 +172,12 @@
           <Loader size={20} class="animate-spin text-surface-500" />
         {:else if gitFound}
           <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={12} />
+            <Check size={16} />
             Ready
           </span>
         {:else}
           <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={12} />
+            <X size={16} />
             Missing
           </span>
         {/if}
@@ -207,12 +208,12 @@
           <Loader size={20} class="animate-spin text-surface-500" />
         {:else if pipxFound}
           <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={12} />
+            <Check size={16} />
             Ready
           </span>
         {:else}
           <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={12} />
+            <X size={16} />
             Missing
           </span>
         {/if}
