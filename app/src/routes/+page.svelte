@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
   import { Bug } from "@lucide/svelte";
+  import DepChecks from "./DepChecks.svelte";
 
   const version = "v0.1.0-alpha.1";
 </script>
@@ -11,9 +12,10 @@
     <ThemeSwitch />
   </header>
 
-  <div class="relative min-h-0 bg-surface-100-900/25 flex flex-col">
-    <h1 class="h1 font-bold">PACE</h1>
-    <img src="/pace_logo.svg" alt="PACE Logo" />
+  <div
+    class="relative min-h-0 bg-surface-100-900/25 flex items-center justify-center p-4"
+  >
+    <DepChecks class="w-[60%] min-w-[400px]" />
   </div>
 
   <footer

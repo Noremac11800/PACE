@@ -21,26 +21,29 @@
           ]
         },
         {
-          "name": "python -m venv",
-          "cmd": "python",
-          "args": [
-            "-m",
-            "venv"
-          ]
+          "name": "git",
+          "cmd": "git",
+          "args": true
         },
         {
-          "name": "pace",
-          "cmd": "pace"
-        },
-        {
-          "name": "python -m pip install",
+          "name": "pip install pipx",
           "cmd": "python",
           "args": [
             "-m",
             "pip",
             "install",
-            "-e"
+            "pipx"
           ]
+        },
+        {
+          "name": "pipx",
+          "cmd": "pipx",
+          "args": true
+        },
+        {
+          "name": "pace",
+          "cmd": "pace",
+          "args": true
         }
       ]
     },
