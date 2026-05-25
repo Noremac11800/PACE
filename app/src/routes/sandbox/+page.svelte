@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
-  import type { LayoutProps } from "./+layout.svelte";
+  import type { LayoutProps } from "./+layout";
 
   const data = getContext<LayoutProps>("data");
   const chipNames = ["layout", "input", "navigation", "overlay"];
@@ -12,13 +12,13 @@
 
 {#snippet chip(name: string)}
   {#if name === chipNames[0]}
-    <span class="chip preset-filled-primary-50-950">{name}</span>
+    <span class="chip preset-filled-primary-500">{name}</span>
   {:else if name === chipNames[1]}
-    <span class="chip preset-filled-warning-50-950">{name}</span>
+    <span class="chip preset-filled-secondary-500">{name}</span>
   {:else if name === chipNames[2]}
-    <span class="chip preset-filled-tertiary-50-950">{name}</span>
+    <span class="chip preset-filled-tertiary-500">{name}</span>
   {:else if name === chipNames[3]}
-    <span class="chip preset-filled-success-50-950">{name}</span>
+    <span class="chip preset-filled-success-500">{name}</span>
   {/if}
 {/snippet}
 

@@ -20,7 +20,7 @@
     class="flex items-center justify-between bg-surface-50-950 px-2 py-1 border-t border-surface-200-800"
   >
     <button
-      class="btn preset-outlined text-xs"
+      class="btn preset-filled-primary-500 text-xs"
       onclick={() => goto("/sandbox")}
     >
       <Bug size={16} />
