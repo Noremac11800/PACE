@@ -15,7 +15,7 @@
   <div
     class="relative min-h-0 bg-surface-100-900/25 flex items-center justify-center p-4"
   >
-    <DepChecks class="w-[60%] min-w-[400px]" />
+    <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
   </div>
 
   <footer
