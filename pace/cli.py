@@ -44,6 +44,7 @@ def main() -> int:
     parser.add_argument(
         "--print-config", action="store_true", help="Print the loaded configuration", default=False
     )
+    parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
