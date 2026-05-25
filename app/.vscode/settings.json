@@ -1,0 +1,8 @@
+{
+  "svelte.enable-ts-plugin": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "i18n-ally.localesPaths": ["src/i18n"],
+  "i18n-ally.keystyle": "nested"
+}

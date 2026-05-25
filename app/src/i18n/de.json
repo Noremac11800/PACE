@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "de",
+    "name": "German"
+  },
+  "auth": {
+    "confirmPassword": "Passwort bestätigen",
+    "continue": "Weitermachen",
+    "currentPassword": "Aktuelles Passwort",
+    "email": "E-Mail",
+    "forgotPassword": "Passwort vergessen?",
+    "login": "Einloggen",
+    "logout": "Abmelden",
+    "newPassword": "Neues Passwort",
+    "password": "Passwort",
+    "rememberMe": "Erinnere dich an mich",
+    "resendCode": "Code erneut senden",
+    "resetPassword": "Passwort zurücksetzen",
+    "signUp": "Melden Sie sich an",
+    "twoFactor": "Zwei-Faktor-Authentifizierung",
+    "verify": "Verifizieren"
+  },
+  "common": {
+    "add": "Hinzufügen",
+    "appName": "PACE",
+    "back": "Zurück",
+    "cancel": "Stornieren",
+    "clear": "Klar",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "copied": "Kopiert",
+    "copy": "Kopie",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "disabled": "Deaktiviert",
+    "done": "Erledigt",
+    "download": "Herunterladen",
+    "edit": "Bearbeiten",
+    "enabled": "Ermöglicht",
+    "loading": "Laden…",
+    "next": "Nächste",
+    "no": "NEIN",
+    "off": "Aus",
+    "on": "An",
+    "optional": "Optional",
+    "previous": "Vorherige",
+    "processing": "Verarbeitung…",
+    "refresh": "Aktualisieren",
+    "remove": "Entfernen",
+    "required": "Erforderlich",
+    "retry": "Wiederholen",
+    "save": "Speichern",
+    "saving": "Sparen…",
+    "search": "Suchen",
+    "submit": "Einreichen",
+    "update": "Aktualisieren",
+    "upload": "Hochladen",
+    "yes": "Ja"
+  },
+  "confirmations": {
+    "deleteBody": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteTitle": "Dieses Element löschen?",
+    "logoutBody": "Sie müssen sich erneut anmelden, um fortzufahren.",
+    "logoutTitle": "Abmelden?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Freitag",
+      "monday": "Montag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag",
+      "thursday": "Donnerstag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch"
+    },
+    "months": {
+      "april": "April",
+      "august": "August",
+      "december": "Dezember",
+      "february": "Februar",
+      "january": "Januar",
+      "july": "Juli",
+      "june": "Juni",
+      "march": "Marsch",
+      "may": "Mai",
+      "november": "November",
+      "october": "Oktober",
+      "september": "September"
+    },
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "yesterday": "Gestern"
+  },
+  "emptyStates": {
+    "noData": "Noch nichts zu zeigen.",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "tryAdjustingFilters": "Versuchen Sie, Ihre Suche oder Filter anzupassen."
+  },
+  "errors": {
+    "forbidden": "Zugriff verweigert.",
+    "network": "Netzwerkfehler. \nBitte überprüfen Sie Ihre Verbindung.",
+    "notFound": "Nicht gefunden.",
+    "server": "Serverfehler. \nBitte versuchen Sie es später noch einmal.",
+    "timeout": "Zeitüberschreitung bei der Anfrage. \nBitte versuchen Sie es erneut.",
+    "title": "Etwas ist schief gelaufen",
+    "unauthorized": "Sie sind nicht berechtigt, diese Aktion durchzuführen.",
+    "unknown": "Es ist ein unerwarteter Fehler aufgetreten."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresse",
+      "city": "Stadt",
+      "country": "Land",
+      "description": "Beschreibung",
+      "email": "E-Mail",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "name": "Name",
+      "notes": "Notizen",
+      "phone": "Telefon",
+      "postcode": "Postleitzahl",
+      "state": "Zustand"
+    },
+    "placeholders": {
+      "search": "Suchen…",
+      "select": "Wählen…",
+      "typeHere": "Geben Sie hier ein..."
+    }
+  },
+  "nav": {
+    "account": "Konto",
+    "admin": "Admin",
+    "dashboard": "Armaturenbrett",
+    "help": "Helfen",
+    "home": "Heim",
+    "logout": "Abmelden",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "support": "Unterstützung"
+  },
+  "toast": {
+    "copied": "In die Zwischenablage kopiert.",
+    "created": "Erfolgreich erstellt.",
+    "deleted": "Erfolgreich gelöscht.",
+    "error": "Fehler",
+    "saved": "Erfolgreich gespeichert.",
+    "success": "Erfolg",
+    "tryAgain": "Bitte versuchen Sie es erneut.",
+    "updated": "Erfolgreich aktualisiert."
+  },
+  "validation": {
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "invalid": "Dieser Wert ist ungültig.",
+    "max": "Darf höchstens {max} sein.",
+    "maxLength": "Darf höchstens {max} Zeichen lang sein.",
+    "min": "Muss mindestens {min} sein.",
+    "minLength": "Muss mindestens {min} Zeichen lang sein.",
+    "passwordMismatch": "Passwörter stimmen nicht überein.",
+    "required": "Dieses Feld ist erforderlich."
+  }
+}

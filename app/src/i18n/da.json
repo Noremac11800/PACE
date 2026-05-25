@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "da",
+    "name": "Danish"
+  },
+  "auth": {
+    "confirmPassword": "Bekræft adgangskode",
+    "continue": "Fortsætte",
+    "currentPassword": "Nuværende adgangskode",
+    "email": "E-mail",
+    "forgotPassword": "Glemt adgangskode?",
+    "login": "Log ind",
+    "logout": "Log ud",
+    "newPassword": "Ny adgangskode",
+    "password": "Adgangskode",
+    "rememberMe": "Husk mig",
+    "resendCode": "Send kode igen",
+    "resetPassword": "Nulstil adgangskode",
+    "signUp": "Tilmeld dig",
+    "twoFactor": "To-faktor autentificering",
+    "verify": "Verificere"
+  },
+  "common": {
+    "add": "Tilføje",
+    "appName": "PACE",
+    "back": "Tilbage",
+    "cancel": "Ophæve",
+    "clear": "Klar",
+    "close": "Tæt",
+    "confirm": "Bekræfte",
+    "copied": "Kopieret",
+    "copy": "Kopi",
+    "create": "Skabe",
+    "delete": "Slet",
+    "disabled": "Handicappet",
+    "done": "Færdig",
+    "download": "Download",
+    "edit": "Redigere",
+    "enabled": "Aktiveret",
+    "loading": "Indlæser...",
+    "next": "Næste",
+    "no": "Ingen",
+    "off": "Slukket",
+    "on": "På",
+    "optional": "Valgfri",
+    "previous": "Tidligere",
+    "processing": "Forarbejdning…",
+    "refresh": "Opfriske",
+    "remove": "Fjerne",
+    "required": "Påkrævet",
+    "retry": "Prøv igen",
+    "save": "Spare",
+    "saving": "Gemmer...",
+    "search": "Søge",
+    "submit": "Indsend",
+    "update": "Opdatering",
+    "upload": "Upload",
+    "yes": "Ja"
+  },
+  "confirmations": {
+    "deleteBody": "Denne handling kan ikke fortrydes.",
+    "deleteTitle": "Vil du slette dette element?",
+    "logoutBody": "Du skal logge på igen for at fortsætte.",
+    "logoutTitle": "Log ud?"
+  },
+  "dates": {
+    "days": {
+      "friday": "fredag",
+      "monday": "mandag",
+      "saturday": "lørdag",
+      "sunday": "søndag",
+      "thursday": "torsdag",
+      "tuesday": "tirsdag",
+      "wednesday": "onsdag"
+    },
+    "months": {
+      "april": "april",
+      "august": "august",
+      "december": "december",
+      "february": "februar",
+      "january": "januar",
+      "july": "juli",
+      "june": "juni",
+      "march": "marts",
+      "may": "maj",
+      "november": "november",
+      "october": "oktober",
+      "september": "september"
+    },
+    "today": "I dag",
+    "tomorrow": "I morgen",
+    "yesterday": "I går"
+  },
+  "emptyStates": {
+    "noData": "Intet at vise endnu.",
+    "noResults": "Ingen resultater fundet.",
+    "tryAdjustingFilters": "Prøv at justere din søgning eller dine filtre."
+  },
+  "errors": {
+    "forbidden": "Adgang nægtet.",
+    "network": "Netværksfejl. \nTjek venligst din forbindelse.",
+    "notFound": "Ikke fundet.",
+    "server": "Serverfejl. \nPrøv venligst igen senere.",
+    "timeout": "Anmodningen fik timeout. \nPrøv venligst igen.",
+    "title": "Noget gik galt",
+    "unauthorized": "Du er ikke autoriseret til at udføre denne handling.",
+    "unknown": "Der opstod en uventet fejl."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresse",
+      "city": "By",
+      "country": "Land",
+      "description": "Beskrivelse",
+      "email": "E-mail",
+      "firstName": "Fornavn",
+      "lastName": "Efternavn",
+      "name": "Navn",
+      "notes": "Noter",
+      "phone": "Telefon",
+      "postcode": "postnummer",
+      "state": "Tilstand"
+    },
+    "placeholders": {
+      "search": "Søge…",
+      "select": "Vælge…",
+      "typeHere": "Skriv her..."
+    }
+  },
+  "nav": {
+    "account": "Konto",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "help": "Hjælp",
+    "home": "Hjem",
+    "logout": "Log ud",
+    "profile": "Profil",
+    "settings": "Indstillinger",
+    "support": "Støtte"
+  },
+  "toast": {
+    "copied": "Kopieret til udklipsholder.",
+    "created": "Oprettet med succes.",
+    "deleted": "Slettet med succes.",
+    "error": "Fejl",
+    "saved": "Gemt.",
+    "success": "Succes",
+    "tryAgain": "Prøv venligst igen.",
+    "updated": "Opdateret med succes."
+  },
+  "validation": {
+    "email": "Indtast venligst en gyldig e-mailadresse.",
+    "invalid": "Denne værdi er ugyldig.",
+    "max": "Må højst være {maks.}.",
+    "maxLength": "Må højst være på {maks.} tegn.",
+    "min": "Skal være mindst {min}.",
+    "minLength": "Skal være mindst {min} tegn.",
+    "passwordMismatch": "Adgangskoder stemmer ikke overens.",
+    "required": "Dette felt er påkrævet."
+  }
+}

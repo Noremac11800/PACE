@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "fi",
+    "name": "Finnish"
+  },
+  "auth": {
+    "confirmPassword": "Vahvista salasana",
+    "continue": "Jatkaa",
+    "currentPassword": "Nykyinen salasana",
+    "email": "Sähköposti",
+    "forgotPassword": "Unohditko salasanan?",
+    "login": "Kirjaudu sisään",
+    "logout": "Kirjaudu ulos",
+    "newPassword": "Uusi salasana",
+    "password": "Salasana",
+    "rememberMe": "Muista minut",
+    "resendCode": "Lähetä koodi uudelleen",
+    "resetPassword": "Palauta salasana",
+    "signUp": "Rekisteröidy",
+    "twoFactor": "Kaksivaiheinen todennus",
+    "verify": "Vahvista"
+  },
+  "common": {
+    "add": "Lisätä",
+    "appName": "PACE",
+    "back": "Takaisin",
+    "cancel": "Peruuttaa",
+    "clear": "Selkeä",
+    "close": "Lähellä",
+    "confirm": "Vahvistaa",
+    "copied": "Kopioitu",
+    "copy": "Kopioida",
+    "create": "Luoda",
+    "delete": "Poistaa",
+    "disabled": "Pois käytöstä",
+    "done": "Tehty",
+    "download": "Lataa",
+    "edit": "Muokata",
+    "enabled": "Käytössä",
+    "loading": "Ladataan…",
+    "next": "Seuraavaksi",
+    "no": "Ei",
+    "off": "Pois",
+    "on": "Päällä",
+    "optional": "Valinnainen",
+    "previous": "Edellinen",
+    "processing": "Käsitellään…",
+    "refresh": "Päivitä",
+    "remove": "Poistaa",
+    "required": "Pakollinen",
+    "retry": "Yritä uudelleen",
+    "save": "Tallentaa",
+    "saving": "Tallennetaan…",
+    "search": "Haku",
+    "submit": "Lähetä",
+    "update": "Päivittää",
+    "upload": "Lataa",
+    "yes": "Kyllä"
+  },
+  "confirmations": {
+    "deleteBody": "Tätä toimintoa ei voi kumota.",
+    "deleteTitle": "Poistetaanko tämä kohde?",
+    "logoutBody": "Sinun on kirjauduttava uudelleen sisään jatkaaksesi.",
+    "logoutTitle": "Kirjaudu ulos?"
+  },
+  "dates": {
+    "days": {
+      "friday": "perjantai",
+      "monday": "maanantai",
+      "saturday": "lauantai",
+      "sunday": "sunnuntai",
+      "thursday": "torstai",
+      "tuesday": "tiistai",
+      "wednesday": "keskiviikko"
+    },
+    "months": {
+      "april": "huhtikuu",
+      "august": "elokuu",
+      "december": "joulukuu",
+      "february": "helmikuu",
+      "january": "tammikuu",
+      "july": "heinäkuu",
+      "june": "kesäkuuta",
+      "march": "maaliskuuta",
+      "may": "toukokuuta",
+      "november": "marraskuu",
+      "october": "lokakuu",
+      "september": "syyskuu"
+    },
+    "today": "Tänään",
+    "tomorrow": "Huomenna",
+    "yesterday": "Eilen"
+  },
+  "emptyStates": {
+    "noData": "Ei vielä mitään näytettävää.",
+    "noResults": "Tuloksia ei löytynyt.",
+    "tryAdjustingFilters": "Yritä säätää hakua tai suodattimia."
+  },
+  "errors": {
+    "forbidden": "Käyttö estetty.",
+    "network": "Verkkovirhe. \nTarkista yhteys.",
+    "notFound": "Ei löytynyt.",
+    "server": "Palvelinvirhe. \nYritä myöhemmin uudelleen.",
+    "timeout": "Pyyntö aikakatkaistiin. \nYritä uudelleen.",
+    "title": "Jotain meni pieleen",
+    "unauthorized": "Sinulla ei ole valtuuksia suorittaa tätä toimintoa.",
+    "unknown": "Tapahtui odottamaton virhe."
+  },
+  "forms": {
+    "labels": {
+      "address": "Osoite",
+      "city": "Kaupunki",
+      "country": "Maa",
+      "description": "Kuvaus",
+      "email": "Sähköposti",
+      "firstName": "Etunimi",
+      "lastName": "Sukunimi",
+      "name": "Nimi",
+      "notes": "Huomautuksia",
+      "phone": "Puhelin",
+      "postcode": "Postinumero",
+      "state": "Osavaltio"
+    },
+    "placeholders": {
+      "search": "Haku…",
+      "select": "Valitse…",
+      "typeHere": "Kirjoita tähän…"
+    }
+  },
+  "nav": {
+    "account": "Tili",
+    "admin": "Admin",
+    "dashboard": "Kojelauta",
+    "help": "Auttaa",
+    "home": "Kotiin",
+    "logout": "Kirjaudu ulos",
+    "profile": "Profiili",
+    "settings": "Asetukset",
+    "support": "Tukea"
+  },
+  "toast": {
+    "copied": "Kopioitu leikepöydälle.",
+    "created": "Luotu onnistuneesti.",
+    "deleted": "Poisto onnistui.",
+    "error": "Virhe",
+    "saved": "Tallennettu onnistuneesti.",
+    "success": "Menestys",
+    "tryAgain": "Yritä uudelleen.",
+    "updated": "Päivitetty onnistuneesti."
+  },
+  "validation": {
+    "email": "Anna kelvollinen sähköpostiosoite.",
+    "invalid": "Tämä arvo on virheellinen.",
+    "max": "Saa olla enintään {max}.",
+    "maxLength": "Saa olla enintään {max} merkkiä.",
+    "min": "On oltava vähintään {min}.",
+    "minLength": "On oltava vähintään {min} merkkiä.",
+    "passwordMismatch": "Salasanat eivät täsmää.",
+    "required": "Tämä kenttä on pakollinen."
+  }
+}

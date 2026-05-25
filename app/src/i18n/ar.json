@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "ar",
+    "name": "Arabic"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "newPassword": "كلمة المرور الجديدة",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرنى",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "continue": "يكمل",
+    "currentPassword": "كلمة المرور الحالية",
+    "email": "بريد إلكتروني",
+    "forgotPassword": "هل نسيت كلمة السر؟",
+    "resendCode": "إعادة إرسال الرمز",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "signUp": "اشتراك",
+    "twoFactor": "المصادقة الثنائية",
+    "verify": "يؤكد"
+  },
+  "confirmations": {
+    "deleteBody": "لا يمكن التراجع عن هذا الإجراء.",
+    "deleteTitle": "هل تريد حذف هذا العنصر؟",
+    "logoutBody": "سوف تحتاج إلى تسجيل الدخول مرة أخرى للمتابعة.",
+    "logoutTitle": "تسجيل الخروج؟"
+  },
+  "dates": {
+    "days": {
+      "friday": "جمعة",
+      "monday": "الاثنين",
+      "saturday": "السبت",
+      "sunday": "الأحد",
+      "thursday": "يوم الخميس",
+      "tuesday": "يوم الثلاثاء",
+      "wednesday": "الأربعاء"
+    },
+    "months": {
+      "april": "أبريل",
+      "august": "أغسطس",
+      "december": "ديسمبر",
+      "february": "فبراير",
+      "january": "يناير",
+      "july": "يوليو",
+      "june": "يونيو",
+      "march": "يمشي",
+      "may": "يمكن",
+      "november": "نوفمبر",
+      "october": "أكتوبر",
+      "september": "سبتمبر"
+    },
+    "today": "اليوم",
+    "tomorrow": "غداً",
+    "yesterday": "أمس"
+  },
+  "emptyStates": {
+    "noData": "لا شيء لإظهاره حتى الآن.",
+    "noResults": "لم يتم العثور على نتائج.",
+    "tryAdjustingFilters": "حاول تعديل بحثك أو عوامل التصفية."
+  },
+  "errors": {
+    "forbidden": "تم الرفض.",
+    "network": "خطأ في الشبكة. \nيرجى التحقق من الاتصال الخاص بك.",
+    "notFound": "لم يتم العثور عليه.",
+    "server": "خطأ في الخادم. \nيرجى المحاولة مرة أخرى في وقت لاحق.",
+    "timeout": "انتهت مهلة الطلب. \nيرجى المحاولة مرة أخرى.",
+    "title": "حدث خطأ ما",
+    "unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء.",
+    "unknown": "حدث خطأ غير متوقع."
+  },
+  "forms": {
+    "labels": {
+      "address": "عنوان",
+      "city": "مدينة",
+      "country": "دولة",
+      "description": "وصف",
+      "email": "بريد إلكتروني",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "name": "اسم",
+      "notes": "ملحوظات",
+      "phone": "هاتف",
+      "postcode": "شفرة البريد",
+      "state": "ولاية"
+    },
+    "placeholders": {
+      "search": "يبحث…",
+      "select": "يختار…",
+      "typeHere": "اكتب هنا…"
+    }
+  },
+  "nav": {
+    "account": "حساب",
+    "admin": "مسؤل",
+    "dashboard": "لوحة القيادة",
+    "help": "يساعد",
+    "home": "بيت",
+    "logout": "تسجيل الخروج",
+    "profile": "حساب تعريفي",
+    "settings": "إعدادات",
+    "support": "يدعم"
+  },
+  "toast": {
+    "copied": "تم النسخ إلى الحافظة.",
+    "created": "تم الإنشاء بنجاح.",
+    "deleted": "تم الحذف بنجاح.",
+    "error": "خطأ",
+    "saved": "تم الحفظ بنجاح.",
+    "success": "نجاح",
+    "tryAgain": "يرجى المحاولة مرة أخرى.",
+    "updated": "تم التحديث بنجاح."
+  },
+  "validation": {
+    "email": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+    "invalid": "هذه القيمة غير صالحة.",
+    "max": "يجب أن يكون الحد الأقصى {max}.",
+    "maxLength": "يجب أن يكون عدد الأحرف {max} على الأكثر.",
+    "min": "يجب أن يكون على الأقل {دقيقة}.",
+    "minLength": "يجب أن لا يقل عدد الأحرف عن {min}.",
+    "passwordMismatch": "كلمات المرور غير متطابقة.",
+    "required": "هذه الخانة مطلوبه."
+  },
+  "common": {
+    "add": "يضيف",
+    "appName": "PACE",
+    "back": "خلف",
+    "cancel": "يلغي",
+    "clear": "واضح",
+    "close": "يغلق",
+    "confirm": "يتأكد",
+    "copied": "منقول",
+    "copy": "ينسخ",
+    "create": "يخلق",
+    "delete": "يمسح",
+    "disabled": "عاجز",
+    "done": "منتهي",
+    "download": "تحميل",
+    "edit": "يحرر",
+    "enabled": "ممكّن",
+    "loading": "تحميل…",
+    "next": "التالي",
+    "no": "لا",
+    "off": "عن",
+    "on": "على",
+    "optional": "خياري",
+    "previous": "سابق",
+    "processing": "يعالج…",
+    "refresh": "ينعش",
+    "remove": "يزيل",
+    "required": "مطلوب",
+    "retry": "أعد المحاولة",
+    "save": "يحفظ",
+    "saving": "توفير…",
+    "search": "يبحث",
+    "submit": "يُقدِّم",
+    "update": "تحديث",
+    "upload": "رفع",
+    "yes": "نعم"
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "cs",
+    "name": "Czech"
+  },
+  "auth": {
+    "confirmPassword": "Potvrďte heslo",
+    "continue": "Pokračovat",
+    "currentPassword": "Aktuální heslo",
+    "email": "E-mail",
+    "forgotPassword": "Zapomněli jste heslo?",
+    "login": "Přihlaste se",
+    "logout": "Odhlaste se",
+    "newPassword": "Nové heslo",
+    "password": "Heslo",
+    "rememberMe": "Pamatuj si mě",
+    "resendCode": "Znovu odeslat kód",
+    "resetPassword": "Obnovit heslo",
+    "signUp": "Zaregistrujte se",
+    "twoFactor": "Dvoufaktorová autentizace",
+    "verify": "Ověřte"
+  },
+  "common": {
+    "add": "Přidat",
+    "appName": "PACE",
+    "back": "Zadní",
+    "cancel": "Zrušit",
+    "clear": "Jasný",
+    "close": "Blízko",
+    "confirm": "Potvrdit",
+    "copied": "Zkopírováno",
+    "copy": "Kopie",
+    "create": "Vytvořit",
+    "delete": "Vymazat",
+    "disabled": "Zakázáno",
+    "done": "Hotovo",
+    "download": "Stáhnout",
+    "edit": "Upravit",
+    "enabled": "Povoleno",
+    "loading": "Načítání…",
+    "next": "Další",
+    "no": "Žádný",
+    "off": "Vypnuto",
+    "on": "Na",
+    "optional": "Volitelný",
+    "previous": "Předchozí",
+    "processing": "Zpracovává se…",
+    "refresh": "Obnovit",
+    "remove": "Odstranit",
+    "required": "Požadovaný",
+    "retry": "Zkuste to znovu",
+    "save": "Uložit",
+    "saving": "Ukládání…",
+    "search": "Vyhledávání",
+    "submit": "Předložit",
+    "update": "Aktualizovat",
+    "upload": "Nahrát",
+    "yes": "Ano"
+  },
+  "confirmations": {
+    "deleteBody": "Tuto akci nelze vrátit zpět.",
+    "deleteTitle": "Smazat tuto položku?",
+    "logoutBody": "Pro pokračování se budete muset znovu přihlásit.",
+    "logoutTitle": "Odhlásit se?"
+  },
+  "dates": {
+    "days": {
+      "friday": "pátek",
+      "monday": "pondělí",
+      "saturday": "sobota",
+      "sunday": "neděle",
+      "thursday": "čtvrtek",
+      "tuesday": "úterý",
+      "wednesday": "středa"
+    },
+    "months": {
+      "april": "duben",
+      "august": "srpen",
+      "december": "prosinec",
+      "february": "únor",
+      "january": "leden",
+      "july": "červenec",
+      "june": "červen",
+      "march": "Pochod",
+      "may": "květen",
+      "november": "listopad",
+      "october": "říjen",
+      "september": "září"
+    },
+    "today": "Dnes",
+    "tomorrow": "Zítra",
+    "yesterday": "Včera"
+  },
+  "emptyStates": {
+    "noData": "Zatím není co ukázat.",
+    "noResults": "Nebyly nalezeny žádné výsledky.",
+    "tryAdjustingFilters": "Zkuste upravit vyhledávání nebo filtry."
+  },
+  "errors": {
+    "forbidden": "Přístup odepřen.",
+    "network": "Chyba sítě. \nZkontrolujte prosím své připojení.",
+    "notFound": "Nenalezeno.",
+    "server": "Chyba serveru. \nZkuste to znovu později.",
+    "timeout": "Časový limit požadavku vypršel. \nZkuste to prosím znovu.",
+    "title": "Něco se pokazilo",
+    "unauthorized": "K provedení této akce nemáte oprávnění.",
+    "unknown": "Došlo k neočekávané chybě."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresa",
+      "city": "Město",
+      "country": "Země",
+      "description": "Popis",
+      "email": "E-mail",
+      "firstName": "Křestní jméno",
+      "lastName": "Příjmení",
+      "name": "Jméno",
+      "notes": "Poznámky",
+      "phone": "Telefon",
+      "postcode": "PSČ",
+      "state": "Stát"
+    },
+    "placeholders": {
+      "search": "Vyhledávání…",
+      "select": "Vybrat…",
+      "typeHere": "Sem napište…"
+    }
+  },
+  "nav": {
+    "account": "Účet",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "help": "Pomoc",
+    "home": "Domov",
+    "logout": "Odhlaste se",
+    "profile": "Profil",
+    "settings": "Nastavení",
+    "support": "Podpora"
+  },
+  "toast": {
+    "copied": "Zkopírováno do schránky.",
+    "created": "Úspěšně vytvořeno.",
+    "deleted": "Úspěšně smazáno.",
+    "error": "Chyba",
+    "saved": "Úspěšně uloženo.",
+    "success": "Úspěch",
+    "tryAgain": "Zkuste to prosím znovu.",
+    "updated": "Úspěšně aktualizováno."
+  },
+  "validation": {
+    "email": "Zadejte prosím platnou e-mailovou adresu.",
+    "invalid": "Tato hodnota je neplatná.",
+    "max": "Musí být maximálně {max}.",
+    "maxLength": "Maximální počet znaků je {max}.",
+    "min": "Musí být alespoň {min}.",
+    "minLength": "Musí obsahovat alespoň {min} znaků.",
+    "passwordMismatch": "Hesla se neshodují.",
+    "required": "Toto pole je povinné."
+  }
+}

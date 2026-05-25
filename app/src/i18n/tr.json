@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "tr",
+    "name": "Turkish"
+  },
+  "auth": {
+    "confirmPassword": "Şifreyi onayla",
+    "continue": "Devam etmek",
+    "currentPassword": "Mevcut Şifre",
+    "email": "E-posta",
+    "forgotPassword": "Parolanızı mı unuttunuz?",
+    "login": "Giriş yapmak",
+    "logout": "Oturumu kapat",
+    "newPassword": "Yeni Şifre",
+    "password": "Şifre",
+    "rememberMe": "Beni Hatırla",
+    "resendCode": "Kodu yeniden gönder",
+    "resetPassword": "Şifreyi sıfırla",
+    "signUp": "Üye olmak",
+    "twoFactor": "İki faktörlü kimlik doğrulama",
+    "verify": "Doğrulamak"
+  },
+  "common": {
+    "add": "Eklemek",
+    "appName": "PACE",
+    "back": "Geri",
+    "cancel": "İptal etmek",
+    "clear": "Temizlemek",
+    "close": "Kapalı",
+    "confirm": "Onaylamak",
+    "copied": "Kopyalandı",
+    "copy": "Kopyala",
+    "create": "Yaratmak",
+    "delete": "Silmek",
+    "disabled": "Engelli",
+    "done": "Tamamlamak",
+    "download": "İndirmek",
+    "edit": "Düzenlemek",
+    "enabled": "Etkinleştirilmiş",
+    "loading": "Yükleniyor…",
+    "next": "Sonraki",
+    "no": "HAYIR",
+    "off": "Kapalı",
+    "on": "Açık",
+    "optional": "İsteğe bağlı",
+    "previous": "Öncesi",
+    "processing": "İşleme…",
+    "refresh": "Yenile",
+    "remove": "Kaldırmak",
+    "required": "Gerekli",
+    "retry": "Yeniden dene",
+    "save": "Kaydetmek",
+    "saving": "Kaydediliyor…",
+    "search": "Aramak",
+    "submit": "Göndermek",
+    "update": "Güncelleme",
+    "upload": "Yüklemek",
+    "yes": "Evet"
+  },
+  "confirmations": {
+    "deleteBody": "Bu eylem geri alınamaz.",
+    "deleteTitle": "Bu öğe silinsin mi?",
+    "logoutBody": "Devam etmek için tekrar giriş yapmanız gerekecek.",
+    "logoutTitle": "Oturumu kapatmak mı istiyorsunuz?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Cuma",
+      "monday": "Pazartesi",
+      "saturday": "Cumartesi",
+      "sunday": "Pazar",
+      "thursday": "Perşembe",
+      "tuesday": "Salı",
+      "wednesday": "Çarşamba"
+    },
+    "months": {
+      "april": "Nisan",
+      "august": "Ağustos",
+      "december": "Aralık",
+      "february": "Şubat",
+      "january": "Ocak",
+      "july": "Temmuz",
+      "june": "Haziran",
+      "march": "Mart",
+      "may": "Mayıs",
+      "november": "Kasım",
+      "october": "Ekim",
+      "september": "Eylül"
+    },
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "yesterday": "Dün"
+  },
+  "emptyStates": {
+    "noData": "Henüz gösterilecek bir şey yok.",
+    "noResults": "Sonuç bulunamadı.",
+    "tryAdjustingFilters": "Aramanızı veya filtrelerinizi ayarlamayı deneyin."
+  },
+  "errors": {
+    "forbidden": "Erişim engellendi.",
+    "network": "Ağ hatası. \nLütfen bağlantınızı kontrol edin.",
+    "notFound": "Bulunamadı.",
+    "server": "Sunucu hatası. \nLütfen daha sonra tekrar deneyin.",
+    "timeout": "İstek zaman aşımına uğradı. \nLütfen tekrar deneyin.",
+    "title": "Bir şeyler ters gitti",
+    "unauthorized": "Bu eylemi gerçekleştirme yetkiniz yok.",
+    "unknown": "Beklenmeyen bir hata oluştu."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adres",
+      "city": "Şehir",
+      "country": "Ülke",
+      "description": "Tanım",
+      "email": "E-posta",
+      "firstName": "İlk adı",
+      "lastName": "Soy isim",
+      "name": "İsim",
+      "notes": "Notlar",
+      "phone": "Telefon",
+      "postcode": "Posta kodu",
+      "state": "Durum"
+    },
+    "placeholders": {
+      "search": "Aramak…",
+      "select": "Seçme…",
+      "typeHere": "Buraya yazın…"
+    }
+  },
+  "nav": {
+    "account": "Hesap",
+    "admin": "Yönetici",
+    "dashboard": "Kontrol Paneli",
+    "help": "Yardım",
+    "home": "Ev",
+    "logout": "Oturumu kapat",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "support": "Destek"
+  },
+  "toast": {
+    "copied": "Panoya kopyalandı.",
+    "created": "Başarıyla oluşturuldu.",
+    "deleted": "Başarıyla silindi.",
+    "error": "Hata",
+    "saved": "Başarıyla kaydedildi.",
+    "success": "Başarı",
+    "tryAgain": "Lütfen tekrar deneyin.",
+    "updated": "Başarıyla güncellendi."
+  },
+  "validation": {
+    "email": "Geçerli bir e.",
+    "invalid": "Bu değer geçersiz.",
+    "max": "En fazla {max} olmalıdır.",
+    "maxLength": "En fazla {max} karakter olmalıdır.",
+    "min": "En az {min} olmalıdır.",
+    "minLength": "En az {min} karakter olmalıdır.",
+    "passwordMismatch": "Şifreler eşleşmiyor.",
+    "required": "Bu alan gereklidir."
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "ko",
+    "name": "Korean"
+  },
+  "auth": {
+    "confirmPassword": "비밀번호 확인",
+    "continue": "계속하다",
+    "currentPassword": "현재 비밀번호",
+    "email": "이메일",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "newPassword": "새 비밀번호",
+    "password": "비밀번호",
+    "rememberMe": "나를 기억해",
+    "resendCode": "코드 재전송",
+    "resetPassword": "비밀번호 재설정",
+    "signUp": "가입",
+    "twoFactor": "이중 인증",
+    "verify": "확인하다"
+  },
+  "common": {
+    "add": "추가하다",
+    "appName": "에듀퀵",
+    "back": "뒤쪽에",
+    "cancel": "취소",
+    "clear": "분명한",
+    "close": "닫다",
+    "confirm": "확인하다",
+    "copied": "복사됨",
+    "copy": "복사",
+    "create": "만들다",
+    "delete": "삭제",
+    "disabled": "장애가 있는",
+    "done": "완료",
+    "download": "다운로드",
+    "edit": "편집하다",
+    "enabled": "활성화됨",
+    "loading": "로드 중…",
+    "next": "다음",
+    "no": "아니요",
+    "off": "끄다",
+    "on": "~에",
+    "optional": "선택 과목",
+    "previous": "이전의",
+    "processing": "처리 중…",
+    "refresh": "새로 고치다",
+    "remove": "제거하다",
+    "required": "필수의",
+    "retry": "다시 해 보다",
+    "save": "구하다",
+    "saving": "절약…",
+    "search": "찾다",
+    "submit": "제출하다",
+    "update": "업데이트",
+    "upload": "업로드",
+    "yes": "예"
+  },
+  "confirmations": {
+    "deleteBody": "이 작업은 취소할 수 없습니다.",
+    "deleteTitle": "이 항목을 삭제하시겠습니까?",
+    "logoutBody": "계속하려면 다시 로그인해야 합니다.",
+    "logoutTitle": "로그아웃하시겠습니까?"
+  },
+  "dates": {
+    "days": {
+      "friday": "금요일",
+      "monday": "월요일",
+      "saturday": "토요일",
+      "sunday": "일요일",
+      "thursday": "목요일",
+      "tuesday": "화요일",
+      "wednesday": "수요일"
+    },
+    "months": {
+      "april": "4월",
+      "august": "팔월",
+      "december": "12월",
+      "february": "2월",
+      "january": "1월",
+      "july": "칠월",
+      "june": "6월",
+      "march": "3월",
+      "may": "5월",
+      "november": "십일월",
+      "october": "십월",
+      "september": "구월"
+    },
+    "today": "오늘",
+    "tomorrow": "내일",
+    "yesterday": "어제"
+  },
+  "emptyStates": {
+    "noData": "아직 표시할 내용이 없습니다.",
+    "noResults": "검색된 결과가 없습니다.",
+    "tryAdjustingFilters": "검색이나 필터를 조정해 보세요."
+  },
+  "errors": {
+    "forbidden": "접근 불가.",
+    "network": "네트워크 오류입니다. \n연결을 확인해주세요.",
+    "notFound": "찾을 수 없습니다.",
+    "server": "서버 오류입니다. \n나중에 다시 시도해 주세요.",
+    "timeout": "요청 시간이 초과되었습니다. \n다시 시도해 주세요.",
+    "title": "문제가 발생했습니다.",
+    "unauthorized": "이 작업을 수행할 권한이 없습니다.",
+    "unknown": "예상치 못한 오류가 발생했습니다."
+  },
+  "forms": {
+    "labels": {
+      "address": "주소",
+      "city": "도시",
+      "country": "국가",
+      "description": "설명",
+      "email": "이메일",
+      "firstName": "이름",
+      "lastName": "성",
+      "name": "이름",
+      "notes": "메모",
+      "phone": "핸드폰",
+      "postcode": "우편번호",
+      "state": "상태"
+    },
+    "placeholders": {
+      "search": "찾다…",
+      "select": "선택하다…",
+      "typeHere": "여기에 입력하세요..."
+    }
+  },
+  "nav": {
+    "account": "계정",
+    "admin": "관리자",
+    "dashboard": "계기반",
+    "help": "돕다",
+    "home": "집",
+    "logout": "로그아웃",
+    "profile": "윤곽",
+    "settings": "설정",
+    "support": "지원하다"
+  },
+  "toast": {
+    "copied": "클립보드에 복사되었습니다.",
+    "created": "성공적으로 생성되었습니다.",
+    "deleted": "삭제되었습니다.",
+    "error": "오류",
+    "saved": "성공적으로 저장되었습니다.",
+    "success": "성공",
+    "tryAgain": "다시 시도해 주세요.",
+    "updated": "성공적으로 업데이트되었습니다."
+  },
+  "validation": {
+    "email": "유효한 이메일 주소를 입력하세요.",
+    "invalid": "이 값은 유효하지 않습니다.",
+    "max": "최대 {max}여야 합니다.",
+    "maxLength": "최대 {max}자여야 합니다.",
+    "min": "최소 {min} 이상이어야 합니다.",
+    "minLength": "{min}자 이상이어야 합니다.",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다.",
+    "required": "이 필드는 필수입니다."
+  }
+}

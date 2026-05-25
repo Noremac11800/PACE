@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "no",
+    "name": "Norwegian"
+  },
+  "auth": {
+    "confirmPassword": "Bekreft passord",
+    "continue": "Fortsette",
+    "currentPassword": "Gjeldende passord",
+    "email": "E-post",
+    "forgotPassword": "Glemt passord?",
+    "login": "Logg inn",
+    "logout": "Logg ut",
+    "newPassword": "Nytt passord",
+    "password": "Passord",
+    "rememberMe": "Husk meg",
+    "resendCode": "Send kode på nytt",
+    "resetPassword": "Tilbakestill passord",
+    "signUp": "Registrer deg",
+    "twoFactor": "To-faktor autentisering",
+    "verify": "Verifisere"
+  },
+  "common": {
+    "add": "Legge til",
+    "appName": "PACE",
+    "back": "Tilbake",
+    "cancel": "Kansellere",
+    "clear": "Klar",
+    "close": "Lukke",
+    "confirm": "Bekrefte",
+    "copied": "Kopiert",
+    "copy": "Kopiere",
+    "create": "Skape",
+    "delete": "Slett",
+    "disabled": "Funksjonshemmet",
+    "done": "Ferdig",
+    "download": "Last ned",
+    "edit": "Redigere",
+    "enabled": "Aktivert",
+    "loading": "Laster inn …",
+    "next": "Neste",
+    "no": "Ingen",
+    "off": "Av",
+    "on": "På",
+    "optional": "Valgfri",
+    "previous": "Tidligere",
+    "processing": "Behandling…",
+    "refresh": "Forfriske",
+    "remove": "Fjerne",
+    "required": "Obligatorisk",
+    "retry": "Prøv på nytt",
+    "save": "Spare",
+    "saving": "Lagrer …",
+    "search": "Søk",
+    "submit": "Send inn",
+    "update": "Oppdater",
+    "upload": "Last opp",
+    "yes": "Ja"
+  },
+  "confirmations": {
+    "deleteBody": "Denne handlingen kan ikke angres.",
+    "deleteTitle": "Vil du slette dette elementet?",
+    "logoutBody": "Du må logge på igjen for å fortsette.",
+    "logoutTitle": "Logge ut?"
+  },
+  "dates": {
+    "days": {
+      "friday": "fredag",
+      "monday": "mandag",
+      "saturday": "lørdag",
+      "sunday": "søndag",
+      "thursday": "torsdag",
+      "tuesday": "tirsdag",
+      "wednesday": "onsdag"
+    },
+    "months": {
+      "april": "april",
+      "august": "august",
+      "december": "desember",
+      "february": "februar",
+      "january": "januar",
+      "july": "juli",
+      "june": "juni",
+      "march": "mars",
+      "may": "mai",
+      "november": "november",
+      "october": "oktober",
+      "september": "september"
+    },
+    "today": "I dag",
+    "tomorrow": "I morgen",
+    "yesterday": "I går"
+  },
+  "emptyStates": {
+    "noData": "Ingenting å vise ennå.",
+    "noResults": "Ingen resultater funnet.",
+    "tryAdjustingFilters": "Prøv å justere søket eller filtrene."
+  },
+  "errors": {
+    "forbidden": "Tilgang nektet.",
+    "network": "Nettverksfeil. \nVennligst sjekk tilkoblingen din.",
+    "notFound": "Ikke funnet.",
+    "server": "Serverfeil. \nVennligst prøv igjen senere.",
+    "timeout": "Forespørselen ble tidsavbrutt. \nVennligst prøv igjen.",
+    "title": "Noe gikk galt",
+    "unauthorized": "Du er ikke autorisert til å utføre denne handlingen.",
+    "unknown": "Det oppstod en uventet feil."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresse",
+      "city": "By",
+      "country": "Land",
+      "description": "Beskrivelse",
+      "email": "E-post",
+      "firstName": "Fornavn",
+      "lastName": "Etternavn",
+      "name": "Navn",
+      "notes": "Notater",
+      "phone": "Telefon",
+      "postcode": "postnummer",
+      "state": "Tilstand"
+    },
+    "placeholders": {
+      "search": "Søk...",
+      "select": "Velge…",
+      "typeHere": "Skriv her..."
+    }
+  },
+  "nav": {
+    "account": "Konto",
+    "admin": "Admin",
+    "dashboard": "Dashbord",
+    "help": "Hjelp",
+    "home": "Hjem",
+    "logout": "Logg ut",
+    "profile": "Profil",
+    "settings": "Innstillinger",
+    "support": "Støtte"
+  },
+  "toast": {
+    "copied": "Kopiert til utklippstavlen.",
+    "created": "Opprettet vellykket.",
+    "deleted": "Slettet vellykket.",
+    "error": "Feil",
+    "saved": "Lagret vellykket.",
+    "success": "Suksess",
+    "tryAgain": "Vennligst prøv igjen.",
+    "updated": "Oppdatert vellykket."
+  },
+  "validation": {
+    "email": "Vennligst skriv inn en gyldig e-postadresse.",
+    "invalid": "Denne verdien er ugyldig.",
+    "max": "Må maksimalt være {maks.}.",
+    "maxLength": "Må være på maksimalt {maks} tegn.",
+    "min": "Må være minst {min}.",
+    "minLength": "Må bestå av minst {min} tegn.",
+    "passwordMismatch": "Passord stemmer ikke.",
+    "required": "Dette feltet er obligatorisk."
+  }
+}

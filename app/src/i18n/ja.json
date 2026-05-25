@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "ja",
+    "name": "Japanese"
+  },
+  "auth": {
+    "confirmPassword": "パスワードを認証する",
+    "continue": "続く",
+    "currentPassword": "現在のパスワード",
+    "email": "電子メール",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "newPassword": "新しいパスワード",
+    "password": "パスワード",
+    "rememberMe": "私を覚えてますか",
+    "resendCode": "コードを再送信する",
+    "resetPassword": "パスワードをリセットする",
+    "signUp": "サインアップ",
+    "twoFactor": "二要素認証",
+    "verify": "確認する"
+  },
+  "common": {
+    "add": "追加",
+    "appName": "エデュクイック",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "clear": "クリア",
+    "close": "近い",
+    "confirm": "確認する",
+    "copied": "コピーされました",
+    "copy": "コピー",
+    "create": "作成する",
+    "delete": "消去",
+    "disabled": "無効",
+    "done": "終わり",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "enabled": "有効",
+    "loading": "読み込み中…",
+    "next": "次",
+    "no": "いいえ",
+    "off": "オフ",
+    "on": "の上",
+    "optional": "オプション",
+    "previous": "前の",
+    "processing": "処理…",
+    "refresh": "リフレッシュ",
+    "remove": "取り除く",
+    "required": "必須",
+    "retry": "リトライ",
+    "save": "保存",
+    "saving": "保存中…",
+    "search": "検索",
+    "submit": "提出する",
+    "update": "アップデート",
+    "upload": "アップロード",
+    "yes": "はい"
+  },
+  "confirmations": {
+    "deleteBody": "この操作は元に戻すことができません。",
+    "deleteTitle": "この項目を削除しますか?",
+    "logoutBody": "続行するには、再度ログインする必要があります。",
+    "logoutTitle": "ログアウト？"
+  },
+  "dates": {
+    "days": {
+      "friday": "金曜日",
+      "monday": "月曜日",
+      "saturday": "土曜日",
+      "sunday": "日曜日",
+      "thursday": "木曜日",
+      "tuesday": "火曜日",
+      "wednesday": "水曜日"
+    },
+    "months": {
+      "april": "4月",
+      "august": "8月",
+      "december": "12月",
+      "february": "2月",
+      "january": "1月",
+      "july": "7月",
+      "june": "6月",
+      "march": "行進",
+      "may": "5月",
+      "november": "11月",
+      "october": "10月",
+      "september": "9月"
+    },
+    "today": "今日",
+    "tomorrow": "明日",
+    "yesterday": "昨日"
+  },
+  "emptyStates": {
+    "noData": "まだ表示するものはありません。",
+    "noResults": "結果が見つかりませんでした。",
+    "tryAdjustingFilters": "検索またはフィルターを調整してみてください。"
+  },
+  "errors": {
+    "forbidden": "アクセスが拒否されました。",
+    "network": "ネットワークエラー。\n接続を確認してください。",
+    "notFound": "見つかりません。",
+    "server": "サーバーエラー。\n後でもう一度試してください。",
+    "timeout": "リクエストがタイムアウトしました。\nもう一度試してください。",
+    "title": "何か問題が発生しました",
+    "unauthorized": "このアクションを実行する権限がありません。",
+    "unknown": "予期しないエラーが発生しました。"
+  },
+  "forms": {
+    "labels": {
+      "address": "住所",
+      "city": "市",
+      "country": "国",
+      "description": "説明",
+      "email": "電子メール",
+      "firstName": "ファーストネーム",
+      "lastName": "苗字",
+      "name": "名前",
+      "notes": "注意事項",
+      "phone": "電話",
+      "postcode": "郵便番号",
+      "state": "州"
+    },
+    "placeholders": {
+      "search": "検索…",
+      "select": "選択してください…",
+      "typeHere": "ここに入力してください…"
+    }
+  },
+  "nav": {
+    "account": "アカウント",
+    "admin": "管理者",
+    "dashboard": "ダッシュボード",
+    "help": "ヘルプ",
+    "home": "家",
+    "logout": "ログアウト",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "support": "サポート"
+  },
+  "toast": {
+    "copied": "クリップボードにコピーされました。",
+    "created": "正常に作成されました。",
+    "deleted": "正常に削除されました。",
+    "error": "エラー",
+    "saved": "正常に保存されました。",
+    "success": "成功",
+    "tryAgain": "もう一度試してください。",
+    "updated": "正常に更新されました。"
+  },
+  "validation": {
+    "email": "有効なメールアドレスを入力してください。",
+    "invalid": "この値は無効です。",
+    "max": "最大でも {max} である必要があります。",
+    "maxLength": "最大でも {max} 文字にする必要があります。",
+    "min": "少なくとも {min} である必要があります。",
+    "minLength": "少なくとも {min} 文字である必要があります。",
+    "passwordMismatch": "パスワードが一致しません。",
+    "required": "この項目は必須です。"
+  }
+}

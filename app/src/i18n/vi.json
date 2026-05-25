@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "vi",
+    "name": "Vietnamese"
+  },
+  "auth": {
+    "confirmPassword": "Xác nhận mật khẩu",
+    "continue": "Tiếp tục",
+    "currentPassword": "Mật khẩu hiện tại",
+    "email": "E-mail",
+    "forgotPassword": "Quên mật khẩu?",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "newPassword": "Mật khẩu mới",
+    "password": "Mật khẩu",
+    "rememberMe": "nhớ tôi",
+    "resendCode": "Gửi lại mã",
+    "resetPassword": "Đặt lại mật khẩu",
+    "signUp": "Đăng ký",
+    "twoFactor": "Xác thực hai yếu tố",
+    "verify": "Xác minh"
+  },
+  "common": {
+    "add": "Thêm vào",
+    "appName": "PACE",
+    "back": "Mặt sau",
+    "cancel": "Hủy bỏ",
+    "clear": "Thông thoáng",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "copied": "Đã sao chép",
+    "copy": "Sao chép",
+    "create": "Tạo nên",
+    "delete": "Xóa bỏ",
+    "disabled": "Tàn tật",
+    "done": "Xong",
+    "download": "Tải xuống",
+    "edit": "Biên tập",
+    "enabled": "Đã bật",
+    "loading": "Đang tải…",
+    "next": "Kế tiếp",
+    "no": "KHÔNG",
+    "off": "Tắt",
+    "on": "TRÊN",
+    "optional": "Không bắt buộc",
+    "previous": "Trước",
+    "processing": "Xử lý…",
+    "refresh": "Làm cho khỏe lại",
+    "remove": "Di dời",
+    "required": "Yêu cầu",
+    "retry": "Thử lại",
+    "save": "Cứu",
+    "saving": "Đang lưu…",
+    "search": "Tìm kiếm",
+    "submit": "Nộp",
+    "update": "Cập nhật",
+    "upload": "Tải lên",
+    "yes": "Đúng"
+  },
+  "confirmations": {
+    "deleteBody": "Không thể hoàn tác hành động này.",
+    "deleteTitle": "Xóa mục này?",
+    "logoutBody": "Bạn sẽ cần phải đăng nhập lại để tiếp tục.",
+    "logoutTitle": "Đăng xuất?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Thứ sáu",
+      "monday": "Thứ hai",
+      "saturday": "Thứ bảy",
+      "sunday": "Chủ nhật",
+      "thursday": "Thứ năm",
+      "tuesday": "Thứ ba",
+      "wednesday": "Thứ Tư"
+    },
+    "months": {
+      "april": "Tháng tư",
+      "august": "Tháng tám",
+      "december": "Tháng 12",
+      "february": "Tháng hai",
+      "january": "Tháng Một",
+      "july": "Tháng bảy",
+      "june": "Tháng sáu",
+      "march": "Bước đều",
+      "may": "Có thể",
+      "november": "Tháng mười một",
+      "october": "tháng mười",
+      "september": "Tháng 9"
+    },
+    "today": "Hôm nay",
+    "tomorrow": "Ngày mai",
+    "yesterday": "Hôm qua"
+  },
+  "emptyStates": {
+    "noData": "Chưa có gì để hiển thị.",
+    "noResults": "Không tìm thấy kết quả nào.",
+    "tryAdjustingFilters": "Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn."
+  },
+  "errors": {
+    "forbidden": "Truy cập bị từ chối.",
+    "network": "Lỗi mạng. \nVui lòng kiểm tra kết nối của bạn.",
+    "notFound": "Không tìm thấy.",
+    "server": "Lỗi máy chủ. \nVui lòng thử lại sau.",
+    "timeout": "Yêu cầu đã hết thời gian chờ. \nVui lòng thử lại.",
+    "title": "Đã xảy ra lỗi",
+    "unauthorized": "Bạn không được phép thực hiện hành động này.",
+    "unknown": "Đã xảy ra lỗi không mong muốn."
+  },
+  "forms": {
+    "labels": {
+      "address": "Địa chỉ",
+      "city": "Thành phố",
+      "country": "Quốc gia",
+      "description": "Sự miêu tả",
+      "email": "E-mail",
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "name": "Tên",
+      "notes": "Ghi chú",
+      "phone": "Điện thoại",
+      "postcode": "Mã bưu điện",
+      "state": "Tình trạng"
+    },
+    "placeholders": {
+      "search": "Tìm kiếm…",
+      "select": "Lựa chọn…",
+      "typeHere": "Nhập vào đây…"
+    }
+  },
+  "nav": {
+    "account": "Tài khoản",
+    "admin": "Quản trị viên",
+    "dashboard": "Trang tổng quan",
+    "help": "Giúp đỡ",
+    "home": "Trang chủ",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "support": "Ủng hộ"
+  },
+  "toast": {
+    "copied": "Đã sao chép vào bảng nhớ tạm.",
+    "created": "Đã tạo thành công.",
+    "deleted": "Đã xóa thành công.",
+    "error": "Lỗi",
+    "saved": "Đã lưu thành công.",
+    "success": "Thành công",
+    "tryAgain": "Vui lòng thử lại.",
+    "updated": "Đã cập nhật thành công."
+  },
+  "validation": {
+    "email": "Vui lòng nhập địa chỉ email hợp lệ.",
+    "invalid": "Giá trị này không hợp lệ.",
+    "max": "Tối đa phải là {max}.",
+    "maxLength": "Phải có tối đa {max} ký tự.",
+    "min": "Phải ít nhất là {min}.",
+    "minLength": "Phải có ít nhất {min} ký tự.",
+    "passwordMismatch": "Mật khẩu không khớp.",
+    "required": "Trường này là bắt buộc."
+  }
+}

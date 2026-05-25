@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "hu",
+    "name": "Hungarian"
+  },
+  "auth": {
+    "confirmPassword": "Erősítse meg a jelszót",
+    "continue": "Folytatás",
+    "currentPassword": "Jelenlegi jelszó",
+    "email": "Email",
+    "forgotPassword": "Elfelejtetted a jelszavad?",
+    "login": "Jelentkezzen be",
+    "logout": "Jelentkezzen ki",
+    "newPassword": "Új jelszó",
+    "password": "Jelszó",
+    "rememberMe": "Emlékezz rám",
+    "resendCode": "Kód újraküldése",
+    "resetPassword": "Jelszó visszaállítása",
+    "signUp": "Regisztráljon",
+    "twoFactor": "Kéttényezős hitelesítés",
+    "verify": "Ellenőrizze"
+  },
+  "common": {
+    "add": "Hozzáadás",
+    "appName": "PACE",
+    "back": "Vissza",
+    "cancel": "Mégse",
+    "clear": "Világos",
+    "close": "Közeli",
+    "confirm": "Erősítse meg",
+    "copied": "Másolva",
+    "copy": "Másolat",
+    "create": "Teremt",
+    "delete": "Töröl",
+    "disabled": "Letiltva",
+    "done": "Kész",
+    "download": "Letöltés",
+    "edit": "Szerkesztés",
+    "enabled": "Engedélyezve",
+    "loading": "Terhelés…",
+    "next": "Következő",
+    "no": "Nem",
+    "off": "Le",
+    "on": "On",
+    "optional": "Választható",
+    "previous": "Előző",
+    "processing": "Feldolgozás…",
+    "refresh": "Frissítés",
+    "remove": "Távolítsa el",
+    "required": "Kívánt",
+    "retry": "Próbálja újra",
+    "save": "Megtakarítás",
+    "saving": "Megtakarítás…",
+    "search": "Keresés",
+    "submit": "Beküld",
+    "update": "Frissítés",
+    "upload": "Feltöltés",
+    "yes": "Igen"
+  },
+  "confirmations": {
+    "deleteBody": "Ez a művelet nem vonható vissza.",
+    "deleteTitle": "Törli ezt az elemet?",
+    "logoutBody": "A folytatáshoz újra be kell jelentkeznie.",
+    "logoutTitle": "Kijelentkezni?"
+  },
+  "dates": {
+    "days": {
+      "friday": "péntek",
+      "monday": "hétfő",
+      "saturday": "szombat",
+      "sunday": "vasárnap",
+      "thursday": "csütörtök",
+      "tuesday": "kedd",
+      "wednesday": "szerda"
+    },
+    "months": {
+      "april": "április",
+      "august": "augusztus",
+      "december": "december",
+      "february": "február",
+      "january": "január",
+      "july": "július",
+      "june": "június",
+      "march": "március",
+      "may": "május",
+      "november": "november",
+      "october": "október",
+      "september": "szeptember"
+    },
+    "today": "Ma",
+    "tomorrow": "Holnap",
+    "yesterday": "Tegnap"
+  },
+  "emptyStates": {
+    "noData": "Még nincs mit mutatni.",
+    "noResults": "Nincs találat.",
+    "tryAdjustingFilters": "Próbálja módosítani a keresést vagy a szűrőket."
+  },
+  "errors": {
+    "forbidden": "Hozzáférés megtagadva.",
+    "network": "Hálózati hiba. \nKérjük, ellenőrizze a kapcsolatot.",
+    "notFound": "Nem található.",
+    "server": "Szerver hiba. \nKérjük, próbálja újra később.",
+    "timeout": "A kérelem lejárt. \nKérjük, próbálja újra.",
+    "title": "Valami elromlott",
+    "unauthorized": "Nincs jogosultsága ennek a műveletnek a végrehajtására.",
+    "unknown": "Váratlan hiba történt."
+  },
+  "forms": {
+    "labels": {
+      "address": "Cím",
+      "city": "Város",
+      "country": "Ország",
+      "description": "Leírás",
+      "email": "Email",
+      "firstName": "Keresztnév",
+      "lastName": "Vezetéknév",
+      "name": "Név",
+      "notes": "Megjegyzések",
+      "phone": "Telefon",
+      "postcode": "Irányítószám",
+      "state": "Állami"
+    },
+    "placeholders": {
+      "search": "Keresés…",
+      "select": "Válasszon…",
+      "typeHere": "Írd ide…"
+    }
+  },
+  "nav": {
+    "account": "fiók",
+    "admin": "Admin",
+    "dashboard": "Műszerfal",
+    "help": "Segítség",
+    "home": "Otthon",
+    "logout": "Jelentkezzen ki",
+    "profile": "Profil",
+    "settings": "Beállítások elemre",
+    "support": "Támogatás"
+  },
+  "toast": {
+    "copied": "Vágólapra másolva.",
+    "created": "Sikeresen létrehozva.",
+    "deleted": "Sikeresen törölve.",
+    "error": "Hiba",
+    "saved": "Sikeresen mentve.",
+    "success": "Siker",
+    "tryAgain": "Kérjük, próbálja újra.",
+    "updated": "Sikeresen frissítve."
+  },
+  "validation": {
+    "email": "Kérjük, adjon meg egy érvényes e-mail címet.",
+    "invalid": "Ez az érték érvénytelen.",
+    "max": "Legfeljebb {max} lehet.",
+    "maxLength": "Legfeljebb {max} karakterből állhat.",
+    "min": "Legalább {min} értékűnek kell lennie.",
+    "minLength": "Legalább {min} karakterből kell állnia.",
+    "passwordMismatch": "A jelszavak nem egyeznek.",
+    "required": "Ezt a mezőt kötelező kitölteni."
+  }
+}

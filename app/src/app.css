@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@import "@skeletonlabs/skeleton";
+@import "@skeletonlabs/skeleton-svelte";
+@import "@skeletonlabs/skeleton/themes/nouveau";
+@import "./pace-theme.css";
+
+@import "@fontsource/open-sans";
+@import "@fontsource/inter";
+@import "@fontsource/lato";
+
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
+[data-theme="pace"] {
+  --heading-font-family: "Open Sans", sans-serif;
+  --heading-font-weight: 100;
+  --base-font-family: "Lato", sans-serif;
+  --anchor-font-family: "Lato", sans-serif;
+
+  [data-scope="tabs"] {
+    &[data-part="list"] {
+      border-color: transparent;
+    }
+    &[data-part="indicator"] {
+      background: var(--color-primary-500);
+    }
+  }
+
+  [data-scope="radio-group"] {
+    &[data-part="control"] {
+      @apply preset-filled-surface-100-900 shadow-md;
+    }
+
+    &[data-part="indicator"] {
+      @apply preset-filled-primary-500;
+    }
+
+    &[data-part="item"] {
+      @apply btn p-2;
+
+      &[data-focus-visible] {
+        outline: 2px solid var(--color-primary-500);
+      }
+    }
+
+    &[data-part="item-text"] {
+      &[data-state="checked"] {
+        color: white;
+      }
+
+      @variant dark {
+        &[data-state="checked"] {
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+html,
+body,
+#svelte {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  padding: 0;
+}
+
+.app-shell {
+  height: 100dvh;
+  overflow: auto;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  box-sizing: border-box;
+}

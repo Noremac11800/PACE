@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "sv",
+    "name": "Swedish"
+  },
+  "auth": {
+    "confirmPassword": "Bekräfta lösenord",
+    "continue": "Fortsätta",
+    "currentPassword": "Aktuellt lösenord",
+    "email": "E-post",
+    "forgotPassword": "Glömt lösenordet?",
+    "login": "Logga in",
+    "logout": "Logga ut",
+    "newPassword": "Nytt lösenord",
+    "password": "Lösenord",
+    "rememberMe": "Kom ihåg mig",
+    "resendCode": "Skicka koden igen",
+    "resetPassword": "Återställ lösenord",
+    "signUp": "Anmäl dig",
+    "twoFactor": "Tvåfaktorsautentisering",
+    "verify": "Kontrollera"
+  },
+  "common": {
+    "add": "Tillägga",
+    "appName": "PACE",
+    "back": "Tillbaka",
+    "cancel": "Avboka",
+    "clear": "Rensa",
+    "close": "Nära",
+    "confirm": "Bekräfta",
+    "copied": "Kopierade",
+    "copy": "Kopiera",
+    "create": "Skapa",
+    "delete": "Radera",
+    "disabled": "Inaktiverad",
+    "done": "Gjort",
+    "download": "Ladda ner",
+    "edit": "Redigera",
+    "enabled": "Aktiverad",
+    "loading": "Belastning…",
+    "next": "Nästa",
+    "no": "Inga",
+    "off": "Av",
+    "on": "På",
+    "optional": "Frivillig",
+    "previous": "Tidigare",
+    "processing": "Bearbetar...",
+    "refresh": "Uppdatera",
+    "remove": "Ta bort",
+    "required": "Nödvändig",
+    "retry": "Försöka igen",
+    "save": "Spara",
+    "saving": "Sparande…",
+    "search": "Söka",
+    "submit": "Överlämna",
+    "update": "Uppdatera",
+    "upload": "Ladda upp",
+    "yes": "Ja"
+  },
+  "confirmations": {
+    "deleteBody": "Denna åtgärd kan inte ångras.",
+    "deleteTitle": "Vill du ta bort det här objektet?",
+    "logoutBody": "Du måste logga in igen för att fortsätta.",
+    "logoutTitle": "Logga ut?"
+  },
+  "dates": {
+    "days": {
+      "friday": "fredag",
+      "monday": "måndag",
+      "saturday": "lördag",
+      "sunday": "söndag",
+      "thursday": "torsdag",
+      "tuesday": "tisdag",
+      "wednesday": "onsdag"
+    },
+    "months": {
+      "april": "april",
+      "august": "augusti",
+      "december": "december",
+      "february": "februari",
+      "january": "januari",
+      "july": "juli",
+      "june": "juni",
+      "march": "mars",
+      "may": "maj",
+      "november": "november",
+      "october": "oktober",
+      "september": "september"
+    },
+    "today": "I dag",
+    "tomorrow": "I morgon",
+    "yesterday": "I går"
+  },
+  "emptyStates": {
+    "noData": "Inget att visa än.",
+    "noResults": "Inga resultat hittades.",
+    "tryAdjustingFilters": "Prova att justera din sökning eller dina filter."
+  },
+  "errors": {
+    "forbidden": "Åtkomst nekad.",
+    "network": "Nätverksfel. \nKontrollera din anslutning.",
+    "notFound": "Hittade inte.",
+    "server": "Serverfel. \nFörsök igen senare.",
+    "timeout": "Begäran tog timeout. \nFörsök igen.",
+    "title": "Något gick fel",
+    "unauthorized": "Du är inte behörig att utföra den här åtgärden.",
+    "unknown": "Ett oväntat fel inträffade."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adress",
+      "city": "Stad",
+      "country": "Land",
+      "description": "Beskrivning",
+      "email": "E-post",
+      "firstName": "Förnamn",
+      "lastName": "Efternamn",
+      "name": "Namn",
+      "notes": "Anteckningar",
+      "phone": "Telefon",
+      "postcode": "Postnummer",
+      "state": "Ange"
+    },
+    "placeholders": {
+      "search": "Söka…",
+      "select": "Välja…",
+      "typeHere": "Skriv här..."
+    }
+  },
+  "nav": {
+    "account": "Konto",
+    "admin": "Administration",
+    "dashboard": "Instrumentpanel",
+    "help": "Hjälp",
+    "home": "Hem",
+    "logout": "Logga ut",
+    "profile": "Profil",
+    "settings": "Inställningar",
+    "support": "Stöd"
+  },
+  "toast": {
+    "copied": "Kopierade till urklipp.",
+    "created": "Skapat framgångsrikt.",
+    "deleted": "Raderades framgångsrikt.",
+    "error": "Fel",
+    "saved": "Sparad framgångsrikt.",
+    "success": "Framgång",
+    "tryAgain": "Försök igen.",
+    "updated": "Uppdaterades framgångsrikt."
+  },
+  "validation": {
+    "email": "Ange en giltig e-postadress.",
+    "invalid": "Detta värde är ogiltigt.",
+    "max": "Får vara högst {max}.",
+    "maxLength": "Får vara högst {max} tecken.",
+    "min": "Måste vara minst {min}.",
+    "minLength": "Måste vara minst {min} tecken.",
+    "passwordMismatch": "Lösenord stämmer inte överens.",
+    "required": "Detta fält är obligatoriskt."
+  }
+}

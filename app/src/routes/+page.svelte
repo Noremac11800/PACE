@@ -1,0 +1,33 @@
+<script lang="ts">
+  import { goto } from "$app/navigation";
+  import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
+  import { Bug } from "@lucide/svelte";
+
+  const version = "v0.1.0-alpha.1";
+</script>
+
+<main class="h-full grid grid-rows-[auto_1fr_auto]">
+  <header class="relative flex flex-row justify-between items-center px-4 py-2">
+    <ThemeSwitch />
+  </header>
+
+  <div class="relative min-h-0 bg-surface-100-900/25 flex flex-col">
+    <h1 class="h1 font-bold">PACE</h1>
+    <img src="/pace_logo.svg" alt="PACE Logo" />
+  </div>
+
+  <footer
+    class="flex items-center justify-between bg-surface-50-950 px-2 py-1 border-t border-surface-200-800"
+  >
+    <button
+      class="btn preset-outlined text-xs"
+      onclick={() => goto("/sandbox")}
+    >
+      <Bug size={16} />
+      Go to sandbox
+    </button>
+    <p class="text-end">
+      {version}
+    </p>
+  </footer>
+</main>

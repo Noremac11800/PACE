@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "he",
+    "name": "Hebrew"
+  },
+  "auth": {
+    "confirmPassword": "אשר את הסיסמה",
+    "continue": "לְהַמשִׁיך",
+    "currentPassword": "סיסמה נוכחית",
+    "email": "אֶלֶקטרוֹנִי",
+    "forgotPassword": "שכחת סיסמא?",
+    "login": "התחבר",
+    "logout": "התנתק",
+    "newPassword": "סיסמה חדשה",
+    "password": "סִיסמָה",
+    "rememberMe": "תזכור אותי",
+    "resendCode": "שלח שוב קוד",
+    "resetPassword": "אפס סיסמה",
+    "signUp": "הירשם",
+    "twoFactor": "אימות דו-גורמי",
+    "verify": "לְאַמֵת"
+  },
+  "common": {
+    "add": "לְהוֹסִיף",
+    "appName": "PACE",
+    "back": "בְּחֲזָרָה",
+    "cancel": "לְבַטֵל",
+    "clear": "בָּרוּר",
+    "close": "לִסְגוֹר",
+    "confirm": "לְאַשֵׁר",
+    "copied": "מוּעֲתָק",
+    "copy": "לְהַעְתִיק",
+    "create": "לִיצוֹר",
+    "delete": "לִמְחוֹק",
+    "disabled": "נָכֶה",
+    "done": "נַעֲשָׂה",
+    "download": "הורד",
+    "edit": "לַעֲרוֹך",
+    "enabled": "מופעל",
+    "loading": "טְעִינָה…",
+    "next": "הַבָּא",
+    "no": "לֹא",
+    "off": "כבוי",
+    "on": "עַל",
+    "optional": "אופציונלי",
+    "previous": "קוֹדֵם",
+    "processing": "מעבד...",
+    "refresh": "לְרַעֲנֵן",
+    "remove": "לְהַסִיר",
+    "required": "דָרוּשׁ",
+    "retry": "נסה שוב",
+    "save": "לְהַצִיל",
+    "saving": "חִסָכוֹן…",
+    "search": "לְחַפֵּשׂ",
+    "submit": "לְהַגִישׁ",
+    "update": "לְעַדְכֵּן",
+    "upload": "העלה",
+    "yes": "כֵּן"
+  },
+  "confirmations": {
+    "deleteBody": "לא ניתן לבטל פעולה זו.",
+    "deleteTitle": "למחוק את הפריט הזה?",
+    "logoutBody": "תצטרך להיכנס שוב כדי להמשיך.",
+    "logoutTitle": "להתנתק?"
+  },
+  "dates": {
+    "days": {
+      "friday": "יוֹם שִׁישִׁי",
+      "monday": "יוֹם שֵׁנִי",
+      "saturday": "שַׁבָּת",
+      "sunday": "יוֹם רִאשׁוֹן",
+      "thursday": "יוֹם חֲמִישִׁי",
+      "tuesday": "יוֹם שְׁלִישִׁי",
+      "wednesday": "יוֹם רְבִיעִי"
+    },
+    "months": {
+      "april": "אַפּרִיל",
+      "august": "אוֹגוּסט",
+      "december": "דֵצֶמבֶּר",
+      "february": "פֶבּרוּאָר",
+      "january": "יָנוּאָר",
+      "july": "יוּלִי",
+      "june": "יוּנִי",
+      "march": "מַרס",
+      "may": "מַאִי",
+      "november": "נוֹבֶמבֶּר",
+      "october": "אוֹקְטוֹבֶּר",
+      "september": "סֶפּטֶמבֶּר"
+    },
+    "today": "הַיוֹם",
+    "tomorrow": "מָחָר",
+    "yesterday": "אֶתמוֹל"
+  },
+  "emptyStates": {
+    "noData": "עדיין אין מה להראות.",
+    "noResults": "לא נמצאו תוצאות.",
+    "tryAdjustingFilters": "נסה להתאים את החיפוש או המסננים שלך."
+  },
+  "errors": {
+    "forbidden": "הגִישָׁה נִדחֲתָה.",
+    "network": "שגיאת רשת. \nאנא בדוק את החיבור שלך.",
+    "notFound": "לא נמצא.",
+    "server": "שגיאת שרת. \nאנא נסה שוב מאוחר יותר.",
+    "timeout": "תם הזמן הקצוב לבקשה. \nאנא נסה שוב.",
+    "title": "משהו השתבש",
+    "unauthorized": "אינך מורשה לבצע פעולה זו.",
+    "unknown": "אירעה שגיאה בלתי צפויה."
+  },
+  "forms": {
+    "labels": {
+      "address": "כְּתוֹבֶת",
+      "city": "עִיר",
+      "country": "מְדִינָה",
+      "description": "תֵאוּר",
+      "email": "אֶלֶקטרוֹנִי",
+      "firstName": "שֵׁם פְּרַטִי",
+      "lastName": "שֵׁם מִשׁפָּחָה",
+      "name": "שֵׁם",
+      "notes": "הערות",
+      "phone": "טֵלֵפוֹן",
+      "postcode": "מיקוד",
+      "state": "מְדִינָה"
+    },
+    "placeholders": {
+      "search": "לְחַפֵּשׂ…",
+      "select": "לִבחוֹר…",
+      "typeHere": "הקלד כאן…"
+    }
+  },
+  "nav": {
+    "account": "חֶשְׁבּוֹן",
+    "admin": "מנהל מערכת",
+    "dashboard": "לוּחַ מַחווָנִים",
+    "help": "עֶזרָה",
+    "home": "בַּיִת",
+    "logout": "התנתק",
+    "profile": "פּרוֹפִיל",
+    "settings": "הגדרות",
+    "support": "תְמִיכָה"
+  },
+  "toast": {
+    "copied": "הועתק ללוח.",
+    "created": "נוצר בהצלחה.",
+    "deleted": "נמחק בהצלחה.",
+    "error": "שְׁגִיאָה",
+    "saved": "נשמר בהצלחה.",
+    "success": "הַצלָחָה",
+    "tryAgain": "אנא נסה שוב.",
+    "updated": "עודכן בהצלחה."
+  },
+  "validation": {
+    "email": "נא להזין כתובת אימייל חוקית.",
+    "invalid": "ערך זה אינו חוקי.",
+    "max": "חייב להיות {max} לכל היותר.",
+    "maxLength": "חייב להיות {max} תווים לכל היותר.",
+    "min": "חייב להיות לפחות {min}.",
+    "minLength": "חייב להיות לפחות {min} תווים.",
+    "passwordMismatch": "הסיסמאות אינן תואמות.",
+    "required": "שדה זה חובה."
+  }
+}

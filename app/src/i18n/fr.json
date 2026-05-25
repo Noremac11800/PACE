@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "fr",
+    "name": "French"
+  },
+  "auth": {
+    "confirmPassword": "Confirmez le mot de passe",
+    "continue": "Continuer",
+    "currentPassword": "Mot de passe actuel",
+    "email": "E-mail",
+    "forgotPassword": "Mot de passe oublié ?",
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
+    "newPassword": "Nouveau mot de passe",
+    "password": "Mot de passe",
+    "rememberMe": "Souviens-toi de moi",
+    "resendCode": "Renvoyer le code",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "signUp": "S'inscrire",
+    "twoFactor": "Authentification à deux facteurs",
+    "verify": "Vérifier"
+  },
+  "common": {
+    "add": "Ajouter",
+    "appName": "ÉduQuick",
+    "back": "Dos",
+    "cancel": "Annuler",
+    "clear": "Clair",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "copied": "Copié",
+    "copy": "Copie",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "disabled": "Désactivé",
+    "done": "Fait",
+    "download": "Télécharger",
+    "edit": "Modifier",
+    "enabled": "Activé",
+    "loading": "Chargement…",
+    "next": "Suivant",
+    "no": "Non",
+    "off": "Désactivé",
+    "on": "Sur",
+    "optional": "Facultatif",
+    "previous": "Précédent",
+    "processing": "Traitement…",
+    "refresh": "Rafraîchir",
+    "remove": "Retirer",
+    "required": "Requis",
+    "retry": "Réessayer",
+    "save": "Sauvegarder",
+    "saving": "Économie…",
+    "search": "Recherche",
+    "submit": "Soumettre",
+    "update": "Mise à jour",
+    "upload": "Télécharger",
+    "yes": "Oui"
+  },
+  "confirmations": {
+    "deleteBody": "Cette action ne peut pas être annulée.",
+    "deleteTitle": "Supprimer cet élément ?",
+    "logoutBody": "Vous devrez vous reconnecter pour continuer.",
+    "logoutTitle": "Se déconnecter ?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Vendredi",
+      "monday": "Lundi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche",
+      "thursday": "Jeudi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi"
+    },
+    "months": {
+      "april": "Avril",
+      "august": "Août",
+      "december": "Décembre",
+      "february": "Février",
+      "january": "Janvier",
+      "july": "Juillet",
+      "june": "Juin",
+      "march": "Mars",
+      "may": "Peut",
+      "november": "Novembre",
+      "october": "Octobre",
+      "september": "Septembre"
+    },
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "yesterday": "Hier"
+  },
+  "emptyStates": {
+    "noData": "Rien à montrer pour l'instant.",
+    "noResults": "Aucun résultat trouvé.",
+    "tryAdjustingFilters": "Essayez d'ajuster votre recherche ou vos filtres."
+  },
+  "errors": {
+    "forbidden": "Accès refusé.",
+    "network": "Erreur réseau. \nVeuillez vérifier votre connexion.",
+    "notFound": "Pas trouvé.",
+    "server": "Erreur de serveur. \nVeuillez réessayer plus tard.",
+    "timeout": "La demande a expiré. \nVeuillez réessayer.",
+    "title": "Quelque chose s'est mal passé",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+    "unknown": "Une erreur inattendue s'est produite."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresse",
+      "city": "Ville",
+      "country": "Pays",
+      "description": "Description",
+      "email": "E-mail",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "name": "Nom",
+      "notes": "Remarques",
+      "phone": "Téléphone",
+      "postcode": "Code postal",
+      "state": "État"
+    },
+    "placeholders": {
+      "search": "Rechercher…",
+      "select": "Sélectionner…",
+      "typeHere": "Tapez ici…"
+    }
+  },
+  "nav": {
+    "account": "Compte",
+    "admin": "Administrateur",
+    "dashboard": "Tableau de bord",
+    "help": "Aide",
+    "home": "Maison",
+    "logout": "Se déconnecter",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "support": "Soutien"
+  },
+  "toast": {
+    "copied": "Copié dans le presse-papiers.",
+    "created": "Créé avec succès.",
+    "deleted": "Supprimé avec succès.",
+    "error": "Erreur",
+    "saved": "Enregistré avec succès.",
+    "success": "Succès",
+    "tryAgain": "Veuillez réessayer.",
+    "updated": "Mis à jour avec succès."
+  },
+  "validation": {
+    "email": "S'il vous plaît, mettez une adresse email valide.",
+    "invalid": "Cette valeur n'est pas valide.",
+    "max": "Doit être au maximum de {max}.",
+    "maxLength": "Doit contenir au maximum {max} caractères.",
+    "min": "Doit être au moins {min}.",
+    "minLength": "Doit contenir au moins {min} caractères.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "required": "Ce champ est obligatoire."
+  }
+}

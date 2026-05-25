@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "id",
+    "name": "Indonesian"
+  },
+  "auth": {
+    "confirmPassword": "Konfirmasikan kata sandi",
+    "continue": "Melanjutkan",
+    "currentPassword": "Kata sandi saat ini",
+    "email": "E-mail",
+    "forgotPassword": "Lupa kata sandi?",
+    "login": "Masuk",
+    "logout": "Keluar",
+    "newPassword": "Kata sandi baru",
+    "password": "Kata sandi",
+    "rememberMe": "Ingat saya",
+    "resendCode": "Kirim ulang kode",
+    "resetPassword": "Setel ulang kata sandi",
+    "signUp": "Mendaftar",
+    "twoFactor": "Otentikasi dua faktor",
+    "verify": "Memeriksa"
+  },
+  "common": {
+    "add": "Menambahkan",
+    "appName": "Edu Cepat",
+    "back": "Kembali",
+    "cancel": "Membatalkan",
+    "clear": "Jernih",
+    "close": "Menutup",
+    "confirm": "Mengonfirmasi",
+    "copied": "Disalin",
+    "copy": "Menyalin",
+    "create": "Membuat",
+    "delete": "Menghapus",
+    "disabled": "Dengan disabilitas",
+    "done": "Selesai",
+    "download": "Unduh",
+    "edit": "Sunting",
+    "enabled": "Diaktifkan",
+    "loading": "Memuat…",
+    "next": "Berikutnya",
+    "no": "TIDAK",
+    "off": "Mati",
+    "on": "Pada",
+    "optional": "Opsional",
+    "previous": "Sebelumnya",
+    "processing": "Pengolahan…",
+    "refresh": "Menyegarkan",
+    "remove": "Menghapus",
+    "required": "Diperlukan",
+    "retry": "Mencoba kembali",
+    "save": "Menyimpan",
+    "saving": "Penghematan…",
+    "search": "Mencari",
+    "submit": "Kirim",
+    "update": "Memperbarui",
+    "upload": "Mengunggah",
+    "yes": "Ya"
+  },
+  "confirmations": {
+    "deleteBody": "Tindakan ini tidak dapat dibatalkan.",
+    "deleteTitle": "Hapus item ini?",
+    "logoutBody": "Anda harus masuk lagi untuk melanjutkan.",
+    "logoutTitle": "Keluar?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Jumat",
+      "monday": "Senin",
+      "saturday": "Sabtu",
+      "sunday": "Minggu",
+      "thursday": "Kamis",
+      "tuesday": "Selasa",
+      "wednesday": "Rabu"
+    },
+    "months": {
+      "april": "April",
+      "august": "Agustus",
+      "december": "Desember",
+      "february": "Februari",
+      "january": "Januari",
+      "july": "Juli",
+      "june": "Juni",
+      "march": "Berbaris",
+      "may": "Mungkin",
+      "november": "November",
+      "october": "Oktober",
+      "september": "September"
+    },
+    "today": "Hari ini",
+    "tomorrow": "Besok",
+    "yesterday": "Kemarin"
+  },
+  "emptyStates": {
+    "noData": "Belum ada yang bisa ditampilkan.",
+    "noResults": "Tidak ada hasil yang ditemukan.",
+    "tryAdjustingFilters": "Coba sesuaikan pencarian atau filter Anda."
+  },
+  "errors": {
+    "forbidden": "Akses ditolak.",
+    "network": "Kesalahan jaringan. \nSilakan periksa koneksi Anda.",
+    "notFound": "Tidak ditemukan.",
+    "server": "Kesalahan server. \nSilakan coba lagi nanti.",
+    "timeout": "Waktu permintaan habis. \nSilakan coba lagi.",
+    "title": "Ada yang tidak beres",
+    "unauthorized": "Anda tidak berwenang untuk melakukan tindakan ini.",
+    "unknown": "Terjadi kesalahan yang tidak terduga."
+  },
+  "forms": {
+    "labels": {
+      "address": "Alamat",
+      "city": "Kota",
+      "country": "Negara",
+      "description": "Keterangan",
+      "email": "E-mail",
+      "firstName": "Nama depan",
+      "lastName": "Nama belakang",
+      "name": "Nama",
+      "notes": "Catatan",
+      "phone": "Telepon",
+      "postcode": "Kode pos",
+      "state": "Negara"
+    },
+    "placeholders": {
+      "search": "Mencari…",
+      "select": "Memilih…",
+      "typeHere": "Ketik di sini…"
+    }
+  },
+  "nav": {
+    "account": "Akun",
+    "admin": "Admin",
+    "dashboard": "Dasbor",
+    "help": "Membantu",
+    "home": "Rumah",
+    "logout": "Keluar",
+    "profile": "Profil",
+    "settings": "Pengaturan",
+    "support": "Mendukung"
+  },
+  "toast": {
+    "copied": "Disalin ke papan klip.",
+    "created": "Berhasil dibuat.",
+    "deleted": "Berhasil dihapus.",
+    "error": "Kesalahan",
+    "saved": "Berhasil disimpan.",
+    "success": "Kesuksesan",
+    "tryAgain": "Silakan coba lagi.",
+    "updated": "Berhasil diperbarui."
+  },
+  "validation": {
+    "email": "Silakan masukkan alamat email yang valid.",
+    "invalid": "Nilai ini tidak valid.",
+    "max": "Maksimal harus {max}.",
+    "maxLength": "Harus berisi maksimal {max} karakter.",
+    "min": "Minimal harus {min}.",
+    "minLength": "Minimal harus berisi {min} karakter.",
+    "passwordMismatch": "Kata sandi tidak cocok.",
+    "required": "Bidang ini wajib diisi."
+  }
+}

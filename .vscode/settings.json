@@ -13,5 +13,11 @@
   "python.analysis.autoImportCompletions": true,
   "ruff.enable": true,
   "ruff.organizeImports": true,
-  "ruff.format.preview": true
+  "ruff.format.preview": true,
+  "[postcss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  }
 }

@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "nl",
+    "name": "Dutch"
+  },
+  "auth": {
+    "confirmPassword": "Bevestig wachtwoord",
+    "continue": "Doorgaan",
+    "currentPassword": "Huidig ​​wachtwoord",
+    "email": "E-mail",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "newPassword": "Nieuw wachtwoord",
+    "password": "Wachtwoord",
+    "rememberMe": "Onthoud mij",
+    "resendCode": "Code opnieuw verzenden",
+    "resetPassword": "Wachtwoord opnieuw instellen",
+    "signUp": "Schrijf je in",
+    "twoFactor": "Tweefactorauthenticatie",
+    "verify": "Verifiëren"
+  },
+  "common": {
+    "add": "Toevoegen",
+    "appName": "PACE",
+    "back": "Rug",
+    "cancel": "Annuleren",
+    "clear": "Duidelijk",
+    "close": "Dichtbij",
+    "confirm": "Bevestigen",
+    "copied": "Gekopieerd",
+    "copy": "Kopiëren",
+    "create": "Creëren",
+    "delete": "Verwijderen",
+    "disabled": "Gehandicapt",
+    "done": "Klaar",
+    "download": "Downloaden",
+    "edit": "Bewerking",
+    "enabled": "Ingeschakeld",
+    "loading": "Laden...",
+    "next": "Volgende",
+    "no": "Nee",
+    "off": "Uit",
+    "on": "Op",
+    "optional": "Optioneel",
+    "previous": "Vorig",
+    "processing": "Verwerken…",
+    "refresh": "Vernieuwen",
+    "remove": "Verwijderen",
+    "required": "Vereist",
+    "retry": "Opnieuw proberen",
+    "save": "Redden",
+    "saving": "Besparing…",
+    "search": "Zoekopdracht",
+    "submit": "Indienen",
+    "update": "Update",
+    "upload": "Uploaden",
+    "yes": "Ja"
+  },
+  "confirmations": {
+    "deleteBody": "Deze actie kan niet ongedaan worden gemaakt.",
+    "deleteTitle": "Dit artikel verwijderen?",
+    "logoutBody": "U moet opnieuw inloggen om door te gaan.",
+    "logoutTitle": "Uitloggen?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Vrijdag",
+      "monday": "Maandag",
+      "saturday": "Zaterdag",
+      "sunday": "Zondag",
+      "thursday": "Donderdag",
+      "tuesday": "Dinsdag",
+      "wednesday": "Woensdag"
+    },
+    "months": {
+      "april": "april",
+      "august": "augustus",
+      "december": "December",
+      "february": "Februari",
+      "january": "Januari",
+      "july": "juli",
+      "june": "juni",
+      "march": "Maart",
+      "may": "Kunnen",
+      "november": "November",
+      "october": "oktober",
+      "september": "september"
+    },
+    "today": "Vandaag",
+    "tomorrow": "Morgen",
+    "yesterday": "Gisteren"
+  },
+  "emptyStates": {
+    "noData": "Er is nog niets te zien.",
+    "noResults": "Geen resultaten gevonden.",
+    "tryAdjustingFilters": "Probeer uw zoekopdracht of filters aan te passen."
+  },
+  "errors": {
+    "forbidden": "Toegang geweigerd.",
+    "network": "Netwerkfout. \nControleer uw verbinding.",
+    "notFound": "Niet gevonden.",
+    "server": "Serverfout. \nProbeer het later opnieuw.",
+    "timeout": "Verzoek is verlopen. \nProbeer het opnieuw.",
+    "title": "Er is iets misgegaan",
+    "unauthorized": "U bent niet bevoegd om deze actie uit te voeren.",
+    "unknown": "Er is een onverwachte fout opgetreden."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adres",
+      "city": "Stad",
+      "country": "Land",
+      "description": "Beschrijving",
+      "email": "E-mail",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "name": "Naam",
+      "notes": "Opmerkingen",
+      "phone": "Telefoon",
+      "postcode": "Postcode",
+      "state": "Staat"
+    },
+    "placeholders": {
+      "search": "Zoekopdracht…",
+      "select": "Selecteer…",
+      "typeHere": "Typ hier…"
+    }
+  },
+  "nav": {
+    "account": "Rekening",
+    "admin": "Beheerder",
+    "dashboard": "Dashboard",
+    "help": "Hulp",
+    "home": "Thuis",
+    "logout": "Uitloggen",
+    "profile": "Profiel",
+    "settings": "Instellingen",
+    "support": "Steun"
+  },
+  "toast": {
+    "copied": "Gekopieerd naar klembord.",
+    "created": "Succesvol aangemaakt.",
+    "deleted": "Succesvol verwijderd.",
+    "error": "Fout",
+    "saved": "Succesvol opgeslagen.",
+    "success": "Succes",
+    "tryAgain": "Probeer het opnieuw.",
+    "updated": "Succesvol bijgewerkt."
+  },
+  "validation": {
+    "email": "Voer een geldig e-mailadres in.",
+    "invalid": "Deze waarde is ongeldig.",
+    "max": "Mag maximaal {max} zijn.",
+    "maxLength": "Moet maximaal {max} tekens bevatten.",
+    "min": "Moet minimaal {min} zijn.",
+    "minLength": "Moet minimaal {min} tekens bevatten.",
+    "passwordMismatch": "Wachtwoorden komen niet overeen.",
+    "required": "Dit veld is verplicht."
+  }
+}

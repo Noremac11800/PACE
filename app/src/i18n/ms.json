@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "ms",
+    "name": "Malay"
+  },
+  "auth": {
+    "confirmPassword": "Sahkan kata laluan",
+    "continue": "teruskan",
+    "currentPassword": "Kata laluan semasa",
+    "email": "E-mel",
+    "forgotPassword": "Lupa kata laluan?",
+    "login": "Log masuk",
+    "logout": "Log keluar",
+    "newPassword": "Kata laluan baharu",
+    "password": "Kata laluan",
+    "rememberMe": "Ingat saya",
+    "resendCode": "Hantar semula kod",
+    "resetPassword": "Tetapkan semula kata laluan",
+    "signUp": "Daftar",
+    "twoFactor": "Pengesahan dua faktor",
+    "verify": "Sahkan"
+  },
+  "common": {
+    "add": "Tambah",
+    "appName": "PACE",
+    "back": "belakang",
+    "cancel": "Batal",
+    "clear": "Jelas",
+    "close": "tutup",
+    "confirm": "sahkan",
+    "copied": "disalin",
+    "copy": "salin",
+    "create": "Buat",
+    "delete": "Padam",
+    "disabled": "Dilumpuhkan",
+    "done": "Selesai",
+    "download": "Muat turun",
+    "edit": "Sunting",
+    "enabled": "Didayakan",
+    "loading": "Memuatkan…",
+    "next": "Seterusnya",
+    "no": "Tidak",
+    "off": "Mati",
+    "on": "hidup",
+    "optional": "Pilihan",
+    "previous": "Sebelumnya",
+    "processing": "Memproses…",
+    "refresh": "Segarkan semula",
+    "remove": "Alih keluar",
+    "required": "Diperlukan",
+    "retry": "Cuba semula",
+    "save": "Jimat",
+    "saving": "Menyimpan…",
+    "search": "Cari",
+    "submit": "Hantar",
+    "update": "Kemas kini",
+    "upload": "Muat naik",
+    "yes": "ya"
+  },
+  "confirmations": {
+    "deleteBody": "Tindakan ini tidak boleh dibuat asal.",
+    "deleteTitle": "Padamkan item ini?",
+    "logoutBody": "Anda perlu log masuk semula untuk meneruskan.",
+    "logoutTitle": "Log keluar?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Jumaat",
+      "monday": "Isnin",
+      "saturday": "Sabtu",
+      "sunday": "Ahad",
+      "thursday": "Khamis",
+      "tuesday": "Selasa",
+      "wednesday": "Rabu"
+    },
+    "months": {
+      "april": "April",
+      "august": "Ogos",
+      "december": "Disember",
+      "february": "Februari",
+      "january": "Januari",
+      "july": "Julai",
+      "june": "Jun",
+      "march": "Mac",
+      "may": "Mei",
+      "november": "November",
+      "october": "Oktober",
+      "september": "September"
+    },
+    "today": "Hari ini",
+    "tomorrow": "Esok",
+    "yesterday": "Semalam"
+  },
+  "emptyStates": {
+    "noData": "Tiada apa-apa untuk ditunjukkan lagi.",
+    "noResults": "Tiada hasil ditemui.",
+    "tryAdjustingFilters": "Cuba laraskan carian atau penapis anda."
+  },
+  "errors": {
+    "forbidden": "Akses ditolak.",
+    "network": "Ralat rangkaian. \nSila semak sambungan anda.",
+    "notFound": "Tidak dijumpai.",
+    "server": "Ralat pelayan. \nSila cuba lagi kemudian.",
+    "timeout": "Permintaan tamat masa. \nSila cuba lagi.",
+    "title": "Sesuatu telah berlaku",
+    "unauthorized": "Anda tidak dibenarkan melakukan tindakan ini.",
+    "unknown": "Ralat yang tidak dijangka berlaku."
+  },
+  "forms": {
+    "labels": {
+      "address": "Alamat",
+      "city": "Bandar",
+      "country": "Negara",
+      "description": "Penerangan",
+      "email": "E-mel",
+      "firstName": "nama pertama",
+      "lastName": "nama keluarga",
+      "name": "Nama",
+      "notes": "Nota",
+      "phone": "telefon",
+      "postcode": "Poskod",
+      "state": "negeri"
+    },
+    "placeholders": {
+      "search": "Cari…",
+      "select": "Pilih…",
+      "typeHere": "Taip di sini…"
+    }
+  },
+  "nav": {
+    "account": "Akaun",
+    "admin": "Admin",
+    "dashboard": "Papan pemuka",
+    "help": "Tolong",
+    "home": "Rumah",
+    "logout": "Log keluar",
+    "profile": "Profil",
+    "settings": "tetapan",
+    "support": "Sokongan"
+  },
+  "toast": {
+    "copied": "Disalin ke papan keratan.",
+    "created": "Berjaya dibuat.",
+    "deleted": "Berjaya dipadamkan.",
+    "error": "ralat",
+    "saved": "Berjaya disimpan.",
+    "success": "Kejayaan",
+    "tryAgain": "Sila cuba lagi.",
+    "updated": "Berjaya dikemas kini."
+  },
+  "validation": {
+    "email": "Sila masukkan alamat e-mel yang sah.",
+    "invalid": "Nilai ini tidak sah.",
+    "max": "Mesti paling banyak {maks}.",
+    "maxLength": "Mesti paling banyak {maks} aksara.",
+    "min": "Mesti sekurang-kurangnya {min}.",
+    "minLength": "Mesti sekurang-kurangnya {min} aksara.",
+    "passwordMismatch": "Kata laluan tidak sepadan.",
+    "required": "Medan ini diperlukan."
+  }
+}

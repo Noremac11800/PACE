@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "en",
+    "name": "English"
+  },
+  "common": {
+    "appName": "PACE",
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "processing": "Processing…",
+    "search": "Search",
+    "clear": "Clear",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "done": "Done",
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "remove": "Remove",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "submit": "Submit",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "upload": "Upload",
+    "yes": "Yes",
+    "no": "No",
+    "on": "On",
+    "off": "Off",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "optional": "Optional",
+    "required": "Required"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "admin": "Admin",
+    "help": "Help",
+    "support": "Support",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Log in",
+    "logout": "Log out",
+    "signUp": "Sign up",
+    "continue": "Continue",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "newPassword": "New password",
+    "currentPassword": "Current password",
+    "twoFactor": "Two-factor authentication",
+    "verify": "Verify",
+    "resendCode": "Resend code",
+    "rememberMe": "Remember me"
+  },
+  "forms": {
+    "labels": {
+      "name": "Name",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "postcode": "Postcode",
+      "country": "Country",
+      "notes": "Notes",
+      "description": "Description"
+    },
+    "placeholders": {
+      "search": "Search…",
+      "select": "Select…",
+      "typeHere": "Type here…"
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "minLength": "Must be at least {min} characters.",
+    "maxLength": "Must be at most {max} characters.",
+    "min": "Must be at least {min}.",
+    "max": "Must be at most {max}.",
+    "email": "Please enter a valid email address.",
+    "passwordMismatch": "Passwords do not match.",
+    "invalid": "This value is invalid."
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "unknown": "An unexpected error occurred.",
+    "network": "Network error. Please check your connection.",
+    "timeout": "Request timed out. Please try again.",
+    "notFound": "Not found.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "forbidden": "Access denied.",
+    "server": "Server error. Please try again later."
+  },
+  "emptyStates": {
+    "noResults": "No results found.",
+    "noData": "Nothing to show yet.",
+    "tryAdjustingFilters": "Try adjusting your search or filters."
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "toast": {
+    "success": "Success",
+    "saved": "Saved successfully.",
+    "created": "Created successfully.",
+    "updated": "Updated successfully.",
+    "deleted": "Deleted successfully.",
+    "copied": "Copied to clipboard.",
+    "error": "Error",
+    "tryAgain": "Please try again."
+  },
+  "confirmations": {
+    "deleteTitle": "Delete this item?",
+    "deleteBody": "This action cannot be undone.",
+    "logoutTitle": "Log out?",
+    "logoutBody": "You will need to log in again to continue."
+  }
+}

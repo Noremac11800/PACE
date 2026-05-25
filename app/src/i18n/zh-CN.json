@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "zh-CN",
+    "name": "Chinese (Simplified)"
+  },
+  "auth": {
+    "confirmPassword": "确认密码",
+    "continue": "继续",
+    "currentPassword": "当前密码",
+    "email": "电子邮件",
+    "forgotPassword": "忘记密码？",
+    "login": "登录",
+    "logout": "退出",
+    "newPassword": "新密码",
+    "password": "密码",
+    "rememberMe": "记住账号",
+    "resendCode": "重新发送代码",
+    "resetPassword": "重置密码",
+    "signUp": "报名",
+    "twoFactor": "双因素身份验证",
+    "verify": "核实"
+  },
+  "common": {
+    "add": "添加",
+    "appName": "快学",
+    "back": "后退",
+    "cancel": "取消",
+    "clear": "清除",
+    "close": "关闭",
+    "confirm": "确认",
+    "copied": "已复制",
+    "copy": "复制",
+    "create": "创造",
+    "delete": "删除",
+    "disabled": "残疾人",
+    "done": "完毕",
+    "download": "下载",
+    "edit": "编辑",
+    "enabled": "启用",
+    "loading": "加载中…",
+    "next": "下一个",
+    "no": "不",
+    "off": "离开",
+    "on": "在",
+    "optional": "选修的",
+    "previous": "以前的",
+    "processing": "加工…",
+    "refresh": "刷新",
+    "remove": "消除",
+    "required": "必需的",
+    "retry": "重试",
+    "save": "节省",
+    "saving": "保存…",
+    "search": "搜索",
+    "submit": "提交",
+    "update": "更新",
+    "upload": "上传",
+    "yes": "是的"
+  },
+  "confirmations": {
+    "deleteBody": "此操作无法撤消。",
+    "deleteTitle": "删除此项目？",
+    "logoutBody": "您需要重新登录才能继续。",
+    "logoutTitle": "退出？"
+  },
+  "dates": {
+    "days": {
+      "friday": "星期五",
+      "monday": "周一",
+      "saturday": "周六",
+      "sunday": "星期日",
+      "thursday": "周四",
+      "tuesday": "周二",
+      "wednesday": "周三"
+    },
+    "months": {
+      "april": "四月",
+      "august": "八月",
+      "december": "十二月",
+      "february": "二月",
+      "january": "一月",
+      "july": "七月",
+      "june": "六月",
+      "march": "行进",
+      "may": "可能",
+      "november": "十一月",
+      "october": "十月",
+      "september": "九月"
+    },
+    "today": "今天",
+    "tomorrow": "明天",
+    "yesterday": "昨天"
+  },
+  "emptyStates": {
+    "noData": "还没有什么可展示的。",
+    "noResults": "没有找到结果。",
+    "tryAdjustingFilters": "尝试调整您的搜索或过滤器。"
+  },
+  "errors": {
+    "forbidden": "拒绝访问。",
+    "network": "网络错误。\n请检查您的连接。",
+    "notFound": "未找到。",
+    "server": "服务器错误。\n请稍后重试。",
+    "timeout": "请求超时。\n请再试一次。",
+    "title": "出了点问题",
+    "unauthorized": "您无权执行此操作。",
+    "unknown": "发生意外错误。"
+  },
+  "forms": {
+    "labels": {
+      "address": "地址",
+      "city": "城市",
+      "country": "国家",
+      "description": "描述",
+      "email": "电子邮件",
+      "firstName": "名",
+      "lastName": "姓",
+      "name": "姓名",
+      "notes": "笔记",
+      "phone": "电话",
+      "postcode": "邮政编码",
+      "state": "状态"
+    },
+    "placeholders": {
+      "search": "搜索…",
+      "select": "选择…",
+      "typeHere": "在此输入..."
+    }
+  },
+  "nav": {
+    "account": "帐户",
+    "admin": "行政",
+    "dashboard": "仪表板",
+    "help": "帮助",
+    "home": "家",
+    "logout": "退出",
+    "profile": "轮廓",
+    "settings": "设置",
+    "support": "支持"
+  },
+  "toast": {
+    "copied": "复制到剪贴板。",
+    "created": "创建成功。",
+    "deleted": "删除成功。",
+    "error": "错误",
+    "saved": "保存成功。",
+    "success": "成功",
+    "tryAgain": "请再试一次。",
+    "updated": "更新成功。"
+  },
+  "validation": {
+    "email": "请输入有效的电子邮件地址。",
+    "invalid": "该值无效。",
+    "max": "最多必须为 {max}。",
+    "maxLength": "最多只能有 {max} 个字符。",
+    "min": "必须至少为 {min}。",
+    "minLength": "必须至少为 {min} 个字符。",
+    "passwordMismatch": "密码不匹配。",
+    "required": "此字段是必需的。"
+  }
+}

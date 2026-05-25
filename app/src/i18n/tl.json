@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "tl",
+    "name": "Filipino"
+  },
+  "auth": {
+    "confirmPassword": "Kumpirmahin ang password",
+    "continue": "Magpatuloy",
+    "currentPassword": "Kasalukuyang password",
+    "email": "Email",
+    "forgotPassword": "Nakalimutan ang password?",
+    "login": "Mag-log in",
+    "logout": "Log out",
+    "newPassword": "Bagong password",
+    "password": "Password",
+    "rememberMe": "Tandaan mo ako",
+    "resendCode": "Muling ipadala ang code",
+    "resetPassword": "I-reset ang password",
+    "signUp": "Mag-sign up",
+    "twoFactor": "Dalawang-factor na pagpapatunay",
+    "verify": "I-verify"
+  },
+  "common": {
+    "add": "Idagdag",
+    "appName": "PACE",
+    "back": "Bumalik",
+    "cancel": "Kanselahin",
+    "clear": "Maaliwalas",
+    "close": "Isara",
+    "confirm": "Kumpirmahin",
+    "copied": "Kinopya",
+    "copy": "Kopyahin",
+    "create": "Lumikha",
+    "delete": "Tanggalin",
+    "disabled": "Hindi pinagana",
+    "done": "Tapos na",
+    "download": "I-download",
+    "edit": "I-edit",
+    "enabled": "Pinagana",
+    "loading": "Naglo-load…",
+    "next": "Susunod",
+    "no": "Hindi",
+    "off": "Naka-off",
+    "on": "Naka-on",
+    "optional": "Opsyonal",
+    "previous": "Nakaraang",
+    "processing": "Pinoproseso…",
+    "refresh": "I-refresh",
+    "remove": "Alisin",
+    "required": "Kinakailangan",
+    "retry": "Subukan muli",
+    "save": "I-save",
+    "saving": "Sine-save...",
+    "search": "Maghanap",
+    "submit": "Isumite",
+    "update": "Update",
+    "upload": "Mag-upload",
+    "yes": "Oo"
+  },
+  "confirmations": {
+    "deleteBody": "Ang pagkilos na ito ay hindi maaaring i-undo.",
+    "deleteTitle": "Tanggalin ang item na ito?",
+    "logoutBody": "Kakailanganin mong mag-log in muli upang magpatuloy.",
+    "logoutTitle": "Log out?"
+  },
+  "dates": {
+    "days": {
+      "friday": "Biyernes",
+      "monday": "Lunes",
+      "saturday": "Sabado",
+      "sunday": "Linggo",
+      "thursday": "Huwebes",
+      "tuesday": "Martes",
+      "wednesday": "Miyerkules"
+    },
+    "months": {
+      "april": "Abril",
+      "august": "Agosto",
+      "december": "Disyembre",
+      "february": "Pebrero",
+      "january": "Enero",
+      "july": "Hulyo",
+      "june": "Hunyo",
+      "march": "Marso",
+      "may": "May",
+      "november": "Nobyembre",
+      "october": "Oktubre",
+      "september": "Setyembre"
+    },
+    "today": "Ngayong araw",
+    "tomorrow": "Bukas",
+    "yesterday": "Kahapon"
+  },
+  "emptyStates": {
+    "noData": "Wala pang maipapakita.",
+    "noResults": "Walang nakitang resulta.",
+    "tryAdjustingFilters": "Subukang ayusin ang iyong paghahanap o mga filter."
+  },
+  "errors": {
+    "forbidden": "Tinanggihan ang pag-access.",
+    "network": "Error sa network. \nPakisuri ang iyong koneksyon.",
+    "notFound": "Hindi nahanap.",
+    "server": "Error sa server. \nPakisubukang muli mamaya.",
+    "timeout": "Nag-time out ang kahilingan. \nPakisubukang muli.",
+    "title": "Nagkaproblema",
+    "unauthorized": "Wala kang pahintulot na gawin ang pagkilos na ito.",
+    "unknown": "May naganap na hindi inaasahang error."
+  },
+  "forms": {
+    "labels": {
+      "address": "Address",
+      "city": "lungsod",
+      "country": "Bansa",
+      "description": "Paglalarawan",
+      "email": "Email",
+      "firstName": "Pangalan",
+      "lastName": "Apelyido",
+      "name": "Pangalan",
+      "notes": "Mga Tala",
+      "phone": "Telepono",
+      "postcode": "Postcode",
+      "state": "Estado"
+    },
+    "placeholders": {
+      "search": "Maghanap…",
+      "select": "Pumili…",
+      "typeHere": "Mag-type dito…"
+    }
+  },
+  "nav": {
+    "account": "Account",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "help": "Tulong",
+    "home": "Bahay",
+    "logout": "Log out",
+    "profile": "Profile",
+    "settings": "Mga setting",
+    "support": "Suporta"
+  },
+  "toast": {
+    "copied": "Kinopya sa clipboard.",
+    "created": "Matagumpay na nalikha.",
+    "deleted": "Matagumpay na natanggal.",
+    "error": "Error",
+    "saved": "Matagumpay na na-save.",
+    "success": "Tagumpay",
+    "tryAgain": "Pakisubukang muli.",
+    "updated": "Matagumpay na na-update."
+  },
+  "validation": {
+    "email": "Mangyaring magpasok ng wastong email address.",
+    "invalid": "Ang halagang ito ay hindi wasto.",
+    "max": "Dapat ay hindi hihigit sa {max}.",
+    "maxLength": "Dapat ay hindi hihigit sa {max} (na) character.",
+    "min": "Dapat ay hindi bababa sa {min}.",
+    "minLength": "Dapat ay hindi bababa sa {min} (na) character.",
+    "passwordMismatch": "Hindi tugma ang mga password.",
+    "required": "Kinakailangan ang field na ito."
+  }
+}

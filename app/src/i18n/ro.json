@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "locale": "ro",
+    "name": "Romanian"
+  },
+  "auth": {
+    "confirmPassword": "Confirmați parola",
+    "continue": "Continua",
+    "currentPassword": "Parola actuală",
+    "email": "E-mail",
+    "forgotPassword": "Aţi uitat parola?",
+    "login": "Log in",
+    "logout": "Deconectați-vă",
+    "newPassword": "Parolă Nouă",
+    "password": "Parolă",
+    "rememberMe": "Ține-mă minte",
+    "resendCode": "Retrimiteți codul",
+    "resetPassword": "Resetează parola",
+    "signUp": "Înscrie-te",
+    "twoFactor": "Autentificare cu doi factori",
+    "verify": "Verifica"
+  },
+  "common": {
+    "add": "Adăuga",
+    "appName": "PACE",
+    "back": "Spate",
+    "cancel": "Anula",
+    "clear": "Clar",
+    "close": "Aproape",
+    "confirm": "Confirma",
+    "copied": "Copiat",
+    "copy": "Copie",
+    "create": "Crea",
+    "delete": "Şterge",
+    "disabled": "Dezactivat",
+    "done": "Făcut",
+    "download": "Descărcați",
+    "edit": "Edita",
+    "enabled": "Activat",
+    "loading": "Încărcare…",
+    "next": "Următorul",
+    "no": "Nu",
+    "off": "Oprit",
+    "on": "Pe",
+    "optional": "Opțional",
+    "previous": "Anterior",
+    "processing": "Prelucrare…",
+    "refresh": "Reîmprospăta",
+    "remove": "Elimina",
+    "required": "Necesar",
+    "retry": "Reîncercați",
+    "save": "Salva",
+    "saving": "Economisire…",
+    "search": "Căutare",
+    "submit": "Trimiteți",
+    "update": "Actualizare",
+    "upload": "Încărcați",
+    "yes": "Da"
+  },
+  "confirmations": {
+    "deleteBody": "Această acțiune nu poate fi anulată.",
+    "deleteTitle": "Ștergeți acest articol?",
+    "logoutBody": "Va trebui să vă conectați din nou pentru a continua.",
+    "logoutTitle": "Deconectați-vă?"
+  },
+  "dates": {
+    "days": {
+      "friday": "vineri",
+      "monday": "luni",
+      "saturday": "sâmbătă",
+      "sunday": "duminică",
+      "thursday": "joi",
+      "tuesday": "marţi",
+      "wednesday": "miercuri"
+    },
+    "months": {
+      "april": "aprilie",
+      "august": "august",
+      "december": "decembrie",
+      "february": "februarie",
+      "january": "ianuarie",
+      "july": "iulie",
+      "june": "iunie",
+      "march": "martie",
+      "may": "mai",
+      "november": "noiembrie",
+      "october": "octombrie",
+      "september": "septembrie"
+    },
+    "today": "Astăzi",
+    "tomorrow": "Mâine",
+    "yesterday": "Ieri"
+  },
+  "emptyStates": {
+    "noData": "Nimic de arătat încă.",
+    "noResults": "Nu s-au găsit rezultate.",
+    "tryAdjustingFilters": "Încercați să ajustați căutarea sau filtrele."
+  },
+  "errors": {
+    "forbidden": "Acces interzis.",
+    "network": "Eroare de rețea. \nVă rugăm să vă verificați conexiunea.",
+    "notFound": "Nu a fost găsit.",
+    "server": "Eroare de server. \nVă rugăm să încercați din nou mai târziu.",
+    "timeout": "Solicitarea a expirat. \nVă rugăm să încercați din nou.",
+    "title": "Ceva a mers prost",
+    "unauthorized": "Nu sunteți autorizat să efectuați această acțiune.",
+    "unknown": "A apărut o eroare neașteptată."
+  },
+  "forms": {
+    "labels": {
+      "address": "Adresa",
+      "city": "Oraş",
+      "country": "Ţară",
+      "description": "Descriere",
+      "email": "E-mail",
+      "firstName": "Prenume",
+      "lastName": "Nume",
+      "name": "Nume",
+      "notes": "Note",
+      "phone": "Telefon",
+      "postcode": "Cod poștal",
+      "state": "Stat"
+    },
+    "placeholders": {
+      "search": "Căutare…",
+      "select": "Selecta…",
+      "typeHere": "Tastați aici…"
+    }
+  },
+  "nav": {
+    "account": "Cont",
+    "admin": "Admin",
+    "dashboard": "Bord",
+    "help": "Ajutor",
+    "home": "Acasă",
+    "logout": "Deconectați-vă",
+    "profile": "Profil",
+    "settings": "Setări",
+    "support": "Sprijin"
+  },
+  "toast": {
+    "copied": "Copiat în clipboard.",
+    "created": "Creat cu succes.",
+    "deleted": "S-a șters cu succes.",
+    "error": "Eroare",
+    "saved": "Salvat cu succes.",
+    "success": "Succes",
+    "tryAgain": "Vă rugăm să încercați din nou.",
+    "updated": "Actualizat cu succes."
+  },
+  "validation": {
+    "email": "Vă rugăm să introduceți o adresă de email validă.",
+    "invalid": "Această valoare este nevalidă.",
+    "max": "Trebuie să fie cel mult {max}.",
+    "maxLength": "Trebuie să conțină maximum {max} caractere.",
+    "min": "Trebuie să fie de cel puțin {min}.",
+    "minLength": "Trebuie să conțină cel puțin {min} caractere.",
+    "passwordMismatch": "Parolele nu se potrivesc.",
+    "required": "Acest câmp este obligatoriu."
+  }
+}
