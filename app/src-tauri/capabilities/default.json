@@ -2,11 +2,48 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
     "fs:default",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "python",
+          "cmd": "python",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "name": "python -m venv",
+          "cmd": "python",
+          "args": [
+            "-m",
+            "venv"
+          ]
+        },
+        {
+          "name": "pace",
+          "cmd": "pace"
+        },
+        {
+          "name": "python -m pip install",
+          "cmd": "python",
+          "args": [
+            "-m",
+            "pip",
+            "install",
+            "-e"
+          ]
+        }
+      ]
+    },
     "fs:allow-read-text-file",
     "fs:allow-resource-read-recursive",
     "fs:allow-resource-meta-recursive",
@@ -81,6 +118,7 @@
           "path": "$HOME/**"
         }
       ]
-    }
+    },
+    "dialog:default"
   ]
 }
