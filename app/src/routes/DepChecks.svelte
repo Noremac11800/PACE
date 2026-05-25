@@ -39,26 +39,26 @@
 
   async function checkPython() {
     pythonFound = undefined;
-    await sleep(1000);
+    await sleep(500);
     pythonFound = await isPythonInstalled(MIN_PYTHON_VERSION);
     pythonVersion = await getPythonVersion();
   }
 
   async function checkGit() {
     gitFound = undefined;
-    await sleep(1000);
+    await sleep(500);
     gitFound = await isGitInstalled();
   }
 
   async function checkPipx() {
     pipxFound = undefined;
-    await sleep(1000);
+    await sleep(500);
     pipxFound = await isPipxInstalled();
   }
 
   async function installPACE() {
     isInstalling = true;
-    await sleep(1000);
+    await sleep(500);
     paceInstallResult = await installPace(paceRepoPath);
     isInstalling = false;
   }
@@ -66,7 +66,7 @@
   async function runPACEHelp() {
     try {
       isRunningHelp = true;
-      await sleep(1000);
+      await sleep(500);
       let helpResult = await Command.create("pace", ["--help"]).execute();
       paceHelpResult = helpResult.stdout;
     } catch (error) {
@@ -224,7 +224,7 @@
   {#if pythonFound && gitFound && pipxFound}
     <div class="card bg-surface-50-950 shadow-md p-4">
       <h4 class="h4 text-primary-500 flex items-center gap-2 mb-4">
-        <img src="/appglyph.svg" alt="PACE" class="h-5 w-5" />
+        <img src="/appicon.svg" alt="PACE" class="h-5 w-5" />
         PACE Installation
       </h4>
 
