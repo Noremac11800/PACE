@@ -12,10 +12,10 @@
     <ThemeSwitch />
   </header>
 
-  <div
-    class="relative min-h-0 bg-surface-100-900/25 flex items-start justify-center p-4 overflow-auto"
-  >
-    <DepChecks class="min-w-[300px] max-w-[500px] w-full py-4" />
+  <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto p-4">
+    <div class="min-h-full flex items-center justify-center">
+      <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
+    </div>
   </div>
 
   <footer
