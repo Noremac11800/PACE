@@ -13,9 +13,9 @@
   </header>
 
   <div
-    class="relative min-h-0 bg-surface-100-900/25 flex items-center justify-center p-4"
+    class="relative min-h-0 bg-surface-100-900/25 flex items-start justify-center p-4 overflow-auto"
   >
-    <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
+    <DepChecks class="min-w-[300px] max-w-[500px] w-full py-4" />
   </div>
 
   <footer

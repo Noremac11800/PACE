@@ -34,6 +34,8 @@
   let paceHelpResult: string = $state("");
   let isInstalling = $state(false);
   let isRunningHelp = $state(false);
+  let isInstallingPipx = $state(false);
+  let pipxInstallResult: string = $state("");
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,6 +57,28 @@
     pipxFound = undefined;
     await sleep(EXEC_DELAY);
     pipxFound = await isPipxInstalled();
+  }
+
+  async function installPipx() {
+    isInstallingPipx = true;
+    pipxInstallResult = "";
+    await sleep(EXEC_DELAY);
+    try {
+      let result = await Command.create("pip install pipx", [
+        "-m",
+        "pip",
+        "install",
+        "pipx",
+      ]).execute();
+      console.log(result);
+      pipxInstallResult =
+        result.code === 0 ? "Pipx installed successfully" : result.stderr;
+      await checkPipx();
+    } catch (error) {
+      pipxInstallResult = error as string;
+    } finally {
+      isInstallingPipx = false;
+    }
   }
 
   async function installPACE() {
@@ -212,13 +236,36 @@
             Ready
           </span>
         {:else}
-          <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={16} />
-            Missing
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="chip preset-filled-error-500 flex items-center gap-1">
+              <X size={16} />
+              Missing
+            </span>
+            {#if pythonFound}
+              <button
+                class="btn preset-filled-secondary-500 text-xs flex items-center gap-1 px-2 py-1"
+                onclick={installPipx}
+                disabled={isInstallingPipx}
+              >
+                {#if isInstallingPipx}
+                  <Loader size={14} class="animate-spin" />
+                  Installing...
+                {:else}
+                  <Package size={14} />
+                  Install
+                {/if}
+              </button>
+            {/if}
+          </div>
         {/if}
       </div>
     </div>
+    {#if pipxInstallResult && pipxFound === false}
+      <div class="mt-2 p-2 bg-surface-100-900 rounded text-xs">
+        <pre
+          class="text-surface-700-300 whitespace-pre-wrap">{pipxInstallResult}</pre>
+      </div>
+    {/if}
   </div>
 
   <!-- PACE Installation Card -->
