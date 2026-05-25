@@ -8,7 +8,7 @@
 </script>
 
 <main class="h-full grid grid-rows-[auto_1fr_auto]">
-  <header class="relative flex flex-row justify-between items-center px-4 py-2">
+  <header class="relative flex flex-row justify-end items-center px-4 py-2">
     <ThemeSwitch />
   </header>
 
