@@ -3,7 +3,7 @@
   import { theme } from "$lib/theme";
   import { Sun, Moon } from "@lucide/svelte";
 
-  let { class: classname } = $props();
+  let { class: classname }: { class?: string } = $props();
 
   let checked = $state(false);
 

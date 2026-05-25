@@ -7,13 +7,14 @@
     installPace,
   } from "$lib/dependency_utils";
   import { Command } from "@tauri-apps/plugin-shell";
+  import { open } from "@tauri-apps/plugin-dialog";
   import { onMount } from "svelte";
   import {
     Check,
     X,
     Loader,
     RefreshCw,
-    Terminal,
+    Folder,
     Package,
     Github,
     Play,
@@ -345,11 +346,27 @@
       </div>
 
       <!-- Repository Path Input -->
+      <label
+        for="pace-repo-path"
+        class="block text-sm text-surface-700-300 mb-1"
+      >
+        Path to PACE repository root
+      </label>
       <div class="input-group grid grid-cols-[auto_1fr] mb-4">
-        <div class="ig-cell preset-tonal">
-          <Terminal size={18} />
-        </div>
+        <button
+          class="ig-cell preset-tonal cursor-pointer"
+          onclick={async () => {
+            const selected = await open({ directory: true });
+            if (selected) {
+              paceRepoPath = selected as string;
+            }
+          }}
+          title="Select directory"
+        >
+          <Folder size={18} />
+        </button>
         <input
+          id="pace-repo-path"
           class="ig-input"
           type="text"
           placeholder="PACE repository path"
