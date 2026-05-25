@@ -20,6 +20,7 @@
     Play,
     Settings,
     Tag,
+    Trash2,
   } from "@lucide/svelte";
 
   let { class: classname = "" } = $props();
@@ -35,8 +36,10 @@
   let paceRepoPath: string = $state("/home/cam/Documents/Development/PACE");
   let paceInstallResult: string = $state("");
   let paceHelpResult: string = $state("");
+  let paceUninstallResult: string = $state("");
   let isInstalling = $state(false);
   let isRunningHelp = $state(false);
+  let isUninstalling = $state(false);
   let isInstallingPipx = $state(false);
   let isCheckingPace = $state(false);
   let pipxInstallResult: string = $state("");
@@ -123,6 +126,25 @@
     await checkPace();
   }
 
+  async function uninstallPACE() {
+    isUninstalling = true;
+    paceUninstallResult = "";
+    await sleep(EXEC_DELAY);
+    try {
+      let result = await Command.create("pipx", [
+        "uninstall",
+        "pace",
+      ]).execute();
+      paceUninstallResult =
+        result.code === 0 ? "PACE uninstalled successfully" : result.stderr;
+      await checkPace();
+    } catch (error) {
+      paceUninstallResult = error as string;
+    } finally {
+      isUninstalling = false;
+    }
+  }
+
   async function runPACEHelp() {
     try {
       isRunningHelp = true;
@@ -144,6 +166,11 @@
     pipxVersion = "";
     paceInstalled = undefined;
     paceVersion = "";
+    paceHelpResult = "";
+    paceInstallResult = "";
+    paceUninstallResult = "";
+    pipxInstallResult = "";
+
     await checkPython();
     await checkGit();
     await checkPipx();
@@ -404,6 +431,20 @@
               Test PACE
             {/if}
           </button>
+
+          <button
+            class="btn preset-filled-error-500 flex items-center gap-2"
+            onclick={uninstallPACE}
+            disabled={isUninstalling}
+          >
+            {#if isUninstalling}
+              <Loader size={16} class="animate-spin" />
+              Uninstalling...
+            {:else}
+              <Trash2 size={16} />
+              Uninstall
+            {/if}
+          </button>
         {/if}
       </div>
 
@@ -412,6 +453,13 @@
         <div class="mt-4 p-3 bg-surface-100-900 rounded text-sm">
           <p class="text-surface-700-300 mb-1">Installation Result:</p>
           <p class="font-mono">{paceInstallResult}</p>
+        </div>
+      {/if}
+
+      {#if paceUninstallResult}
+        <div class="mt-4 p-3 bg-surface-100-900 rounded text-sm">
+          <p class="text-surface-700-300 mb-1">Uninstall Result:</p>
+          <p class="font-mono">{paceUninstallResult}</p>
         </div>
       {/if}
 
