@@ -1,20 +1,14 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
-  import {
-    Bug,
-    Home,
-    Package,
-    Settings,
-    Terminal,
-    CircleHelp,
-  } from "@lucide/svelte";
-  import DepChecks from "./DepChecks.svelte";
-
-  const version = "v0.1.0-alpha.1";
+  import { Bug, Home, Package, Terminal, CircleHelp } from "@lucide/svelte";
+  import HomePanel from "./HomePanel.svelte";
+  import DependenciesPanel from "./DependenciesPanel.svelte";
+  import ConsolePanel from "./ConsolePanel.svelte";
+  import AboutPanel from "./AboutPanel.svelte";
 
   let activeView: "home" | "dependencies" | "console" | "about" =
-    $state("dependencies");
+    $state("home");
 </script>
 
 <main class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr_auto]">
@@ -85,44 +79,13 @@
   <!-- Main Content -->
   <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto p-4">
     {#if activeView === "home"}
-      <div class="min-h-full flex items-center justify-center">
-        <div class="card bg-surface-50-950 shadow-md p-8 text-center max-w-md">
-          <img src="/appicon.svg" alt="PACE" class="h-16 w-16 mx-auto mb-4" />
-          <h1 class="h1 text-primary-500 mb-2">Welcome to PACE</h1>
-          <p class="text-surface-700-300 mb-4">
-            Project Automation and Configuration Engine
-          </p>
-          <p class="text-sm text-surface-700-300">
-            Use the sidebar to navigate between views.
-          </p>
-        </div>
-      </div>
+      <HomePanel />
     {:else if activeView === "dependencies"}
-      <div class="min-h-full flex items-center justify-center">
-        <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
-      </div>
+      <DependenciesPanel />
     {:else if activeView === "console"}
-      <div class="min-h-full flex items-center justify-center">
-        <div class="card bg-surface-50-950 shadow-md p-8 text-center max-w-md">
-          <Terminal size={48} class="mx-auto mb-4 text-primary-500" />
-          <h2 class="h2 text-primary-500 mb-2">Console</h2>
-          <p class="text-surface-700-300">
-            Command output and logs will appear here.
-          </p>
-        </div>
-      </div>
+      <ConsolePanel />
     {:else if activeView === "about"}
-      <div class="min-h-full flex items-center justify-center">
-        <div class="card bg-surface-50-950 shadow-md p-8 text-center max-w-md">
-          <img src="/appicon.svg" alt="PACE" class="h-16 w-16 mx-auto mb-4" />
-          <h2 class="h2 text-primary-500 mb-2">About PACE</h2>
-          <p class="text-surface-700-300 mb-2">Version {version}</p>
-          <p class="text-sm text-surface-700-300">
-            A project automation and configuration tool for managing
-            multi-repository projects.
-          </p>
-        </div>
-      </div>
+      <AboutPanel />
     {/if}
   </div>
 
@@ -137,8 +100,6 @@
       <Bug size={16} />
       Go to sandbox
     </button>
-    <p class="text-end">
-      {version}
-    </p>
+    <p class="text-end">v0.1.0-alpha.1</p>
   </footer>
 </main>
