@@ -108,6 +108,7 @@
       pipxInstallResult = error as string;
     } finally {
       isInstallingPipx = false;
+      await checkAll();
     }
   }
 
