@@ -91,8 +91,18 @@
         "pipx",
       ]).execute();
       console.log(result);
-      pipxInstallResult =
-        result.code === 0 ? "Pipx installed successfully" : result.stderr;
+      if (result.code === 0) {
+        pipxInstallResult = "Pipx installed successfully. Ensuring PATH...";
+        let ensurePathResult = await Command.create("pipx", [
+          "ensurepath",
+        ]).execute();
+        pipxInstallResult =
+          ensurePathResult.code === 0
+            ? "Pipx installed and PATH updated."
+            : `Pipx installed but PATH update failed: ${ensurePathResult.stderr}`;
+      } else {
+        pipxInstallResult = result.stderr;
+      }
       await checkPipx();
     } catch (error) {
       pipxInstallResult = error as string;
