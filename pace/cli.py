@@ -80,7 +80,7 @@ def main() -> int:
         help="Print the loaded configuration",
         default=False,
     )
-    parser.add_argument(_Options.VERSION.long, action="version", version="%(prog)s 0.1.0")
+    parser.add_argument(_Options.VERSION.long, action="version", version="pace 0.1.0")
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
