@@ -1,4 +1,4 @@
-# repodir = "/tmp/PACE"
+repodir = "/tmp/PACE"
 
 [[projects]]
 name = "toolkit-core"
