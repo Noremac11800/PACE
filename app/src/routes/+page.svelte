@@ -1,14 +1,15 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
-  import { Bug, Home, Package, Terminal, CircleHelp } from "@lucide/svelte";
+  import { Bug } from "@lucide/svelte";
+  import { View } from "./view-types";
+  import Sidebar from "./Sidebar.svelte";
   import HomePanel from "./HomePanel.svelte";
   import DependenciesPanel from "./DependenciesPanel.svelte";
   import ConsolePanel from "./ConsolePanel.svelte";
   import AboutPanel from "./AboutPanel.svelte";
 
-  let activeView: "home" | "dependencies" | "console" | "about" =
-    $state("home");
+  let activeView: View = $state(View.HOME);
 </script>
 
 <main class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr_auto]">
@@ -34,57 +35,17 @@
     <ThemeSwitch />
   </header>
 
-  <!-- Sidebar -->
-  <aside
-    class="flex flex-col items-center gap-2 p-2 bg-surface-50-950 border-r border-surface-200-800"
-  >
-    <button
-      class="btn {activeView === 'home'
-        ? 'preset-filled-primary-500'
-        : 'preset-tonal'} p-2"
-      onclick={() => (activeView = "home")}
-      title="Home"
-    >
-      <Home size={20} />
-    </button>
-    <button
-      class="btn {activeView === 'dependencies'
-        ? 'preset-filled-primary-500'
-        : 'preset-tonal'} p-2"
-      onclick={() => (activeView = "dependencies")}
-      title="Dependencies"
-    >
-      <Package size={20} />
-    </button>
-    <button
-      class="btn {activeView === 'console'
-        ? 'preset-filled-primary-500'
-        : 'preset-tonal'} p-2"
-      onclick={() => (activeView = "console")}
-      title="Console"
-    >
-      <Terminal size={20} />
-    </button>
-    <button
-      class="btn {activeView === 'about'
-        ? 'preset-filled-primary-500'
-        : 'preset-tonal'} p-2"
-      onclick={() => (activeView = "about")}
-      title="About"
-    >
-      <CircleHelp size={20} />
-    </button>
-  </aside>
+  <Sidebar bind:activeView />
 
   <!-- Main Content -->
   <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto p-4">
-    {#if activeView === "home"}
+    {#if activeView === View.HOME}
       <HomePanel />
-    {:else if activeView === "dependencies"}
+    {:else if activeView === View.DEPENDENCIES}
       <DependenciesPanel />
-    {:else if activeView === "console"}
+    {:else if activeView === View.CONSOLE}
       <ConsolePanel />
-    {:else if activeView === "about"}
+    {:else if activeView === View.ABOUT}
       <AboutPanel />
     {/if}
   </div>
