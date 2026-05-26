@@ -4,6 +4,7 @@ import argparse
 import sys
 from argparse import Namespace
 from pathlib import Path
+from typing import Any
 
 import rich
 from rich.console import Console
@@ -19,6 +20,34 @@ _DEMOS = {
 }
 
 
+class _Option:
+    def __init__(self, short: str, long: str, description: str, metavar: str | None = None) -> None:
+        self.short = short
+        self.long = long
+        self.metavar = metavar
+        self.description = description
+
+
+class _Options:
+    DEBUG = _Option("", "--debug", "Enable debug mode with full tracebacks")
+    CONFIG = _Option(
+        "-C",
+        "--config",
+        "Path to configuration file. Defaults to an internal pace.toml file.",
+        metavar="<path>",
+    )
+    PRINT_CONFIG = _Option("", "--print-config", "Print the configuration and exit")
+    VERSION = _Option("-v", "--version", "Print the version and exit")
+
+
+class PaceFormatter(argparse.HelpFormatter):
+    """Custom help formatter for PACE CLI."""
+
+    def _format_usage(self, usage: Any, actions: Any, groups: Any, prefix: Any) -> str:  # noqa: ARG002
+        """Override usage formatting to match the desired style."""
+        return f"usage: [-h] [{_Options.CONFIG.short} {_Options.CONFIG.metavar}] [OPTIONS] command...\n\n"  # noqa: E501
+
+
 def main() -> int:
     """Main entry point for the PACE CLI.
 
@@ -28,23 +57,30 @@ def main() -> int:
     console = Console()
 
     parser = argparse.ArgumentParser(
-        description="PACE - Project Automation and Configuration Engine"
+        description="PACE - Project Automation and Configuration Engine",
+        formatter_class=PaceFormatter,
     )
 
     parser.add_argument(
-        "--debug", action="store_true", default=False, help="Enable debug mode with full tracebacks"
+        _Options.DEBUG.long,
+        action="store_true",
+        default=False,
+        help="Enable debug mode with full tracebacks",
     )
     parser.add_argument(
-        "-C",
-        "--config",
-        metavar="<path>",
+        _Options.CONFIG.short,
+        _Options.CONFIG.long,
+        metavar=_Options.CONFIG.metavar,
         help="Path to configuration file. Defaults to an internal pace.toml file.",
         type=Path,
     )
     parser.add_argument(
-        "--print-config", action="store_true", help="Print the loaded configuration", default=False
+        _Options.PRINT_CONFIG.long,
+        action="store_true",
+        help="Print the loaded configuration",
+        default=False,
     )
-    parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
+    parser.add_argument(_Options.VERSION.long, action="version", version="%(prog)s 0.1.0")
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
