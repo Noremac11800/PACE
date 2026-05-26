@@ -1,12 +1,20 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
-  import { Bug, Home, Package, Settings } from "@lucide/svelte";
+  import {
+    Bug,
+    Home,
+    Package,
+    Settings,
+    Terminal,
+    CircleHelp,
+  } from "@lucide/svelte";
   import DepChecks from "./DepChecks.svelte";
 
   const version = "v0.1.0-alpha.1";
 
-  let activeView: "home" | "dependencies" = $state("dependencies");
+  let activeView: "home" | "dependencies" | "console" | "about" =
+    $state("dependencies");
 </script>
 
 <main class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr_auto]">
@@ -54,6 +62,24 @@
     >
       <Package size={20} />
     </button>
+    <button
+      class="btn {activeView === 'console'
+        ? 'preset-filled-primary-500'
+        : 'preset-tonal'} p-2"
+      onclick={() => (activeView = "console")}
+      title="Console"
+    >
+      <Terminal size={20} />
+    </button>
+    <button
+      class="btn {activeView === 'about'
+        ? 'preset-filled-primary-500'
+        : 'preset-tonal'} p-2"
+      onclick={() => (activeView = "about")}
+      title="About"
+    >
+      <CircleHelp size={20} />
+    </button>
   </aside>
 
   <!-- Main Content -->
@@ -71,9 +97,31 @@
           </p>
         </div>
       </div>
-    {:else}
+    {:else if activeView === "dependencies"}
       <div class="min-h-full flex items-center justify-center">
         <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
+      </div>
+    {:else if activeView === "console"}
+      <div class="min-h-full flex items-center justify-center">
+        <div class="card bg-surface-50-950 shadow-md p-8 text-center max-w-md">
+          <Terminal size={48} class="mx-auto mb-4 text-primary-500" />
+          <h2 class="h2 text-primary-500 mb-2">Console</h2>
+          <p class="text-surface-700-300">
+            Command output and logs will appear here.
+          </p>
+        </div>
+      </div>
+    {:else if activeView === "about"}
+      <div class="min-h-full flex items-center justify-center">
+        <div class="card bg-surface-50-950 shadow-md p-8 text-center max-w-md">
+          <img src="/appicon.svg" alt="PACE" class="h-16 w-16 mx-auto mb-4" />
+          <h2 class="h2 text-primary-500 mb-2">About PACE</h2>
+          <p class="text-surface-700-300 mb-2">Version {version}</p>
+          <p class="text-sm text-surface-700-300">
+            A project automation and configuration tool for managing
+            multi-repository projects.
+          </p>
+        </div>
       </div>
     {/if}
   </div>
