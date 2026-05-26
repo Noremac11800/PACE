@@ -38,7 +38,7 @@
   <Sidebar bind:activeView />
 
   <!-- Main Content -->
-  <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto p-4">
+  <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto">
     {#if activeView === View.HOME}
       <HomePanel />
     {:else if activeView === View.DEPENDENCIES}
