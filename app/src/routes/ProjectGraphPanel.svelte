@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Network } from "@lucide/svelte";
+  import { Network, MousePointerClick, Move, ZoomIn } from "@lucide/svelte";
   import { onMount } from "svelte";
   import cytoscape from "cytoscape";
   import cytoscapeDagre from "cytoscape-dagre";
@@ -408,16 +408,28 @@
   </div>
   <div class="flex-1 min-h-0" bind:this={containerEl}></div>
   <div
-    class="flex items-center gap-4 px-4 py-2 border-t border-surface-200-800 text-xs text-surface-500"
+    class="flex flex-col gap-1 px-4 py-2 border-t border-surface-200-800 text-xs text-surface-500"
   >
-    <span class="flex items-center gap-1"
-      ><span class="inline-block w-3 h-3 rounded-full bg-[#6366f1]"></span> Toolkit</span
-    >
-    <span class="flex items-center gap-1"
-      ><span class="inline-block w-3 h-3 rounded-full bg-[#f59e0b]"></span> AppModule</span
-    >
-    <span class="flex items-center gap-1"
-      ><span class="inline-block w-3 h-3 rounded-full bg-[#10b981]"></span> App</span
-    >
+    <div class="flex items-center gap-4 text-surface-400">
+      <span class="flex items-center gap-1"
+        ><ZoomIn size={12} /> Scroll to zoom</span
+      >
+      <span class="flex items-center gap-1"><Move size={12} /> Drag to pan</span
+      >
+      <span class="flex items-center gap-1"
+        ><MousePointerClick size={12} /> Click node to trace dependencies</span
+      >
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="flex items-center gap-1"
+        ><span class="inline-block w-3 h-3 rounded-full bg-[#6366f1]"></span> Toolkit</span
+      >
+      <span class="flex items-center gap-1"
+        ><span class="inline-block w-3 h-3 rounded-full bg-[#f59e0b]"></span> AppModule</span
+      >
+      <span class="flex items-center gap-1"
+        ><span class="inline-block w-3 h-3 rounded-full bg-[#10b981]"></span> App</span
+      >
+    </div>
   </div>
 </div>
