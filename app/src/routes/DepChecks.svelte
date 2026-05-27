@@ -132,6 +132,13 @@
   }
 
   async function installPACE() {
+    // Validate that a repository path is provided
+    if (!paceRepoPath || paceRepoPath.trim() === "") {
+      paceInstallResult =
+        "Please select a PACE repository path before installing.";
+      return;
+    }
+
     isInstalling = true;
     await sleep(EXEC_DELAY);
     paceInstallResult = await installPace(paceRepoPath);
