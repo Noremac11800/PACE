@@ -64,15 +64,21 @@
 
   <!-- Footer -->
   <footer
-    class="col-span-2 flex items-center justify-between bg-surface-50-950 px-2 py-1 border-t border-surface-200-800"
+    class="col-span-2 flex items-center justify-end bg-surface-50-950 px-2 py-1 border-t border-surface-200-800"
   >
-    <button
+    <!-- <button
       class="btn preset-filled-primary-500 text-xs"
       onclick={() => goto("/sandbox")}
     >
       <Bug size={16} />
       Go to sandbox
+    </button> -->
+
+    <button
+      onclick={() => goto("/sandbox")}
+      class="text-end text-xs text-surface-500-400"
+    >
+      v0.1.0-alpha
     </button>
-    <p class="text-end">v0.1.0-alpha.1</p>
   </footer>
 </main>

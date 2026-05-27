@@ -402,7 +402,9 @@
 </script>
 
 <div class="h-full flex flex-col overflow-hidden">
-  <div class="flex items-center gap-2 p-4 border-b border-surface-200-800">
+  <div
+    class="flex items-center gap-2 p-4 bg-surface-50-950 border-b border-surface-200-800"
+  >
     <Network size={24} class="text-primary-500" />
     <h2 class="h3 text-primary-500">Project graph</h2>
   </div>
