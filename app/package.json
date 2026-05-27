@@ -28,6 +28,8 @@
     "@tauri-apps/plugin-window-state": "~2",
     "@types/cytoscape": "^3.31.0",
     "cytoscape": "^3.33.4",
+    "cytoscape-dagre": "^3.0.0",
+    "dagre": "^0.8.5",
     "svelte-i18n": "^4.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.3",

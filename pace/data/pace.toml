@@ -216,7 +216,7 @@ depends_on = ["appmodule-survey123"]
 name = "apps-sdk"
 csproj_path = "src/Esri.Apps.Sdk/Esri.Apps.Sdk.csproj"
 repo_url = "git@devtopia.esri.com:Melbourne/apps-sdk.git"
-sln_group = "Apps"
+sln_group = "AppModule"
 explicit_frameworks = []
 depends_on = ["appmodule-survey123", "appmodule-featureforms", "appmodule-quickcapture", "appmodule-webforms"]
 
