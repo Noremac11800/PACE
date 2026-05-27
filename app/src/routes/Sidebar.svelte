@@ -6,6 +6,7 @@
     CircleQuestionMark,
     FileCode,
     Network,
+    Settings,
     TriangleAlert,
   } from "@lucide/svelte";
   import { View } from "./view-types";
@@ -77,6 +78,16 @@
     disabled={!paceReady}
   >
     <Terminal size={20} />
+  </button>
+  <div class="flex-1"></div>
+  <button
+    class="btn {activeView === View.SETTINGS
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2"
+    onclick={() => (activeView = View.SETTINGS)}
+    title="Settings"
+  >
+    <Settings size={20} />
   </button>
   <button
     class="btn {activeView === View.ABOUT

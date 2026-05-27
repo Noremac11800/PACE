@@ -4,6 +4,7 @@ export enum View {
   DIRECTORY_BUILD_PROPS = "directory_build_props",
   PROJECT_GRAPH = "project_graph",
   CONSOLE = "console",
+  SETTINGS = "settings",
   ABOUT = "about",
 }
 
