@@ -25,6 +25,7 @@
     "@tauri-apps/plugin-fs": "~2",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "~2",
+    "@tauri-apps/plugin-updater": "~2",
     "@tauri-apps/plugin-window-state": "~2",
     "@types/cytoscape": "^3.31.0",
     "cytoscape": "^3.33.4",
