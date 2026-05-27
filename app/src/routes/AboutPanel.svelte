@@ -88,7 +88,7 @@
           <strong>pipx</strong>. Install PACE from the repository root:
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto">pipx install --editable /path/to/PACE</pre>
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pipx install --editable /path/to/PACE</pre>
         <p class="text-xs text-surface-500 mt-2">
           Use the <strong>Dependencies</strong> panel in the GUI to check and install
           all prerequisites automatically.
@@ -104,7 +104,7 @@
           >, but you can specify a custom config:
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto">pace -C /path/to/config.toml [command]</pre>
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pace -C /path/to/config.toml [command]</pre>
         <p class="text-sm text-surface-700-300 mt-2">
           The <code class="text-primary-500">REPODIR</code> environment variable
           can override the
@@ -119,7 +119,7 @@
         CLI Usage
       </h2>
       <pre
-        class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-4">usage: pace [-h] [-C &lt;path&gt;] [OPTIONS] command...</pre>
+        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">usage: pace [-h] [-C &lt;path&gt;] [OPTIONS] command...</pre>
 
       <div id="global-options" class="mb-6">
         <h3 class="h4 mb-2">Global Options</h3>
@@ -185,12 +185,12 @@
           <code class="text-primary-500">dotnet build</code> against it.
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace dotnet [-- dotnet-args...]</pre>
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace dotnet [-- dotnet-args...]</pre>
         <p class="text-sm text-surface-700-300 mb-2">
           <strong>Framework filtering:</strong>
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-2"># Build only iOS-compatible projects
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2"># Build only iOS-compatible projects
 pace dotnet -- -f net8.0-ios</pre>
         <p class="text-xs text-surface-500">
           Supported framework filters: <code>ios</code>, <code>android</code>,
@@ -205,7 +205,7 @@ pace dotnet -- -f net8.0-ios</pre>
           status updates.
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace git clone   # Clone all repositories
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace git clone   # Clone all repositories
 pace git pull    # Pull latest for all repositories</pre>
         <p class="text-xs text-surface-500">
           Repositories are defined per-project in the config file via the
@@ -219,7 +219,7 @@ pace git pull    # Pull latest for all repositories</pre>
           Run built-in Rich demos for development and testing purposes.
         </p>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace demo columns
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace demo columns
 pace demo progress_bar</pre>
       </div>
     </section>
@@ -292,7 +292,7 @@ pace demo progress_bar</pre>
       </p>
       <h3 class="h4 mb-2">Structure</h3>
       <pre
-        class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-sm font-mono overflow-x-auto mb-4">repodir = "/path/to/repos"
+        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">repodir = "/path/to/repos"
 
 [[projects]]
 name = "my-project"

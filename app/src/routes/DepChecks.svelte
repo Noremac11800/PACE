@@ -487,7 +487,7 @@
         <div class="mt-4">
           <p class="text-xs text-surface-700-300 mb-1">PACE Help Output:</p>
           <pre
-            class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-xs overflow-auto max-h-48">{paceHelpResult}</pre>
+            class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-xs overflow-auto max-h-48">{paceHelpResult}</pre>
         </div>
       {/if}
     </div>

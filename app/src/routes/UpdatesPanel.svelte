@@ -70,7 +70,7 @@
           </button>
           {#if showCliChangelog}
             <pre
-              class="text-xs bg-surface-200-800 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
+              class="text-xs bg-surface-100-900 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
                 .cli.changelog}</pre>
           {/if}
         {/if}
@@ -134,7 +134,7 @@
           </button>
           {#if showAppChangelog}
             <pre
-              class="text-xs bg-surface-200-800 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
+              class="text-xs bg-surface-100-900 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
                 .app.changelog}</pre>
           {/if}
         {/if}

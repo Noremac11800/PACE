@@ -503,7 +503,7 @@
           </button>
         </div>
         <pre
-          class="bg-surface-950-50 text-surface-50-950 p-3 rounded text-xs overflow-auto max-h-48 font-mono">{generateXml()}</pre>
+          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-xs overflow-auto max-h-48 font-mono">{generateXml()}</pre>
       </div>
     {/if}
   </div>
