@@ -222,7 +222,7 @@
   <div class="flex items-center justify-between">
     <h2 class="h3 text-primary-500 flex items-center gap-2">
       <FileCode size={24} />
-      Directory.Build.props Editor
+      Directory.Build.props editor
     </h2>
   </div>
 

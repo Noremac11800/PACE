@@ -404,8 +404,7 @@
 <div class="h-full flex flex-col overflow-hidden">
   <div class="flex items-center gap-2 p-4 border-b border-surface-200-800">
     <Network size={24} class="text-primary-500" />
-    <h2 class="h3 text-primary-500">Project Graph</h2>
-    <span class="text-xs text-surface-500 ml-2">(mocked data)</span>
+    <h2 class="h3 text-primary-500">Project graph</h2>
   </div>
   <div class="flex-1 min-h-0" bind:this={containerEl}></div>
   <div
