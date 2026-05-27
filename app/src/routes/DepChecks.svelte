@@ -7,6 +7,7 @@
     installPace,
   } from "$lib/dependency_utils";
   import { Command } from "@tauri-apps/plugin-shell";
+  import { setPaceInstalledStatus } from "$lib/pace-status.svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { onMount } from "svelte";
   import {
@@ -126,6 +127,7 @@
       paceInstalled = false;
     } finally {
       isCheckingPace = false;
+      setPaceInstalledStatus(paceInstalled ?? false);
     }
   }
 

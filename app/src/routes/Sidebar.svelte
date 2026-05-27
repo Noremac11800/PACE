@@ -5,14 +5,18 @@
     Terminal,
     CircleQuestionMark,
     FileCode,
+    TriangleAlert,
   } from "@lucide/svelte";
   import { View } from "./view-types";
 
   interface Props {
     activeView: View;
+    paceInstalledStatus: boolean | undefined;
   }
 
-  let { activeView = $bindable() }: Props = $props();
+  let { activeView = $bindable(), paceInstalledStatus }: Props = $props();
+
+  let paceReady = $derived(paceInstalledStatus === true);
 </script>
 
 <aside
@@ -30,11 +34,18 @@
   <button
     class="btn {activeView === View.DEPENDENCIES
       ? 'preset-filled-primary-500'
-      : 'preset-tonal'} p-2"
+      : 'preset-tonal'} p-2 relative"
     onclick={() => (activeView = View.DEPENDENCIES)}
     title="Dependencies"
   >
     <Package size={20} />
+    {#if paceInstalledStatus === false}
+      <span
+        class="absolute -top-1.5 -right-1.5 bg-error-500 text-surface-50 rounded-full p-0.5"
+      >
+        <TriangleAlert size={10} />
+      </span>
+    {/if}
   </button>
   <button
     class="btn {activeView === View.DIRECTORY_BUILD_PROPS
@@ -42,6 +53,7 @@
       : 'preset-tonal'} p-2"
     onclick={() => (activeView = View.DIRECTORY_BUILD_PROPS)}
     title="Directory.Build.props"
+    disabled={!paceReady}
   >
     <FileCode size={20} />
   </button>
@@ -51,6 +63,7 @@
       : 'preset-tonal'} p-2"
     onclick={() => (activeView = View.CONSOLE)}
     title="Console"
+    disabled={!paceReady}
   >
     <Terminal size={20} />
   </button>

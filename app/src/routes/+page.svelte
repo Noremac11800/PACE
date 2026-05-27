@@ -9,8 +9,14 @@
   import ConsolePanel from "./ConsolePanel.svelte";
   import AboutPanel from "./AboutPanel.svelte";
   import DirectoryBuildPropsPanel from "./DirectoryBuildPropsPanel.svelte";
+  import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
+  import { onMount } from "svelte";
 
   let activeView: View = $state(View.HOME);
+
+  onMount(() => {
+    checkPaceInstalled();
+  });
 </script>
 
 <main class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr_auto]">
@@ -36,7 +42,7 @@
     <ThemeSwitch />
   </header>
 
-  <Sidebar bind:activeView />
+  <Sidebar bind:activeView paceInstalledStatus={paceStatus.installed} />
 
   <!-- Main Content -->
   <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto">
