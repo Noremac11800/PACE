@@ -5,6 +5,7 @@
     Terminal,
     CircleQuestionMark,
     FileCode,
+    Network,
     TriangleAlert,
   } from "@lucide/svelte";
   import { View } from "./view-types";
@@ -56,6 +57,16 @@
     disabled={!paceReady}
   >
     <FileCode size={20} />
+  </button>
+  <button
+    class="btn {activeView === View.PROJECT_GRAPH
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2"
+    onclick={() => (activeView = View.PROJECT_GRAPH)}
+    title="Project Graph"
+    disabled={!paceReady}
+  >
+    <Network size={20} />
   </button>
   <button
     class="btn {activeView === View.CONSOLE

@@ -9,6 +9,7 @@
   import ConsolePanel from "./ConsolePanel.svelte";
   import AboutPanel from "./AboutPanel.svelte";
   import DirectoryBuildPropsPanel from "./DirectoryBuildPropsPanel.svelte";
+  import ProjectGraphPanel from "./ProjectGraphPanel.svelte";
   import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
   import { onMount } from "svelte";
 
@@ -52,6 +53,8 @@
       <DependenciesPanel />
     {:else if activeView === View.DIRECTORY_BUILD_PROPS}
       <DirectoryBuildPropsPanel />
+    {:else if activeView === View.PROJECT_GRAPH}
+      <ProjectGraphPanel />
     {:else if activeView === View.CONSOLE}
       <ConsolePanel />
     {:else if activeView === View.ABOUT}
