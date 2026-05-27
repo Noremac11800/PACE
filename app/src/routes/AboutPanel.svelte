@@ -2,7 +2,7 @@
   import { PanelRightClose, PanelRightOpen } from "@lucide/svelte";
   import { slide } from "svelte/transition";
 
-  const version = "v0.1.0-alpha.1";
+  const version = "v0.1.0-alpha";
 
   interface TocEntry {
     id: string;

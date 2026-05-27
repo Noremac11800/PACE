@@ -36,6 +36,6 @@
 >
   <p class="text-sm italic text-surface-700-300">
     <!-- &copy; {new Date().getFullYear()} VentureCodable - All rights reserved -->
-    v0.1.0-alpha.1
+    v0.1.0-alpha
   </p>
 </footer>
