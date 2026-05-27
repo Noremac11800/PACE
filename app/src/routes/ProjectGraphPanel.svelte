@@ -222,6 +222,7 @@
     // Edges - toolkit-maui-controls
     { data: { source: "toolkit-maui-mvvm", target: "toolkit-maui-controls" } },
     // Edges - toolkit-maui
+    { data: { source: "toolkit-core", target: "toolkit-maui" } },
     { data: { source: "toolkit-maui-media", target: "toolkit-maui" } },
     { data: { source: "toolkit-maui-sensors", target: "toolkit-maui" } },
     { data: { source: "toolkit-maui-devices", target: "toolkit-maui" } },

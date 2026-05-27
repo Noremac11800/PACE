@@ -83,3 +83,51 @@ body {
   padding-left: env(safe-area-inset-left);
   box-sizing: border-box;
 }
+
+/* Modern scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Dark mode scrollbar */
+[data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.3);
+}
+
+[data-mode="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.5);
+}
+
+/* Firefox scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+[data-mode="dark"] * {
+  scrollbar-color: rgba(107, 114, 128, 0.3) transparent;
+}
+
+/* Firefox hover effect */
+*:hover {
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+[data-mode="dark"] *:hover {
+  scrollbar-color: rgba(107, 114, 128, 0.5) transparent;
+}
