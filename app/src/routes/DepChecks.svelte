@@ -34,7 +34,7 @@
   let gitFound: boolean | undefined = $state(undefined);
   let pipxFound: boolean | undefined = $state(undefined);
   let pipxVersion = $state("");
-  let paceRepoPath: string = $state("/home/cam/Documents/Development/PACE");
+  let paceRepoPath: string = $state("");
   let paceInstallResult: string = $state("");
   let paceHelpResult: string = $state("");
   let paceUninstallResult: string = $state("");
