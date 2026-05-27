@@ -1,30 +1,39 @@
 import { Command } from "@tauri-apps/plugin-shell";
 
 export async function isPythonInstalled(min_version: string): Promise<boolean> {
-  let result = await Command.create("python", ["--version"]).execute();
-  if (result.code != 0) {
-    return false;
-  } else {
-    const version = result.stdout.trim().split(" ")[1];
-    const versionParts = version.split(".").map(Number);
-    const minParts = min_version.split(".").map(Number);
+  try {
+    let result = await Command.create("python", ["--version"]).execute();
+    if (result.code != 0) {
+      return false;
+    } else {
+      const version = result.stdout.trim().split(" ")[1];
+      const versionParts = version.split(".").map(Number);
+      const minParts = min_version.split(".").map(Number);
 
-    for (let i = 0; i < minParts.length; i++) {
-      if ((versionParts[i] || 0) < minParts[i]) return false;
-      if ((versionParts[i] || 0) > minParts[i]) return true;
+      for (let i = 0; i < minParts.length; i++) {
+        if ((versionParts[i] || 0) < minParts[i]) return false;
+        if ((versionParts[i] || 0) > minParts[i]) return true;
+      }
+      return true;
     }
-    return true;
+  } catch (error) {
+    console.error("Error checking Python version:", error);
+    return false;
   }
 }
 
 export async function getPythonVersion(): Promise<string> {
   if (await isPythonInstalled("3.0.0")) {
-    let result = await Command.create("python", ["--version"]).execute();
-    if (result.code != 0) {
-      return `Error getting Python version: ${result.stderr}`;
-    }
+    try {
+      let result = await Command.create("python", ["--version"]).execute();
+      if (result.code != 0) {
+        return `Error getting Python version: ${result.stderr}`;
+      }
 
-    return result.stdout;
+      return result.stdout;
+    } catch (error) {
+      return `Error getting Python version: ${error instanceof Error ? error.message : String(error)}`;
+    }
   } else {
     return "Error getting Python version: Unknown error";
   }
