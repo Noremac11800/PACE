@@ -8,6 +8,7 @@
   import DependenciesPanel from "./DependenciesPanel.svelte";
   import ConsolePanel from "./ConsolePanel.svelte";
   import AboutPanel from "./AboutPanel.svelte";
+  import DirectoryBuildPropsPanel from "./DirectoryBuildPropsPanel.svelte";
 
   let activeView: View = $state(View.HOME);
 </script>
@@ -43,6 +44,8 @@
       <HomePanel />
     {:else if activeView === View.DEPENDENCIES}
       <DependenciesPanel />
+    {:else if activeView === View.DIRECTORY_BUILD_PROPS}
+      <DirectoryBuildPropsPanel />
     {:else if activeView === View.CONSOLE}
       <ConsolePanel />
     {:else if activeView === View.ABOUT}

@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { House, Package, Terminal, CircleQuestionMark } from "@lucide/svelte";
+  import {
+    House,
+    Package,
+    Terminal,
+    CircleQuestionMark,
+    FileCode,
+  } from "@lucide/svelte";
   import { View } from "./view-types";
 
   interface Props {
@@ -29,6 +35,15 @@
     title="Dependencies"
   >
     <Package size={20} />
+  </button>
+  <button
+    class="btn {activeView === View.DIRECTORY_BUILD_PROPS
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2"
+    onclick={() => (activeView = View.DIRECTORY_BUILD_PROPS)}
+    title="Directory.Build.props"
+  >
+    <FileCode size={20} />
   </button>
   <button
     class="btn {activeView === View.CONSOLE
