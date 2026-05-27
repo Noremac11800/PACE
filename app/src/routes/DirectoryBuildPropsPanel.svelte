@@ -8,7 +8,19 @@
     FileCode,
     Copy,
     TriangleAlert,
+    Folder,
+    Save,
+    FolderOpen,
+    Loader,
   } from "@lucide/svelte";
+  import {
+    readTextFile,
+    writeTextFile,
+    exists,
+    mkdir,
+  } from "@tauri-apps/plugin-fs";
+  import { open } from "@tauri-apps/plugin-dialog";
+  import { onMount } from "svelte";
 
   interface BuildProp {
     id: string;
@@ -26,6 +38,11 @@
   let searchQuery = $state("");
   let editDraft: { id: string; name: string; value: string } | null =
     $state(null);
+  let targetDir = $state("/tmp/PACE");
+  let isSaving = $state(false);
+  let isLoading = $state(false);
+  let saveResult = $state("");
+  let loadResult = $state("");
 
   function generateId(): string {
     return crypto.randomUUID();
@@ -55,6 +72,7 @@
     newValue = "";
     isAdding = false;
     addError = "";
+    saveFile();
   }
 
   function removeProp(id: string) {
@@ -117,6 +135,77 @@
     return `<Project>\n  <PropertyGroup>\n${entries}\n  </PropertyGroup>\n</Project>`;
   }
 
+  function getFilePath(): string {
+    const dir = targetDir.endsWith("/") ? targetDir.slice(0, -1) : targetDir;
+    return `${dir}/Directory.Build.props`;
+  }
+
+  async function saveFile() {
+    isSaving = true;
+    saveResult = "";
+    loadResult = "";
+    try {
+      const dirExists = await exists(targetDir);
+      if (!dirExists) {
+        await mkdir(targetDir, { recursive: true });
+      }
+      const xml = generateXml();
+      await writeTextFile(getFilePath(), xml);
+      saveResult = `Saved to ${getFilePath()}`;
+      setTimeout(() => (saveResult = ""), 3000);
+    } catch (error) {
+      saveResult = `Error: ${error}`;
+    } finally {
+      isSaving = false;
+    }
+  }
+
+  async function loadFile() {
+    isLoading = true;
+    loadResult = "";
+    saveResult = "";
+    try {
+      const filePath = getFilePath();
+      const fileExists = await exists(filePath);
+      if (!fileExists) {
+        loadResult = `File not found: ${filePath}`;
+        return;
+      }
+      const content = await readTextFile(filePath);
+      parseXmlToProps(content);
+      loadResult = `Loaded from ${filePath}`;
+      setTimeout(() => (loadResult = ""), 3000);
+    } catch (error) {
+      loadResult = `Error: ${error}`;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  function parseXmlToProps(xml: string) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, "text/xml");
+    const propertyGroup = doc.querySelector("PropertyGroup");
+    if (!propertyGroup) {
+      loadResult = "Invalid file: no PropertyGroup found.";
+      return;
+    }
+    const newProps: BuildProp[] = [];
+    for (const child of Array.from(propertyGroup.children)) {
+      newProps.push({
+        id: generateId(),
+        name: child.tagName,
+        value: child.textContent ?? "",
+        editing: false,
+      });
+    }
+    props = newProps;
+  }
+
+  onMount(() => {
+    loadFile();
+  });
+
   let filteredProps = $derived(
     searchQuery.trim()
       ? props.filter(
@@ -135,6 +224,86 @@
       <FileCode size={24} />
       Directory.Build.props Editor
     </h2>
+  </div>
+
+  <!-- Target Directory -->
+  <div class="card bg-surface-50-950 p-4 gap-2 shadow-md mb-4">
+    <label for="target-dir" class="block text-sm text-surface-700-300 mb-1">
+      Target directory
+    </label>
+    <p class="text-xs text-warning-500 mb-2">
+      Note: This directory and/or its subdirectories, etc, should contain the
+      .NET projects to be affected by the props file
+    </p>
+    <div class="input-group grid grid-cols-[auto_1fr] mb-1">
+      <button
+        class="ig-cell preset-tonal cursor-pointer"
+        onclick={async () => {
+          const selected = await open({ directory: true });
+          if (selected) {
+            targetDir = selected as string;
+          }
+        }}
+        title="Select directory"
+      >
+        <Folder size={18} />
+      </button>
+      <input
+        id="target-dir"
+        class="ig-input"
+        type="text"
+        placeholder="Directory path"
+        bind:value={targetDir}
+      />
+    </div>
+    <div class="flex items-center gap-2">
+      <button
+        class="btn preset-filled-primary-500 flex items-center gap-1 text-sm"
+        onclick={saveFile}
+        disabled={isSaving || props.length === 0}
+      >
+        {#if isSaving}
+          <Loader size={16} class="animate-spin" />
+          Saving...
+        {:else}
+          <Save size={16} />
+          Save
+        {/if}
+      </button>
+      <button
+        class="btn preset-tonal flex items-center gap-1 text-sm"
+        onclick={loadFile}
+        disabled={isLoading}
+      >
+        {#if isLoading}
+          <Loader size={16} class="animate-spin" />
+          Loading...
+        {:else}
+          <FolderOpen size={16} />
+          Load
+        {/if}
+      </button>
+      {#if saveResult}
+        <span
+          class="text-xs {saveResult.startsWith('Error')
+            ? 'text-error-500'
+            : 'text-success-500'}"
+        >
+          {saveResult}
+        </span>
+      {/if}
+      {#if loadResult}
+        <span
+          class="text-xs {loadResult.startsWith('Error') ||
+          loadResult.startsWith('File not') ||
+          loadResult.startsWith('Invalid')
+            ? 'text-error-500'
+            : 'text-success-500'}"
+        >
+          {loadResult}
+        </span>
+      {/if}
+    </div>
   </div>
 
   <!-- Search & Add bar -->

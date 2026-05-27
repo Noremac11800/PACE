@@ -55,6 +55,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
         }
       ]
     },
@@ -63,6 +66,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
         }
       ]
     },
@@ -71,6 +77,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
         }
       ]
     },
@@ -79,6 +88,20 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
         }
       ]
     },
@@ -87,6 +110,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "/tmp/**"
         }
       ]
     },

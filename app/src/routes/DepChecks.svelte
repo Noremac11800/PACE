@@ -195,7 +195,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-4 {classname}">
+<div class="flex flex-col p-4 gap-4 {classname}">
   <!-- Dependency Status Card -->
   <div class="card bg-surface-50-950 shadow-md p-4">
     <div class="flex items-center justify-between mb-4">
