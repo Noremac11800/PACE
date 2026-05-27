@@ -26,6 +26,8 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "~2",
     "@tauri-apps/plugin-window-state": "~2",
+    "@types/cytoscape": "^3.31.0",
+    "cytoscape": "^3.33.4",
     "svelte-i18n": "^4.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.3",
