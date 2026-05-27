@@ -7,9 +7,13 @@
     FileCode,
     Network,
     Settings,
+    Download,
+    CircleAlert,
     TriangleAlert,
+    Check,
   } from "@lucide/svelte";
   import { View } from "./view-types";
+  import { updateStatus } from "$lib/update-status.svelte";
 
   interface Props {
     activeView: View;
@@ -19,6 +23,9 @@
   let { activeView = $bindable(), paceInstalledStatus }: Props = $props();
 
   let paceReady = $derived(paceInstalledStatus === true);
+  let hasUpdates = $derived(
+    updateStatus.cli.updateAvailable || updateStatus.app.updateAvailable,
+  );
 </script>
 
 <aside
@@ -97,5 +104,27 @@
     title="About"
   >
     <CircleQuestionMark size={20} />
+  </button>
+  <button
+    class="btn {activeView === View.UPDATES
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2 relative"
+    onclick={() => (activeView = View.UPDATES)}
+    title="Updates"
+  >
+    <Download size={20} />
+    {#if hasUpdates}
+      <span
+        class="absolute -top-1.5 -right-1.5 bg-warning-500 text-surface-950 rounded-full p-0.5"
+      >
+        <TriangleAlert size={12} />
+      </span>
+    {:else}
+      <span
+        class="absolute -top-1.5 -right-1.5 bg-success-500 text-surface-950 rounded-full p-0.5"
+      >
+        <Check size={12} />
+      </span>
+    {/if}
   </button>
 </aside>
