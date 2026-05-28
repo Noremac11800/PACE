@@ -29,6 +29,7 @@ depends_on = ["toolkit-versioning", "toolkit-msbuild"]
 [[projects]]
 name = "toolkit-core"
 csproj_path = "src/Esri.Toolkit.Core/Esri.Toolkit.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-core.git"
 sln_group = "Toolkits"
 explicit_frameworks = []
 depends_on = ["toolkit-versioning", "toolkit-msbuild"]
@@ -221,9 +222,9 @@ explicit_frameworks = []
 depends_on = ["appmodule-survey123", "appmodule-featureforms", "appmodule-quickcapture", "appmodule-webforms"]
 
 [[projects]]
-name = "Survey123"
+name = "Survey123-Mobile"
 csproj_path = "src/Survey123.MobileApp/Survey123.MobileApp.csproj"
-repo_url = "git@devtopia.esri.com:Melbourne/survey123-mobile.git"
+repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Mobile.git"
 sln_group = "Apps"
 explicit_frameworks = []
 depends_on = ["apps-sdk"]
@@ -231,7 +232,7 @@ depends_on = ["apps-sdk"]
 [[projects]]
 name = "Survey123-Studio"
 csproj_path = "src/Survey123.Studio/Survey123.Studio.csproj"
-repo_url = "git@devtopia.esri.com:Melbourne/survey123-studio.git"
+repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Studio.git"
 sln_group = "Apps"
 explicit_frameworks = []
 depends_on = ["apps-sdk"]
