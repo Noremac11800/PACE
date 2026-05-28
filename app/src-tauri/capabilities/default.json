@@ -56,6 +56,11 @@
           "name": "pace",
           "cmd": "pace",
           "args": true
+        },
+        {
+          "name": "ls",
+          "cmd": "ls",
+          "args": true
         }
       ]
     },
@@ -125,6 +130,9 @@
         },
         {
           "path": "/tmp/**"
+        },
+        {
+          "path": "**/*.toml"
         }
       ]
     },

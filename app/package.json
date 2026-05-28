@@ -31,6 +31,7 @@
     "cytoscape": "^3.33.4",
     "cytoscape-dagre": "^3.0.0",
     "dagre": "^0.8.5",
+    "js-toml": "^1.1.1",
     "svelte-i18n": "^4.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.3",
