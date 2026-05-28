@@ -8,9 +8,9 @@
     Network,
     Settings,
     Download,
-    CircleAlert,
     TriangleAlert,
     Check,
+    Cog,
   } from "@lucide/svelte";
   import { View } from "./view-types";
   import { updateStatus } from "$lib/update-status.svelte";
@@ -76,6 +76,16 @@
     disabled={!paceReady}
   >
     <Network size={20} />
+  </button>
+  <button
+    class="btn {activeView === View.ORCHESTRATOR
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2"
+    onclick={() => (activeView = View.ORCHESTRATOR)}
+    title="Orchestrator"
+    disabled={!paceReady}
+  >
+    <Cog size={20} />
   </button>
   <button
     class="btn {activeView === View.CONSOLE

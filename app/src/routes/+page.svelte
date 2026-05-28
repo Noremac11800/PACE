@@ -13,6 +13,7 @@
   import ProjectGraphPanel from "./ProjectGraphPanel.svelte";
   import SettingsPanel from "./SettingsPanel.svelte";
   import UpdatesPanel from "./UpdatesPanel.svelte";
+  import OrchestratorPanel from "./OrchestratorPanel.svelte";
   import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
   import { setAppUpdate, setCliUpdate } from "$lib/update-status.svelte";
   import { onMount } from "svelte";
@@ -70,6 +71,8 @@
       <DirectoryBuildPropsPanel />
     {:else if activeView === View.PROJECT_GRAPH}
       <ProjectGraphPanel />
+    {:else if activeView === View.ORCHESTRATOR}
+      <OrchestratorPanel />
     {:else if activeView === View.CONSOLE}
       <ConsolePanel />
     {:else if activeView === View.SETTINGS}
