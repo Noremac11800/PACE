@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Download, ArrowRight } from "@lucide/svelte";
-  import AnimatedBackground from "./AnimatedBackground.svelte";
+  import AnimatedBackground from "$lib/panels/AnimatedBackground.svelte";
   import { updateStatus } from "$lib/update-status.svelte";
-  import { View } from "./view-types";
+  import { View } from "$lib/panels/view-types";
 
   interface Props {
     onGoToPanel?: (view: View) => void;

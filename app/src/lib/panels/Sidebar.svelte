@@ -12,7 +12,7 @@
     Check,
     Cog,
   } from "@lucide/svelte";
-  import { View } from "./view-types";
+  import { View } from "$lib/panels/view-types";
   import { updateStatus } from "$lib/update-status.svelte";
   import { theme } from "$lib/theme";
 
