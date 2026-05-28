@@ -115,6 +115,8 @@
   >
     {#if activeView === View.ABOUT}
       <img src="/appglyph.svg" alt="PACE Logo" class="w-5 h-5" />
+    {:else if $theme === "dark"}
+      <img src="/appglyph.svg" alt="PACE Logo" class="w-5 h-5" />
     {:else}
       <img src="/appglyph-dark.svg" alt="PACE Logo" class="w-5 h-5" />
     {/if}
