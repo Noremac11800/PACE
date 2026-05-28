@@ -14,6 +14,7 @@
   } from "@lucide/svelte";
   import { View } from "./view-types";
   import { updateStatus } from "$lib/update-status.svelte";
+  import { theme } from "$lib/theme";
 
   interface Props {
     activeView: View;
@@ -97,13 +98,26 @@
     <Settings size={20} />
   </button>
   <button
+    class="btn {activeView === View.HELP
+      ? 'preset-filled-primary-500'
+      : 'preset-tonal'} p-2"
+    onclick={() => (activeView = View.HELP)}
+    title="Help"
+  >
+    <CircleQuestionMark size={20} />
+  </button>
+  <button
     class="btn {activeView === View.ABOUT
       ? 'preset-filled-primary-500'
       : 'preset-tonal'} p-2"
     onclick={() => (activeView = View.ABOUT)}
     title="About"
   >
-    <CircleQuestionMark size={20} />
+    {#if activeView === View.ABOUT}
+      <img src="/appglyph.svg" alt="PACE Logo" class="w-5 h-5" />
+    {:else}
+      <img src="/appglyph-dark.svg" alt="PACE Logo" class="w-5 h-5" />
+    {/if}
   </button>
   <button
     class="btn {activeView === View.UPDATES

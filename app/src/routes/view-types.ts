@@ -7,6 +7,7 @@ export enum View {
   SETTINGS = "settings",
   ABOUT = "about",
   UPDATES = "updates",
+  HELP = "help",
 }
 
 export type ViewType = View;

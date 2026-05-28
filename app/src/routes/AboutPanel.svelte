@@ -1,416 +1,368 @@
 <script lang="ts">
-  import { PanelRightClose, PanelRightOpen } from "@lucide/svelte";
-  import { slide } from "svelte/transition";
+  import {
+    Github,
+    ExternalLink,
+    Code,
+    Palette,
+    Cpu,
+    Package,
+    Globe,
+    Zap,
+    Layers,
+    Shield,
+    Sparkles,
+    Rocket,
+    Heart,
+    Copy,
+  } from "@lucide/svelte";
+  import { open } from "@tauri-apps/plugin-shell";
+
+  let { class: classname = "" } = $props();
 
   const version = "v0.1.0-alpha";
 
-  interface TocEntry {
-    id: string;
-    label: string;
-    children?: TocEntry[];
-  }
-
-  const toc: TocEntry[] = [
-    { id: "about", label: "About PACE" },
+  const techStack = [
     {
-      id: "getting-started",
-      label: "Getting Started",
-      children: [
-        { id: "installation", label: "Installation" },
-        { id: "configuration", label: "Configuration" },
+      name: "Svelte 5",
+      description:
+        "Modern reactive web framework with runes for fine-grained reactivity",
+      color: "text-orange-500",
+      link: "https://svelte.dev",
+      features: [
+        "Runes",
+        "Fine-grained reactivity",
+        "Compile-time optimizations",
       ],
+      logo: "/svelte.svg",
     },
     {
-      id: "cli-usage",
-      label: "CLI Usage",
-      children: [
-        { id: "global-options", label: "Global Options" },
-        { id: "cmd-dotnet", label: "dotnet Command" },
-        { id: "cmd-git", label: "git Command" },
-        { id: "cmd-demo", label: "demo Command" },
-      ],
+      name: "Tauri",
+      description:
+        "Build secure, fast, and cross-platform desktop apps with web technologies",
+      color: "text-blue-500",
+      link: "https://tauri.app",
+      features: ["Rust backend", "Security-first", "Small bundle sizes"],
+      logo: "/tauri.svg",
     },
     {
-      id: "gui-usage",
-      label: "GUI Usage",
-      children: [
-        { id: "gui-dependencies", label: "Dependencies Panel" },
-        { id: "gui-build-props", label: "Directory.Build.props Editor" },
-        { id: "gui-console", label: "Console Panel" },
-      ],
+      name: "Tailwind CSS",
+      description: "Utility-first CSS framework for rapid UI development",
+      color: "text-cyan-500",
+      link: "https://tailwindcss.com",
+      features: ["Utility classes", "Responsive design", "Dark mode support"],
+      logo: "/tailwindcss.svg",
     },
-    { id: "config-file", label: "Configuration File" },
+    {
+      name: "Lucide Svelte",
+      description: "Beautiful & consistent icon toolkit for modern interfaces",
+      color: "text-purple-500",
+      link: "https://lucide.dev",
+      features: ["400+ icons", "Consistent design", "Tree-shakeable"],
+      logo: "/lucide.svg",
+    },
+    {
+      name: "Python",
+      description: "Backend CLI implementation with Rich terminal output",
+      color: "text-green-500",
+      link: "https://python.org",
+      features: ["Rich CLI", "Async operations", "Cross-platform"],
+      logo: "/python.svg",
+    },
+    {
+      name: "Rust",
+      description: "Systems programming language powering the Tauri backend",
+      color: "text-orange-600",
+      link: "https://rust-lang.org",
+      features: ["Memory safety", "Performance", "WebAssembly"],
+      logo: "/rust.svg",
+    },
   ];
 
-  let activeSection = $state("about");
-  let tocOpen = $state(true);
+  const features = [
+    {
+      title: "Cross-Platform",
+      description: "Runs on Windows, macOS, and Linux with native performance",
+      icon: Globe,
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    {
+      title: "Modern Stack",
+      description: "Built with the latest web technologies and best practices",
+      icon: Layers,
+      gradient: "from-purple-500 to-pink-500",
+    },
+    {
+      title: "Secure by Design",
+      description: "Tauri's security model keeps your data safe and private",
+      icon: Shield,
+      gradient: "from-green-500 to-emerald-500",
+    },
+    {
+      title: "High Performance",
+      description: "Lightweight and fast with minimal resource usage",
+      icon: Rocket,
+      gradient: "from-orange-500 to-red-500",
+    },
+  ];
 
-  function scrollTo(id: string) {
-    activeSection = id;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const stats = [
+    { label: "Technologies", value: "6+", icon: Sparkles },
+    { label: "Platforms", value: "3", icon: Globe },
+    { label: "Open Source", value: "MIT", icon: Heart },
+    { label: "Version", value: version, icon: Package },
+  ];
+
+  async function openLink(url: string) {
+    await open(url);
   }
 </script>
 
-<div
-  class="h-full grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out"
-  style="grid-template-columns: 1fr {tocOpen ? '220px' : '48px'};"
->
-  <!-- Main Content -->
-  <div class="overflow-auto p-6 space-y-8" id="docs-content">
-    <!-- About -->
-    <section id="about">
-      <div class="flex items-center gap-4 mb-4">
-        <img src="/appicon.svg" alt="PACE" class="h-12 w-12" />
-        <div>
-          <h1 class="h2 text-primary-500">PACE</h1>
-          <p class="text-sm text-surface-700-300">Version {version}</p>
-        </div>
-      </div>
-      <p class="text-surface-700-300">
-        <strong>Project Automation and Configuration Engine</strong> — a tool for
-        managing multi-repository .NET projects. PACE provides both a CLI and a GUI
-        to orchestrate builds, manage git operations, and configure shared build
-        properties across your project graph.
-      </p>
-    </section>
+<div class="overflow-auto h-full bg-surface-50-950 {classname}">
+  <!-- Hero Section -->
+  <div class="relative overflow-hidden">
+    <!-- Background gradient -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700"
+    ></div>
+    <!-- Pattern overlay -->
+    <div class="absolute inset-0 opacity-10">
+      <div
+        class="absolute inset-0"
+        style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 60px 60px;"
+      ></div>
+    </div>
 
-    <!-- Getting Started -->
-    <section id="getting-started">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        Getting Started
-      </h2>
-
-      <div id="installation" class="mb-6">
-        <h3 class="h4 mb-2">Installation</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          PACE requires <strong>Python 3.11+</strong>, <strong>Git</strong>, and
-          <strong>pipx</strong>. Install PACE from the repository root:
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pipx install --editable /path/to/PACE</pre>
-        <p class="text-xs text-surface-500 mt-2">
-          Use the <strong>Dependencies</strong> panel in the GUI to check and install
-          all prerequisites automatically.
-        </p>
-      </div>
-
-      <div id="configuration" class="mb-6">
-        <h3 class="h4 mb-2">Configuration</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          PACE uses a TOML configuration file to define the project graph. By
-          default it loads an internal <code class="text-primary-500"
-            >pace.toml</code
-          >, but you can specify a custom config:
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pace -C /path/to/config.toml [command]</pre>
-        <p class="text-sm text-surface-700-300 mt-2">
-          The <code class="text-primary-500">REPODIR</code> environment variable
-          can override the
-          <code class="text-primary-500">repodir</code> setting in the config file.
-        </p>
-      </div>
-    </section>
-
-    <!-- CLI Usage -->
-    <section id="cli-usage">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        CLI Usage
-      </h2>
-      <pre
-        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">usage: pace [-h] [-C &lt;path&gt;] [OPTIONS] command...</pre>
-
-      <div id="global-options" class="mb-6">
-        <h3 class="h4 mb-2">Global Options</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-surface-200-800">
-                <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                  >Option</th
-                >
-                <th class="text-left py-2 text-surface-500 font-medium"
-                  >Description</th
-                >
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500">-h, --help</td>
-                <td class="py-2 text-surface-700-300"
-                  >Show help message and exit</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >-v, --version</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Print the version and exit</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >-C, --config &lt;path&gt;</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Path to configuration file (defaults to internal pace.toml)</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500">--debug</td>
-                <td class="py-2 text-surface-700-300"
-                  >Enable debug mode with full tracebacks</td
-                >
-              </tr>
-              <tr>
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >--print-config</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Print the loaded configuration and exit</td
-                >
-              </tr>
-            </tbody>
-          </table>
+    <!-- Content -->
+    <div class="relative z-10 px-6 py-6 text-center">
+      <div class="flex justify-center mb-3">
+        <div class="relative">
+          <div
+            class="bg-white/20 backdrop-blur-sm rounded-2xl p-3 border border-white/30"
+          >
+            <img src="/appglyph.svg" alt="PACE" class="h-12 w-12" />
+          </div>
+          <div
+            class="absolute -bottom-1 -right-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full p-1"
+          >
+            <Sparkles size={12} class="text-white" />
+          </div>
         </div>
       </div>
 
-      <div id="cmd-dotnet" class="mb-6">
-        <h3 class="h4 mb-2">dotnet Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Execute dotnet build commands across the project graph. PACE creates a
-          temporary solution file containing all configured projects and runs
-          <code class="text-primary-500">dotnet build</code> against it.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace dotnet [-- dotnet-args...]</pre>
-        <p class="text-sm text-surface-700-300 mb-2">
-          <strong>Framework filtering:</strong>
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2"># Build only iOS-compatible projects
-pace dotnet -- -f net8.0-ios</pre>
-        <p class="text-xs text-surface-500">
-          Supported framework filters: <code>ios</code>, <code>android</code>,
-          <code>windows</code>, <code>maccatalyst</code>
-        </p>
-      </div>
-
-      <div id="cmd-git" class="mb-6">
-        <h3 class="h4 mb-2">git Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Execute git operations across all repositories in parallel with live
-          status updates.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace git clone   # Clone all repositories
-pace git pull    # Pull latest for all repositories</pre>
-        <p class="text-xs text-surface-500">
-          Repositories are defined per-project in the config file via the
-          <code>repo_url</code> field.
-        </p>
-      </div>
-
-      <div id="cmd-demo" class="mb-6">
-        <h3 class="h4 mb-2">demo Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Run built-in Rich demos for development and testing purposes.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace demo columns
-pace demo progress_bar</pre>
-      </div>
-    </section>
-
-    <!-- GUI Usage -->
-    <section id="gui-usage">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        GUI Usage
-      </h2>
-      <p class="text-sm text-surface-700-300 mb-4">
-        The PACE GUI provides visual access to the same functionality as the
-        CLI, plus additional features. Navigate between panels using the
-        sidebar.
+      <h1 class="h2 text-white mb-2">About PACE</h1>
+      <p class="text-primary-100 text-base mb-3 max-w-xl mx-auto">
+        Project Automation & Configuration Engine
       </p>
 
-      <div id="gui-dependencies" class="mb-6">
-        <h3 class="h4 mb-2">Dependencies Panel</h3>
-        <p class="text-sm text-surface-700-300">
-          Checks for required dependencies (Python, Git, pipx) and allows you to
-          install PACE directly from the GUI. If PACE is not installed, other
-          panels will be disabled and a warning badge will appear on this
-          button.
-        </p>
+      <div class="flex flex-wrap justify-center gap-2 mb-3">
+        {#each stats as stat}
+          <div
+            class="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20"
+          >
+            <stat.icon size={12} class="text-white" />
+            <span class="text-white text-sm font-medium">{stat.value}</span>
+            <span class="text-primary-200 text-xs">{stat.label}</span>
+          </div>
+        {/each}
       </div>
-
-      <div id="gui-build-props" class="mb-6">
-        <h3 class="h4 mb-2">Directory.Build.props Editor</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Create and manage MSBuild properties that apply to all .NET projects
-          in a directory tree.
-        </p>
-        <ul
-          class="text-sm text-surface-700-300 list-disc list-inside space-y-1"
-        >
-          <li>
-            <strong>Add/Edit/Delete</strong> properties with name-value pairs
-          </li>
-          <li><strong>Search</strong> to filter the property list</li>
-          <li>
-            <strong>Save</strong> writes a
-            <code class="text-primary-500">Directory.Build.props</code> file to the
-            target directory
-          </li>
-          <li>
-            <strong>Load</strong> reads an existing file from the target directory
-          </li>
-          <li>
-            <strong>Copy XML</strong> copies the generated XML to clipboard
-          </li>
-        </ul>
-      </div>
-
-      <div id="gui-console" class="mb-6">
-        <h3 class="h4 mb-2">Console Panel</h3>
-        <p class="text-sm text-surface-700-300">
-          Displays command output and logs from PACE operations. Use this to
-          monitor build progress, git operations, and other long-running tasks.
-        </p>
-      </div>
-    </section>
-
-    <!-- Configuration File -->
-    <section id="config-file">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        Configuration File
-      </h2>
-      <p class="text-sm text-surface-700-300 mb-3">
-        The PACE config file is written in TOML. It defines the repository root
-        directory and a list of projects with their paths and repository URLs.
-      </p>
-      <h3 class="h4 mb-2">Structure</h3>
-      <pre
-        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">repodir = "/path/to/repos"
-
-[[projects]]
-name = "my-project"
-csproj_path = "src/MyProject/MyProject.csproj"
-repo_url = "git@github.com:org/my-project.git"</pre>
-
-      <h3 class="h4 mb-2">Fields</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-surface-200-800">
-              <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                >Field</th
-              >
-              <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                >Type</th
-              >
-              <th class="text-left py-2 text-surface-500 font-medium"
-                >Description</th
-              >
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500">repodir</td>
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Root directory where repositories are cloned</td
-              >
-            </tr>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].name</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Project identifier (also the subdirectory name)</td
-              >
-            </tr>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].csproj_path</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Relative path to the .csproj file within the project</td
-              >
-            </tr>
-            <tr>
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].repo_url</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string?</td>
-              <td class="py-2 text-surface-700-300"
-                >Git remote URL (optional, required for clone/pull)</td
-              >
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    </div>
   </div>
 
-  <!-- Table of Contents Sidebar -->
-  <nav
-    class="overflow-auto border-l border-surface-200-800 p-4 bg-surface-50-950 flex flex-col"
-  >
-    <div class="flex items-center justify-between mb-3">
-      {#if tocOpen}
-        <h4 class="text-xs font-bold uppercase tracking-wider text-surface-500">
-          Table of Contents
-        </h4>
-      {/if}
-      <button
-        class="btn preset-tonal p-1"
-        onclick={() => (tocOpen = !tocOpen)}
-        title={tocOpen ? "Collapse TOC" : "Expand TOC"}
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-8 md:space-y-16">
+    <!-- Tech Stack Section -->
+    <section>
+      <div class="text-center mb-6 md:mb-12">
+        <div
+          class="inline-flex items-center gap-2 bg-primary-100-900 text-primary-600-400 px-3 py-1.5 rounded-full mb-3"
+        >
+          <Code size={14} />
+          <span class="font-medium text-sm">Technology Stack</span>
+        </div>
+        <h2 class="h3 text-surface-900-100 mb-3">
+          Built with Modern Technologies
+        </h2>
+        <p class="text-surface-600-400 text-sm md:text-lg max-w-2xl mx-auto">
+          PACE leverages cutting-edge web technologies to deliver a powerful,
+          secure, and performant experience
+        </p>
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
       >
-        {#if tocOpen}
-          <PanelRightClose size={14} />
-        {:else}
-          <PanelRightOpen size={14} />
-        {/if}
-      </button>
-    </div>
-    {#if tocOpen}
-      <ul class="space-y-1" transition:slide={{ duration: 200 }}>
-        {#each toc as entry}
-          <li>
-            <button
-              class="text-left text-sm w-full px-2 py-1 rounded hover:bg-surface-200-800 transition-colors
-              {activeSection === entry.id
-                ? 'text-primary-500 font-medium'
-                : 'text-surface-700-300'}"
-              onclick={() => scrollTo(entry.id)}
+        {#each techStack as tech, index}
+          <div class="group relative">
+            <!-- Card -->
+            <div
+              class="card bg-gradient-to-br from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900 border border-surface-200-800 p-6 md:p-10 hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] group-hover:border-primary-300-700"
             >
-              {entry.label}
-            </button>
-            {#if entry.children}
-              <ul class="ml-3 space-y-0.5">
-                {#each entry.children as child}
-                  <li>
-                    <button
-                      class="text-left text-xs w-full px-2 py-0.5 rounded hover:bg-surface-200-800 transition-colors
-                      {activeSection === child.id
-                        ? 'text-primary-500 font-medium'
-                        : 'text-surface-500'}"
-                      onclick={() => scrollTo(child.id)}
+              <!-- Icon with enhanced background -->
+              <div class="relative mb-6 md:mb-8">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br {tech.color ===
+                  'text-orange-500'
+                    ? 'from-orange-400 to-orange-600'
+                    : tech.color === 'text-blue-500'
+                      ? 'from-blue-400 to-blue-600'
+                      : tech.color === 'text-cyan-500'
+                        ? 'from-cyan-400 to-cyan-600'
+                        : tech.color === 'text-purple-500'
+                          ? 'from-purple-400 to-purple-600'
+                          : tech.color === 'text-green-500'
+                            ? 'from-green-400 to-green-600'
+                            : 'from-orange-500 to-orange-600'} opacity-15 rounded-3xl blur-2xl group-hover:opacity-25 transition-all duration-500"
+                ></div>
+                <div
+                  class="relative bg-white border border-surface-200-800 shadow-lg rounded-3xl p-4 md:p-6 group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                >
+                  <img
+                    src={tech.logo}
+                    alt={tech.name}
+                    class="h-12 w-12 md:h-16 md:w-16 object-contain drop-shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="space-y-6">
+                <div>
+                  <h3
+                    class="h3 mb-3 group-hover:text-primary-500 transition-colors font-semibold"
+                  >
+                    {tech.name}
+                  </h3>
+                  <p class="text-surface-600-400 text-sm leading-relaxed">
+                    {tech.description}
+                  </p>
+                </div>
+
+                <!-- Features -->
+                <div class="flex flex-wrap gap-2">
+                  {#each tech.features as feature}
+                    <span
+                      class="text-xs px-3 py-1.5 bg-gradient-to-r from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700 text-surface-700-300 rounded-full border border-surface-200-800 font-medium"
                     >
-                      {child.label}
-                    </button>
-                  </li>
-                {/each}
-              </ul>
-            {/if}
-          </li>
+                      {feature}
+                    </span>
+                  {/each}
+                </div>
+
+                <!-- Link -->
+                <button
+                  class="flex items-center gap-2 text-sm text-primary-500 hover:text-primary-600 font-medium opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-105"
+                  onclick={() => openLink(tech.link)}
+                >
+                  <ExternalLink size={16} />
+                  Learn more
+                </button>
+              </div>
+            </div>
+
+            <!-- Decorative element -->
+            <div
+              class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br {tech.color} opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"
+            ></div>
+          </div>
         {/each}
-      </ul>
-    {/if}
-  </nav>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section>
+      <div class="text-center mb-12">
+        <div
+          class="inline-flex items-center gap-2 bg-success-100-900 text-success-600-400 px-4 py-2 rounded-full mb-4"
+        >
+          <Zap size={16} />
+          <span class="font-medium">Key Features</span>
+        </div>
+        <h2 class="h2 text-surface-900-100 mb-4">What Makes PACE Special</h2>
+        <p class="text-surface-600-400 text-lg max-w-2xl mx-auto">
+          Designed with modern development workflows in mind
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {#each features as feature}
+          <div class="text-center">
+            <div class="relative mb-6">
+              <div
+                class="absolute inset-0 bg-gradient-to-r {feature.gradient} opacity-20 rounded-full blur-2xl"
+              ></div>
+              <div
+                class="relative bg-gradient-to-r {feature.gradient} rounded-full p-6"
+              >
+                <feature.icon size={32} class="text-white" />
+              </div>
+            </div>
+            <h3 class="h4 mb-2">
+              {feature.title}
+            </h3>
+            <p class="text-surface-600-400 text-sm">{feature.description}</p>
+          </div>
+        {/each}
+      </div>
+    </section>
+
+    <!-- Repository Section -->
+    <section class="relative">
+      <!-- Background decoration -->
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-surface-100-900 via-surface-50-950 to-surface-100-900"
+      ></div>
+
+      <div
+        class="relative z-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-3xl p-12 text-center border border-primary-400-600"
+      >
+        <div class="max-w-4xl mx-auto">
+          <div
+            class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6"
+          >
+            <Github size={16} class="text-white" />
+            <span class="text-white font-medium">Open Source</span>
+          </div>
+
+          <h2 class="h2 text-white mb-4">Get Involved</h2>
+          <p class="text-primary-100 text-lg mb-8 max-w-2xl mx-auto">
+            PACE is open source and contributions are welcome! Whether you want
+            to report a bug, suggest a feature, or submit a pull request, we'd
+            love to hear from you.
+          </p>
+
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
+          >
+            <button
+              class="bg-white text-primary-600 hover:bg-primary-50 flex items-center gap-2 px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              onclick={() => openLink("https://github.com/Noremac11800/PACE")}
+            >
+              <Github size={20} />
+              View Repository
+            </button>
+
+            <button
+              class="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30 flex items-center gap-2 px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+              onclick={() =>
+                openLink("https://github.com/Noremac11800/PACE/issues")}
+            >
+              <Package size={20} />
+              Report Issues
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- License Section -->
+    <section class="text-center py-12 border-t border-surface-200-800">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <span class="text-surface-600-400 font-medium">Made with</span>
+        <Heart size={20} class="text-red-500" />
+      </div>
+      <p class="text-surface-600-400 mb-2">
+        PACE is licensed under the MIT License
+      </p>
+    </section>
+  </div>
 </div>

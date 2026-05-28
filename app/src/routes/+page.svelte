@@ -7,6 +7,7 @@
   import HomePanel from "./HomePanel.svelte";
   import DependenciesPanel from "./DependenciesPanel.svelte";
   import ConsolePanel from "./ConsolePanel.svelte";
+  import HelpPanel from "./HelpPanel.svelte";
   import AboutPanel from "./AboutPanel.svelte";
   import DirectoryBuildPropsPanel from "./DirectoryBuildPropsPanel.svelte";
   import ProjectGraphPanel from "./ProjectGraphPanel.svelte";
@@ -73,6 +74,8 @@
       <ConsolePanel />
     {:else if activeView === View.SETTINGS}
       <SettingsPanel />
+    {:else if activeView === View.HELP}
+      <HelpPanel />
     {:else if activeView === View.ABOUT}
       <AboutPanel />
     {:else if activeView === View.UPDATES}
