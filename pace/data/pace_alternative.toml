@@ -1,0 +1,427 @@
+repodir = "/tmp/CONFIG_PACE_TEST"
+
+# Original toolkit projects (kept for reference)
+[[projects]]
+name = "toolkit-msbuild"
+csproj_path = "src/Esri.Toolkit.MSBuild/Esri.Toolkit.MSBuild.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-msbuild.git"
+sln_group = "Toolkits"
+explicit_frameworks = []
+depends_on = []
+
+[[projects]]
+name = "toolkit-versioning"
+csproj_path = "src/Esri.Toolkit.Versioning/Esri.Toolkit.Versioning.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-versioning.git"
+sln_group = "Toolkits"
+explicit_frameworks = []
+depends_on = []
+
+[[projects]]
+name = "toolkit-core"
+csproj_path = "src/Esri.Toolkit.Core/Esri.Toolkit.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-core.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0", "netstandard2.1"]
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+# Additional Toolkit projects
+[[projects]]
+name = "toolkit-ui-components"
+csproj_path = "src/Esri.Toolkit.UI/Esri.Toolkit.UI.Components.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-ui-components.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0-windows"]
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "toolkit-data-access"
+csproj_path = "src/Esri.Toolkit.Data/Esri.Toolkit.Data.Access.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-data-access.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0", "net48"]
+depends_on = ["toolkit-core", "toolkit-versioning"]
+
+[[projects]]
+name = "toolkit-geometry-utils"
+csproj_path = "src/Esri.Toolkit.Geometry/Esri.Toolkit.Geometry.Utils.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-geometry-utils.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "toolkit-caching-layer"
+csproj_path = "src/Esri.Toolkit.Caching/Esri.Toolkit.Caching.Layer.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-caching-layer.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0", "netstandard2.0"]
+depends_on = ["toolkit-core", "toolkit-data-access"]
+
+[[projects]]
+name = "toolkit-validation-engine"
+csproj_path = "src/Esri.Toolkit.Validation/Esri.Toolkit.Validation.Engine.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-validation-engine.git"
+sln_group = "Toolkits"
+explicit_frameworks = []
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "toolkit-serialization-json"
+csproj_path = "src/Esri.Toolkit.Serialization/Esri.Toolkit.Serialization.Json.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-serialization-json.git"
+sln_group = "Toolkits"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-geometry-utils"]
+
+# AppModules - Survey Related
+[[projects]]
+name = "appmodule-survey123"
+csproj_path = "src/Esri.AppModule.Survey123/Esri.AppModule.Survey123.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-survey123.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-ui-components", "toolkit-data-access"]
+
+[[projects]]
+name = "appmodule-survey456"
+csproj_path = "src/Esri.AppModule.Survey456/Esri.AppModule.Survey456.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-survey456.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0", "net8.0-android", "net8.0-ios"]
+depends_on = ["toolkit-core", "appmodule-survey123"]
+
+[[projects]]
+name = "appmodule-field-collection"
+csproj_path = "src/Esri.AppModule.FieldCollection/Esri.AppModule.FieldCollection.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-field-collection.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "appmodule-survey123"]
+
+[[projects]]
+name = "appmodule-data-collection-extended"
+csproj_path = "src/Esri.AppModule.DataCollection.Extended/Esri.AppModule.DataCollection.Extended.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-data-collection-extended.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0", "net8.0-maccatalyst"]
+depends_on = ["toolkit-core", "appmodule-field-collection", "appmodule-survey123"]
+
+[[projects]]
+name = "appmodule-offline-sync"
+csproj_path = "src/Esri.AppModule.OfflineSync/Esri.AppModule.OfflineSync.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-offline-sync.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-caching-layer", "appmodule-survey123"]
+
+[[projects]]
+name = "appmodule-gps-tracking"
+csproj_path = "src/Esri.AppModule.GpsTracking/Esri.AppModule.GpsTracking.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-gps-tracking.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0-android", "net8.0-ios"]
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "appmodule-map-annotation"
+csproj_path = "src/Esri.AppModule.MapAnnotation/Esri.AppModule.MapAnnotation.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-map-annotation.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-ui-components"]
+
+[[projects]]
+name = "appmodule-layer-management"
+csproj_path = "src/Esri.AppModule.LayerManagement/Esri.AppModule.LayerManagement.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-layer-management.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-data-access", "appmodule-survey123"]
+
+# AppModules - Forms & UI
+[[projects]]
+name = "appmodule-featureforms"
+csproj_path = "src/Esri.AppModule.FeatureForms/Esri.AppModule.FeatureForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-featureforms.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-ui-components"]
+
+[[projects]]
+name = "appmodule-quickcapture"
+csproj_path = "src/Esri.AppModule.QuickCapture/Esri.AppModule.QuickCapture.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-quickcapture.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0", "net8.0-android", "net8.0-ios"]
+depends_on = ["toolkit-core", "appmodule-featureforms"]
+
+[[projects]]
+name = "appmodule-webforms"
+csproj_path = "src/Esri.AppModule.WebForms/Esri.AppModule.WebForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-webforms.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "appmodule-featureforms"]
+
+[[projects]]
+name = "appmodule-smart-forms"
+csproj_path = "src/Esri.AppModule.SmartForms/Esri.AppModule.SmartForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-smart-forms.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0", "net8.0-windows"]
+depends_on = ["toolkit-core", "appmodule-featureforms", "appmodule-webforms"]
+
+[[projects]]
+name = "appmodule-conditional-forms"
+csproj_path = "src/Esri.AppModule.ConditionalForms/Esri.AppModule.ConditionalForms.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-conditional-forms.git"
+sln_group = "AppModules"
+explicit_frameworks = ["net8.0"]
+depends_on = ["appmodule-smart-forms", "appmodule-featureforms"]
+
+[[projects]]
+name = "appmodule-form-validators"
+csproj_path = "src/Esri.AppModule.FormValidators/Esri.AppModule.FormValidators.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-form-validators.git"
+sln_group = "AppModules"
+explicit_frameworks = []
+depends_on = ["toolkit-core", "toolkit-validation-engine", "appmodule-featureforms"]
+
+# Apps - Mobile Applications
+[[projects]]
+name = "Survey123-Mobile"
+csproj_path = "src/Survey123.MobileApp/Survey123.MobileApp.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Mobile.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-android", "net8.0-ios"]
+depends_on = ["appmodule-survey123", "appmodule-offline-sync", "toolkit-core"]
+
+[[projects]]
+name = "FieldMaps-Classic"
+csproj_path = "src/FieldMaps.Classic/FieldMaps.Classic.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/FieldMaps-Classic.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-android", "net8.0-ios", "net8.0-maccatalyst"]
+depends_on = ["appmodule-field-collection", "appmodule-gps-tracking", "appmodule-layer-management"]
+
+[[projects]]
+name = "QuickCapture-Mobile"
+csproj_path = "src/QuickCapture.Mobile/QuickCapture.Mobile.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/QuickCapture-Mobile.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-android", "net8.0-ios"]
+depends_on = ["appmodule-quickcapture", "appmodule-offline-sync"]
+
+[[projects]]
+name = "Collector-Offline"
+csproj_path = "src/Collector.Offline/Collector.Offline.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/Collector-Offline.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-android", "net8.0-ios"]
+depends_on = ["appmodule-data-collection-extended", "appmodule-offline-sync"]
+
+[[projects]]
+name = "Navigator-Pro"
+csproj_path = "src/Navigator.Pro/Navigator.Pro.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/Navigator-Pro.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-android", "net8.0-ios"]
+depends_on = ["appmodule-gps-tracking", "appmodule-map-annotation"]
+
+# Apps - Desktop Applications
+[[projects]]
+name = "ArcGIS-Pro-Addin"
+csproj_path = "src/ArcGIS.Pro.Addin/ArcGIS.Pro.Addin.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/ArcGIS-Pro-Addin.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-windows", "net48"]
+depends_on = ["toolkit-core", "appmodule-layer-management", "appmodule-featureforms"]
+
+[[projects]]
+name = "ArcMap-Bridge"
+csproj_path = "src/ArcMap.Bridge/ArcMap.Bridge.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/ArcMap-Bridge.git"
+sln_group = "Apps"
+explicit_frameworks = ["net48"]
+depends_on = ["toolkit-core", "toolkit-data-access"]
+
+[[projects]]
+name = "DataReviewer-Desktop"
+csproj_path = "src/DataReviewer.Desktop/DataReviewer.Desktop.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/DataReviewer-Desktop.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-windows", "net48"]
+depends_on = ["toolkit-core", "appmodule-featureforms", "toolkit-validation-engine"]
+
+[[projects]]
+name = "WorkflowManager-Client"
+csproj_path = "src/WorkflowManager.Client/WorkflowManager.Client.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/WorkflowManager-Client.git"
+sln_group = "Apps"
+explicit_frameworks = ["net8.0-windows"]
+depends_on = ["toolkit-core", "toolkit-ui-components", "appmodule-smart-forms"]
+
+# Services - Backend/API projects
+[[projects]]
+name = "feature-service-api"
+csproj_path = "src/Services.FeatureService/FeatureService.Api.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/feature-service-api.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-data-access"]
+
+[[projects]]
+name = "geometry-service"
+csproj_path = "src/Services.Geometry/Geometry.Service.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/geometry-service.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-geometry-utils"]
+
+[[projects]]
+name = "tile-service-generator"
+csproj_path = "src/Services.TileGenerator/Tile.Service.Generator.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/tile-service-generator.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-caching-layer", "geometry-service"]
+
+[[projects]]
+name = "sync-service-handler"
+csproj_path = "src/Services.SyncHandler/Sync.Service.Handler.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/sync-service-handler.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-data-access", "feature-service-api"]
+
+[[projects]]
+name = "auth-service-provider"
+csproj_path = "src/Services.AuthProvider/Auth.Service.Provider.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/auth-service-provider.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "webhook-processor"
+csproj_path = "src/Services.Webhook/Webhook.Processor.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/webhook-processor.git"
+sln_group = "Services"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "sync-service-handler"]
+
+# Infrastructure - Shared infrastructure
+[[projects]]
+name = "infra-logging-framework"
+csproj_path = "src/Infrastructure.Logging/Infrastructure.Logging.Framework.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-logging-framework.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0", "netstandard2.0"]
+depends_on = []
+
+[[projects]]
+name = "infra-telemetry-collector"
+csproj_path = "src/Infrastructure.Telemetry/Infrastructure.Telemetry.Collector.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-telemetry-collector.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0"]
+depends_on = ["infra-logging-framework"]
+
+[[projects]]
+name = "infra-config-provider"
+csproj_path = "src/Infrastructure.Config/Infrastructure.Config.Provider.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-config-provider.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0", "netstandard2.0"]
+depends_on = ["infra-logging-framework"]
+
+[[projects]]
+name = "infra-health-checks"
+csproj_path = "src/Infrastructure.HealthChecks/Infrastructure.HealthChecks.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-health-checks.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0"]
+depends_on = ["infra-logging-framework", "infra-telemetry-collector"]
+
+[[projects]]
+name = "infra-message-bus"
+csproj_path = "src/Infrastructure.MessageBus/Infrastructure.MessageBus.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-message-bus.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0"]
+depends_on = ["infra-logging-framework", "infra-config-provider"]
+
+[[projects]]
+name = "infra-rate-limiter"
+csproj_path = "src/Infrastructure.RateLimiting/Infrastructure.RateLimiter.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/infra-rate-limiter.git"
+sln_group = "Infrastructure"
+explicit_frameworks = ["net8.0"]
+depends_on = ["infra-logging-framework", "infra-telemetry-collector"]
+
+# Tests - Test projects and utilities
+[[projects]]
+name = "test-unit-core"
+csproj_path = "src/Tests.Unit.Core/Tests.Unit.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/test-unit-core.git"
+sln_group = "Tests"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core"]
+
+[[projects]]
+name = "test-integration-api"
+csproj_path = "src/Tests.Integration.Api/Tests.Integration.Api.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/test-integration-api.git"
+sln_group = "Tests"
+explicit_frameworks = ["net8.0"]
+depends_on = ["feature-service-api", "test-unit-core"]
+
+[[projects]]
+name = "test-e2e-mobile"
+csproj_path = "src/Tests.E2E.Mobile/Tests.E2E.Mobile.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/test-e2e-mobile.git"
+sln_group = "Tests"
+explicit_frameworks = ["net8.0"]
+depends_on = ["Survey123-Mobile", "QuickCapture-Mobile", "test-unit-core"]
+
+[[projects]]
+name = "test-performance-suite"
+csproj_path = "src/Tests.Performance/Tests.Performance.Suite.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/test-performance-suite.git"
+sln_group = "Tests"
+explicit_frameworks = ["net8.0"]
+depends_on = ["geometry-service", "tile-service-generator", "test-unit-core"]
+
+[[projects]]
+name = "test-mock-data-generator"
+csproj_path = "src/Tests.MockData/Tests.MockData.Generator.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/test-mock-data-generator.git"
+sln_group = "Tests"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "toolkit-data-access"]
+
+# Documentation and Samples
+[[projects]]
+name = "docs-api-reference"
+csproj_path = "src/Docs.ApiReference/Docs.ApiReference.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/docs-api-reference.git"
+sln_group = "Documentation"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "feature-service-api"]
+
+[[projects]]
+name = "samples-maui-gallery"
+csproj_path = "src/Samples.MauiGallery/Samples.MauiGallery.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/samples-maui-gallery.git"
+sln_group = "Documentation"
+explicit_frameworks = ["net8.0", "net8.0-android", "net8.0-ios", "net8.0-maccatalyst"]
+depends_on = ["toolkit-core", "appmodule-survey123", "appmodule-featureforms"]
+
+[[projects]]
+name = "samples-workshop-tutorials"
+csproj_path = "src/Samples.WorkshopTutorials/Samples.WorkshopTutorials.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/samples-workshop-tutorials.git"
+sln_group = "Documentation"
+explicit_frameworks = ["net8.0"]
+depends_on = ["toolkit-core", "appmodule-field-collection"]
