@@ -3,6 +3,7 @@
 import argparse
 import sys
 from argparse import Namespace
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,7 @@ from rich.console import Console
 from rich.traceback import install
 
 from pace.commands import dotnet, git
-from pace.config import load_config
+from pace.config import Config, load_config
 from pace.rich_demos import columns, progress_bar
 
 _DEMOS = {
@@ -37,6 +38,9 @@ class _Options:
         metavar="<path>",
     )
     PRINT_CONFIG = _Option("", "--print-config", "Print the configuration and exit")
+    PRINT_CONFIG_PATH = _Option(
+        "", "--print-config-path", "Print the path to the configuration file and exit"
+    )
     VERSION = _Option("-v", "--version", "Print the version and exit")
 
 
@@ -80,6 +84,12 @@ def main() -> int:
         help="Print the loaded configuration",
         default=False,
     )
+    parser.add_argument(
+        _Options.PRINT_CONFIG_PATH.long,
+        action="store_true",
+        help="Print the path to the configuration file and exit",
+        default=False,
+    )
     parser.add_argument(_Options.VERSION.long, action="version", version="pace 0.1.0")
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
@@ -111,6 +121,31 @@ def main() -> int:
         return 1
 
 
+def process_options(console: Console, config: Config, args: Namespace) -> bool:
+    """Process configuration options and return True if any were given.
+
+    Args:
+        console: Rich console for output
+        config: Loaded configuration
+        args: Parsed command line arguments
+
+    Returns:
+        True if any configuration option was given, False otherwise
+    """
+    config_path = args.config or files("pace.data").joinpath("pace.toml")
+
+    was_option_given = False
+    if args.print_config_path:
+        console.print(config_path)
+        was_option_given = True
+
+    if args.print_config:
+        console.print(config)
+        was_option_given = True
+
+    return was_option_given
+
+
 def _run(
     console: Console, args: Namespace, unknownargs: list[str], parser: argparse.ArgumentParser
 ) -> int:
@@ -123,8 +158,7 @@ def _run(
     else:
         config = load_config()
 
-    if args.print_config:
-        console.print(config)
+    was_option_given = process_options(console, config, args)
 
     match args.command:
         case "dotnet":
@@ -134,7 +168,8 @@ def _run(
         case "demo":
             _DEMOS[args.name](console, unknownargs)
         case _:
-            parser.print_help()
+            if not was_option_given:
+                parser.print_help()
     return 0
 
 
