@@ -3,57 +3,71 @@
   import {
     Cog,
     Folder,
-    FileCode,
-    Package,
-    Layers,
+    GitBranch,
     Hammer,
     Rocket,
+    PenLine,
   } from "@lucide/svelte";
-  import { loadPaceConfig, type PaceConfig } from "$lib/pace-config";
+  import {
+    configStore,
+    loadAvailableConfigs,
+    loadConfig,
+  } from "$lib/config-store.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
-  import DependenciesTab from "$lib/orchestrator/DependenciesTab.svelte";
   import BuildTab from "$lib/orchestrator/BuildTab.svelte";
   import DeployTab from "$lib/orchestrator/DeployTab.svelte";
-  import LogsTab from "$lib/orchestrator/LogsTab.svelte";
+  import GitTab from "$lib/orchestrator/GitTab.svelte";
+  import ConfigEditorTab from "$lib/orchestrator/ConfigEditorTab.svelte";
+  import ConfigSelector from "$lib/panels/ConfigSelector.svelte";
 
-  let config = $state<PaceConfig | null>(null);
-  let loading = $state(true);
-  let error = $state<string | null>(null);
-  let activeTab = $state<
-    "projects" | "dependencies" | "build" | "deploy" | "logs"
-  >("projects");
+  let activeTab = $state<"projects" | "build" | "deploy" | "git" | "editor">(
+    "projects",
+  );
 
-  onMount(async () => {
-    try {
-      const loadedConfig = await loadPaceConfig();
-      if (loadedConfig) {
-        config = loadedConfig;
-      } else {
-        error = "Failed to load PACE configuration";
-      }
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Unknown error";
-    } finally {
-      loading = false;
+  const allTabs = [
+    { id: "projects" as const, label: "Projects", icon: Folder },
+    { id: "build" as const, label: "Build", icon: Hammer },
+    { id: "deploy" as const, label: "Deploy", icon: Rocket },
+    { id: "git" as const, label: "Git", icon: GitBranch },
+    { id: "editor" as const, label: "Config editor", icon: PenLine },
+  ];
+
+  const isDefaultConfig = $derived(
+    configStore.activeConfigName === "default.toml",
+  );
+
+  const tabs = $derived(
+    allTabs.filter((tab) => tab.id !== "editor" || !isDefaultConfig),
+  );
+
+  $effect(() => {
+    if (isDefaultConfig && activeTab === "editor") {
+      activeTab = "projects";
     }
   });
 
-  const tabs = [
-    { id: "projects" as const, label: "Projects", icon: Folder },
-    { id: "dependencies" as const, label: "Dependencies", icon: Package },
-    { id: "build" as const, label: "Build", icon: Hammer },
-    { id: "deploy" as const, label: "Deploy", icon: Rocket },
-    { id: "logs" as const, label: "Logs", icon: FileCode },
-  ];
+  onMount(async () => {
+    await loadAvailableConfigs();
+    if (
+      configStore.availableConfigs.length > 0 &&
+      !configStore.activeConfigName
+    ) {
+      await loadConfig(configStore.availableConfigs[0].filename);
+    }
+  });
 </script>
 
 <div class="h-full flex flex-col overflow-hidden">
   <!-- Header -->
   <div
-    class="flex items-center gap-2 p-4 bg-surface-50-950 border-b border-surface-200-800 shrink-0"
+    class="flex items-center justify-between gap-2 px-4 py-3 bg-surface-50-950 border-b border-surface-200-800 shrink-0"
   >
-    <Cog size={24} class="text-primary-500" />
-    <h2 class="h3 text-primary-500">Orchestrator</h2>
+    <div class="flex items-center gap-2">
+      <Cog size={24} class="text-primary-500" />
+      <h2 class="h3 text-primary-500">Orchestrator</h2>
+    </div>
+
+    <ConfigSelector />
   </div>
 
   <!-- Tabs -->
@@ -61,6 +75,7 @@
     class="flex border-b border-surface-200-800 bg-surface-50-950 shrink-0 overflow-x-auto"
   >
     {#each tabs as tab}
+      {@const Icon = tab.icon}
       <button
         class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap {activeTab ===
         tab.id
@@ -68,7 +83,7 @@
           : 'text-surface-600-400 hover:text-surface-900-100 hover:bg-surface-100-900/30'}"
         onclick={() => (activeTab = tab.id)}
       >
-        <svelte:component this={tab.icon} size={16} />
+        <Icon size={16} />
         {tab.label}
       </button>
     {/each}
@@ -76,34 +91,48 @@
 
   <!-- Tab Content -->
   <div class="flex-1 overflow-auto p-4">
-    {#if loading}
+    {#if configStore.loading}
       <div class="flex-1 flex items-center justify-center min-h-[200px]">
         <div class="text-center">
           <Cog size={48} class="mx-auto mb-4 text-primary-500 animate-spin" />
           <p class="text-surface-700-300">Loading PACE configuration...</p>
         </div>
       </div>
-    {:else if error}
-      <div class="flex-1 flex items-center justify-center min-h-[200px]">
+    {:else if configStore.error}
+      <div class="flex items-center justify-center min-h-[200px]">
         <div
           class="card bg-error-500/10 border border-error-500 p-6 text-center max-w-md"
         >
           <p class="text-error-500 font-semibold mb-2">Error</p>
-          <p class="text-surface-700-300 break-all">{error}</p>
+          <p class="text-surface-700-300 break-all">{configStore.error}</p>
         </div>
       </div>
-    {:else if config}
+    {:else if activeTab === "editor"}
+      {#if configStore.activeConfig}
+        <ConfigEditorTab />
+      {:else}
+        <div
+          class="flex items-center justify-center min-h-[200px] text-surface-500-400 text-sm"
+        >
+          Select or create a config to start editing.
+        </div>
+      {/if}
+    {:else if configStore.activeConfig}
       {#if activeTab === "projects"}
-        <ProjectsTab {config} />
-      {:else if activeTab === "dependencies"}
-        <DependenciesTab />
+        <ProjectsTab config={configStore.activeConfig} />
       {:else if activeTab === "build"}
         <BuildTab />
       {:else if activeTab === "deploy"}
         <DeployTab />
-      {:else if activeTab === "logs"}
-        <LogsTab />
+      {:else if activeTab === "git"}
+        <GitTab />
       {/if}
+    {:else}
+      <div
+        class="flex items-center justify-center min-h-[200px] text-surface-500-400 text-sm"
+      >
+        No config loaded. Use the picker above to select or create one.
+      </div>
     {/if}
   </div>
 </div>

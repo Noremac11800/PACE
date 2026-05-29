@@ -57,9 +57,13 @@
   function getOrderedGroups(): string[] {
     if (!config) return [];
     const availableGroups = new Set(
-      config.projects.map((p) => p.sln_group).filter(Boolean),
+      config.projects.map((p) => p.sln_group).filter(Boolean) as string[],
     );
-    return GROUP_ORDER.filter((g) => availableGroups.has(g));
+    const ordered = GROUP_ORDER.filter((g) => availableGroups.has(g));
+    for (const g of availableGroups) {
+      if (!GROUP_ORDER.includes(g)) ordered.push(g);
+    }
+    return ordered;
   }
 
   function getProjectsByGroup(group: string): PaceProject[] {
@@ -100,9 +104,13 @@
   <div class="card bg-surface-50-950 p-4">
     <div class="flex items-center gap-2 mb-2">
       <Folder size={18} class="text-primary-500" />
-      <span class="font-semibold text-surface-900-100">Repository Directory</span>
+      <span class="font-semibold text-surface-900-100"
+        >Repository Directory</span
+      >
     </div>
-    <code class="text-sm bg-surface-200-800 px-3 py-2 rounded block">{config.repodir}</code>
+    <code class="text-sm bg-surface-200-800 px-3 py-2 rounded block"
+      >{config.repodir}</code
+    >
   </div>
 
   <!-- Projects Overview -->
@@ -110,7 +118,9 @@
     <div class="flex items-center gap-2 mb-4">
       <Package size={18} class="text-primary-500" />
       <span class="font-semibold text-surface-900-100">Projects Overview</span>
-      <span class="text-sm text-surface-500-400">({config.projects.length} total)</span>
+      <span class="text-sm text-surface-500-400"
+        >({config.projects.length} total)</span
+      >
     </div>
 
     <div class="grid grid-cols-3 gap-3">
@@ -126,7 +136,9 @@
   </div>
 
   <!-- Projects Table -->
-  <div class="card bg-surface-50-950 p-4 flex-1 min-h-0 overflow-hidden flex flex-col">
+  <div
+    class="card bg-surface-50-950 p-4 flex-1 min-h-0 overflow-hidden flex flex-col"
+  >
     <div class="flex items-center gap-2 mb-4">
       <FileCode size={18} class="text-primary-500" />
       <span class="font-semibold text-surface-900-100">Projects</span>
@@ -154,23 +166,46 @@
               <table class="w-full text-sm table-fixed">
                 <thead>
                   <tr class="border-b border-surface-200-800">
-                    <th class="text-left py-2 px-3 font-semibold text-surface-700-300">Project</th>
-                    <th class="text-center py-2 px-3 font-semibold text-surface-700-300 w-24">Cloned</th>
-                    <th class="text-center py-2 px-3 font-semibold text-surface-700-300 w-32">Up to Date</th>
-                    <th class="text-left py-2 px-3 font-semibold text-surface-700-300 w-40">Branch</th>
+                    <th
+                      class="text-left py-2 px-3 font-semibold text-surface-700-300"
+                      >Project</th
+                    >
+                    <th
+                      class="text-center py-2 px-3 font-semibold text-surface-700-300 w-24"
+                      >Cloned</th
+                    >
+                    <th
+                      class="text-center py-2 px-3 font-semibold text-surface-700-300 w-32"
+                      >Up to Date</th
+                    >
+                    <th
+                      class="text-left py-2 px-3 font-semibold text-surface-700-300 w-40"
+                      >Branch</th
+                    >
                   </tr>
                 </thead>
                 <tbody>
                   {#each getProjectsByGroup(group) as project}
                     {@const gitStatus = getGitStatus(project)}
-                    <tr class="border-b border-surface-100-900/50 hover:bg-surface-100-900/30">
+                    <tr
+                      class="border-b border-surface-100-900/50 hover:bg-surface-100-900/30"
+                    >
                       <td class="py-2 px-3">
-                        <div class="font-medium text-surface-900-100 break-words">{project.name}</div>
-                        <div class="text-xs text-surface-500-400 break-words">{project.csproj_path}</div>
+                        <div
+                          class="font-medium text-surface-900-100 break-words"
+                        >
+                          {project.name}
+                        </div>
+                        <div class="text-xs text-surface-500-400 break-words">
+                          {project.csproj_path}
+                        </div>
                       </td>
                       <td class="py-2 px-3 text-center">
                         {#if isLoadingGit(project)}
-                          <Loader size={16} class="animate-spin mx-auto text-primary-500" />
+                          <Loader
+                            size={16}
+                            class="animate-spin mx-auto text-primary-500"
+                          />
                         {:else if gitStatus}
                           {#if gitStatus.cloned}
                             <Check size={18} class="mx-auto text-success-500" />
@@ -186,14 +221,21 @@
                           <span class="text-surface-500-400">...</span>
                         {:else if gitStatus?.cloned}
                           {#if gitStatus.upToDate}
-                            <span class="inline-flex items-center gap-1 text-success-500">
+                            <span
+                              class="inline-flex items-center gap-1 text-success-500"
+                            >
                               <Check size={14} />
                               <span class="text-xs">Yes</span>
                             </span>
                           {:else}
-                            <span class="inline-flex items-center gap-1 text-warning-500" title={gitStatus.aheadBehind}>
+                            <span
+                              class="inline-flex items-center gap-1 text-warning-500"
+                              title={gitStatus.aheadBehind}
+                            >
                               <X size={14} />
-                              <span class="text-xs break-all">{gitStatus.aheadBehind || "No"}</span>
+                              <span class="text-xs break-all"
+                                >{gitStatus.aheadBehind || "No"}</span
+                              >
                             </span>
                           {/if}
                         {:else}
@@ -205,8 +247,13 @@
                           <span class="text-surface-500-400">...</span>
                         {:else if gitStatus?.cloned}
                           <span class="inline-flex items-center gap-1 min-w-0">
-                            <GitBranch size={14} class="text-primary-500 shrink-0" />
-                            <span class="text-surface-700-300 break-all">{gitStatus.branch}</span>
+                            <GitBranch
+                              size={14}
+                              class="text-primary-500 shrink-0"
+                            />
+                            <span class="text-surface-700-300 break-all"
+                              >{gitStatus.branch}</span
+                            >
                           </span>
                         {:else}
                           <span class="text-surface-500-400">-</span>

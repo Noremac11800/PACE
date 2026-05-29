@@ -179,6 +179,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "$HOME/.pace/configs/**"
         }
       ]
     },
@@ -187,6 +190,9 @@
       "allow": [
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "$HOME/.pace/**"
         }
       ]
     },
