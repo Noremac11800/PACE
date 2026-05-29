@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { theme } from "$lib/theme";
+  import { settings } from "$lib/settings.svelte";
   import { Sun, Moon } from "@lucide/svelte";
 
   let { class: classname }: { class?: string } = $props();
@@ -14,6 +15,7 @@
   const onCheckedChange = (event: { checked: boolean }) => {
     const mode = event.checked ? "dark" : "light";
     theme.set(mode);
+    settings.general.theme = mode;
   };
 </script>
 

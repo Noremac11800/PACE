@@ -9,7 +9,9 @@ import {
   DEFAULT_SETTINGS,
   setSettingsFromJSON,
   getSettingsJSON,
+  settings,
 } from "./settings.svelte";
+import { theme } from "./theme";
 
 export async function initializeApp(): Promise<void> {
   try {
@@ -40,12 +42,25 @@ export async function initializeApp(): Promise<void> {
       // Load default settings into the reactive state
       setSettingsFromJSON(defaultJson);
     }
+
+    applyTheme(settings.general.theme);
   } catch (error) {
     console.error("Failed to initialize app settings:", error);
 
     // Fallback to default settings if something goes wrong
     const defaultJson = JSON.stringify(DEFAULT_SETTINGS, null, 2);
     setSettingsFromJSON(defaultJson);
+  }
+}
+
+export function applyTheme(themeValue: "light" | "dark" | "system"): void {
+  if (themeValue === "system") {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    theme.set(prefersDark ? "dark" : "light");
+  } else {
+    theme.set(themeValue);
   }
 }
 

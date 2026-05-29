@@ -9,7 +9,7 @@
     Palette,
   } from "@lucide/svelte";
   import { settings } from "$lib/settings.svelte";
-  import { saveSettings } from "$lib/app-init";
+  import { saveSettings, applyTheme } from "$lib/app-init";
   import {
     SettingSwitch,
     SettingInput,
@@ -78,7 +78,10 @@
             "Theme",
             "Choose your preferred color theme",
             settings.general.theme,
-            (v) => (settings.general.theme = v as "light" | "dark" | "system"),
+            (v) => {
+              settings.general.theme = v as "light" | "dark" | "system";
+              applyTheme(settings.general.theme);
+            },
             [
               { value: "light", label: "Light" },
               { value: "dark", label: "Dark" },
