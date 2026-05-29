@@ -21,7 +21,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   general: {
-    theme: "light",
+    theme: "system",
     language: "en",
     autoCheckUpdates: true,
   },

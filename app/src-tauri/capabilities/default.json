@@ -165,6 +165,12 @@
       "allow": [
         {
           "path": "*/**"
+        },
+        {
+          "path": "$HOME/.pace/configs"
+        },
+        {
+          "path": "$HOME/.pace/configs/**"
         }
       ]
     },

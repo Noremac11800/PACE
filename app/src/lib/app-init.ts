@@ -4,7 +4,9 @@ import {
   writeTextFile,
   mkdir,
   exists,
+  copyFile,
 } from "@tauri-apps/plugin-fs";
+import { Command } from "@tauri-apps/plugin-shell";
 import {
   DEFAULT_SETTINGS,
   setSettingsFromJSON,
@@ -14,42 +16,44 @@ import {
 import { theme } from "./theme";
 
 export async function initializeApp(): Promise<void> {
+  await ensurePaceDir();
+  await loadSettings();
+  applyTheme(settings.general.theme);
+  await syncPaceConfig();
+}
+
+async function ensurePaceDir(): Promise<void> {
   try {
-    // Ensure .pace directory exists
     await mkdir(".pace", {
       baseDir: BaseDirectory.Home,
       recursive: true,
     });
+  } catch (error) {
+    console.error("Failed to create .pace directory:", error);
+  }
+}
 
-    // Try to read existing settings
+async function loadSettings(): Promise<void> {
+  try {
     const settingsExist = await exists(".pace/settings.json", {
       baseDir: BaseDirectory.Home,
     });
 
     if (settingsExist) {
-      // Load existing settings
       const existingSettings = await readTextFile(".pace/settings.json", {
         baseDir: BaseDirectory.Home,
       });
       setSettingsFromJSON(existingSettings);
     } else {
-      // Create default settings file
       const defaultJson = JSON.stringify(DEFAULT_SETTINGS, null, 2);
       await writeTextFile(".pace/settings.json", defaultJson, {
         baseDir: BaseDirectory.Home,
       });
-
-      // Load default settings into the reactive state
       setSettingsFromJSON(defaultJson);
     }
-
-    applyTheme(settings.general.theme);
   } catch (error) {
-    console.error("Failed to initialize app settings:", error);
-
-    // Fallback to default settings if something goes wrong
-    const defaultJson = JSON.stringify(DEFAULT_SETTINGS, null, 2);
-    setSettingsFromJSON(defaultJson);
+    console.error("Failed to load settings:", error);
+    setSettingsFromJSON(JSON.stringify(DEFAULT_SETTINGS, null, 2));
   }
 }
 
@@ -61,6 +65,34 @@ export function applyTheme(themeValue: "light" | "dark" | "system"): void {
     theme.set(prefersDark ? "dark" : "light");
   } else {
     theme.set(themeValue);
+  }
+}
+
+async function syncPaceConfig(): Promise<void> {
+  try {
+    // Get the config file path from the pace CLI
+    const result = await Command.create("pace", [
+      "--print-config-path",
+    ]).execute();
+    if (result.code !== 0 || !result.stdout.trim()) {
+      console.warn("pace --print-config-path did not return a valid path");
+      return;
+    }
+
+    const configPath = result.stdout.trim();
+
+    // Ensure .pace/configs directory exists
+    await mkdir(".pace/configs", {
+      baseDir: BaseDirectory.Home,
+      recursive: true,
+    });
+
+    // Copy the config file into .pace/configs/default.toml, overwriting if present
+    await copyFile(configPath, ".pace/configs/default.toml", {
+      toPathBaseDir: BaseDirectory.Home,
+    });
+  } catch (error) {
+    console.error("Failed to sync pace config:", error);
   }
 }
 
