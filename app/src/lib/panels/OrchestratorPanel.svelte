@@ -89,7 +89,7 @@
           class="card bg-error-500/10 border border-error-500 p-6 text-center max-w-md"
         >
           <p class="text-error-500 font-semibold mb-2">Error</p>
-          <p class="text-surface-700-300">{error}</p>
+          <p class="text-surface-700-300 break-all">{error}</p>
         </div>
       </div>
     {:else if config}

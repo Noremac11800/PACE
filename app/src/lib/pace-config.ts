@@ -1,4 +1,4 @@
-import { Command } from "@tauri-apps/plugin-shell";
+import { Command, type ChildProcess } from "@tauri-apps/plugin-shell";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import * as TOML from "js-toml";
 
@@ -17,17 +17,18 @@ export interface PaceConfig {
 }
 
 export async function getPaceConfigPath(): Promise<string | null> {
+  let result: ChildProcess<string> | null = null;
   try {
     const cmd = Command.create("pace", ["--print-config-path"]);
-    const result = await cmd.execute();
+    result = await cmd.execute();
 
     if (result.code === 0 && result.stdout) {
       return result.stdout.trim();
+    } else {
+      throw new Error(result.stderr);
     }
-    return null;
   } catch (error) {
-    console.error("Failed to get pace config path:", error);
-    return null;
+    throw new Error(result?.stdout);
   }
 }
 
@@ -36,17 +37,20 @@ export function parseToml(tomlContent: string): PaceConfig {
 }
 
 export async function loadPaceConfig(): Promise<PaceConfig | null> {
-  const configPath = await getPaceConfigPath();
-  if (!configPath) {
-    return null;
-  }
-
   try {
-    const content = await readTextFile(configPath);
-    return parseToml(content);
+    const configPath = await getPaceConfigPath();
+    if (!configPath) {
+      return null;
+    }
+
+    try {
+      const content = await readTextFile(configPath);
+      return parseToml(content);
+    } catch (error) {
+      return null;
+    }
   } catch (error) {
-    console.error("Failed to load pace config:", error);
-    return null;
+    throw error;
   }
 }
 

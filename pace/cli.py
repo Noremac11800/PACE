@@ -153,7 +153,6 @@ def _run(
         if args.config.exists():
             config = load_config(args.config)
         else:
-            console.print(f"Configuration file {args.config} does not exist")
             return 1
     else:
         config = load_config()

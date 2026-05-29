@@ -43,8 +43,13 @@ class Config(BaseModel):
 
         if self.repodir.exists() and self.repodir != Path():
             return self
-
-        raise ValueError(f"Repository directory {self.repodir} does not exist")
+        try:
+            self.repodir.mkdir(parents=True, exist_ok=True)
+            return self
+        except Exception:  # noqa: BLE001
+            raise RuntimeError(
+                f"Repository directory {self.repodir} does not exist and could not be created."
+            ) from None
 
 
 def load_config(file_path: Path | Traversable | None = None) -> Config:
@@ -59,6 +64,9 @@ def load_config(file_path: Path | Traversable | None = None) -> Config:
     if file_path is None:
         file_path = files("pace.data").joinpath("pace.toml")
 
-    with file_path.open("rb") as f:
-        data = tomli.load(f)
-    return Config(**data)
+    try:
+        with file_path.open("rb") as f:
+            data = tomli.load(f)
+            return Config(**data)
+    except Exception as e:
+        raise ValueError(f"Failed to load configuration file {file_path} with error:\n{e}") from e
