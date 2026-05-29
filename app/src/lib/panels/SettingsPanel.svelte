@@ -9,6 +9,7 @@
     Palette,
   } from "@lucide/svelte";
   import { settings } from "$lib/settings.svelte";
+  import { saveSettings } from "$lib/app-init";
   import {
     SettingSwitch,
     SettingInput,
@@ -32,6 +33,16 @@
 
   let activeSection = $state("general");
   let tocOpen = $state(true);
+  let initialized = $state(false);
+
+  $effect(() => {
+    JSON.stringify(settings);
+    if (!initialized) {
+      initialized = true;
+      return;
+    }
+    saveSettings();
+  });
 
   function scrollTo(id: string) {
     activeSection = id;

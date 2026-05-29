@@ -9,6 +9,8 @@
   import { fly } from "svelte/transition";
   import { page } from "$app/state";
   import { beforeNavigate } from "$app/navigation";
+  import { onMount } from "svelte";
+  import { initializeApp } from "$lib/app-init";
 
   const { children } = $props();
 
@@ -17,6 +19,10 @@
   setToaster(toaster);
 
   initI18n();
+
+  onMount(() => {
+    initializeApp();
+  });
 
   let transitionParams = $state({ x: 0, duration: 300 });
 

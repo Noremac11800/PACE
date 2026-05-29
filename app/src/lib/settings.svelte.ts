@@ -19,9 +19,9 @@ export interface Settings {
   };
 }
 
-export const settings: Settings = $state({
+export const DEFAULT_SETTINGS: Settings = {
   general: {
-    theme: "system",
+    theme: "light",
     language: "en",
     autoCheckUpdates: true,
   },
@@ -38,7 +38,9 @@ export const settings: Settings = $state({
     fontSize: "medium",
     compactMode: false,
   },
-});
+};
+
+export const settings: Settings = $state(DEFAULT_SETTINGS);
 
 export function getSettingsJSON(): string {
   return JSON.stringify(settings, null, 2);

@@ -71,6 +71,12 @@
       "identifier": "fs:allow-exists",
       "allow": [
         {
+          "path": "$HOME/.pace"
+        },
+        {
+          "path": "$HOME/.pace/**"
+        },
+        {
           "path": "$HOME/**"
         },
         {
@@ -81,6 +87,12 @@
     {
       "identifier": "fs:allow-mkdir",
       "allow": [
+        {
+          "path": "$HOME/.pace"
+        },
+        {
+          "path": "$HOME/.pace/**"
+        },
         {
           "path": "$HOME/**"
         },
@@ -115,6 +127,12 @@
       "identifier": "fs:allow-write-text-file",
       "allow": [
         {
+          "path": "$HOME/.pace"
+        },
+        {
+          "path": "$HOME/.pace/**"
+        },
+        {
           "path": "$HOME/**"
         },
         {
@@ -125,6 +143,12 @@
     {
       "identifier": "fs:allow-read-text-file",
       "allow": [
+        {
+          "path": "$HOME/.pace"
+        },
+        {
+          "path": "$HOME/.pace/**"
+        },
         {
           "path": "$HOME/**"
         },
