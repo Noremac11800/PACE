@@ -53,23 +53,121 @@ class Config(BaseModel):
                 f"Repository directory {self.repodir} does not exist and could not be created."
             ) from None
 
+    @staticmethod
+    def build_dependency_graph(projects: list[Project]) -> dict[str, set[str]]:
+        """Build a reverse dependency graph (project -> projects that depend on it).
 
-def build_dependency_graph(projects: list[Project]) -> dict[str, set[str]]:
-    """Build a reverse dependency graph (project -> projects that depend on it).
+        Args:
+            projects: List of projects.
 
-    Args:
-        projects: List of projects.
+        Returns:
+            Dictionary mapping project names to set of projects that depend on them.
+        """
+        # Build reverse dependency graph (who depends on whom)
+        dependents: dict[str, set[str]] = {p.name: set() for p in projects}
+        for project in projects:
+            for dep in project.depends_on:
+                if dep in dependents:
+                    dependents[dep].add(project.name)
+        return dependents
 
-    Returns:
-        Dictionary mapping project names to set of projects that depend on them.
-    """
-    # Build reverse dependency graph (who depends on whom)
-    dependents: dict[str, set[str]] = {p.name: set() for p in projects}
+    @staticmethod
+    def can_reach_downstream(start: str, end: str, dependents: dict[str, set[str]]) -> bool:
+        """Check if start can reach end by following dependency edges (start's dependencies can reach start).
+
+        Args:
+            start: Starting project name.
+            end: Target project name.
+            dependents: Reverse dependency graph (project -> projects that depend on it).
+
+        Returns:
+            True if start can reach end, False otherwise.
+        """
+        if start == end:
+            return True
+        visited: set[str] = set()
+        queue = [start]
+        while queue:
+            current = queue.pop(0)
+            if current == end:
+                return True
+            if current not in visited:
+                visited.add(current)
+                # Follow dependents (downstream)
+                for neighbor in dependents.get(current, set()):
+                    if neighbor not in visited:
+                        queue.extend([neighbor])
+        return False
+
+    @staticmethod
+    def can_reach_upstream(start: str, end: str, dependencies: dict[str, set[str]]) -> bool:
+        """Check if start can reach end by following upstream edges (what start depends on)."""
+        if start == end:
+            return True
+        visited: set[str] = set()
+        queue = [start]
+        while queue:
+            current = queue.pop(0)
+            if current == end:
+                return True
+            if current not in visited:
+                visited.add(current)
+                # Follow dependencies (upstream)
+                for neighbor in dependencies.get(current, set()):
+                    if neighbor not in visited:
+                        queue.extend([neighbor])
+        return False
+
+
+def _filter_projects_to_target(
+    projects: list[Project], to_repo: str, dependencies: dict[str, set[str]]
+) -> set[str]:
+    """Filter projects to include target repo and all its dependencies (transitively)."""
+    included: set[str] = set()
+
     for project in projects:
-        for dep in project.depends_on:
-            if dep in dependents:
-                dependents[dep].add(project.name)
-    return dependents
+        if Config.can_reach_upstream(to_repo, project.name, dependencies):
+            included.add(project.name)
+
+    # Collect all dependencies of included projects (transitively)
+    all_deps: set[str] = set()
+    queue = list(included)
+    while queue:
+        current = queue.pop(0)
+        for dep in dependencies.get(current, set()):
+            if dep not in all_deps and dep not in included:
+                all_deps.add(dep)
+                queue.append(dep)
+
+    return included | all_deps
+
+
+def _filter_projects_from_source(
+    projects: list[Project], from_repo: str, dependents: dict[str, set[str]]
+) -> set[str]:
+    """Filter projects to include source repo and all projects reachable downstream."""
+    included: set[str] = set()
+
+    for project in projects:
+        if Config.can_reach_downstream(from_repo, project.name, dependents):
+            included.add(project.name)
+
+    return included
+
+
+def _filter_projects_between(
+    projects: list[Project], from_repo: str, to_repo: str, dependents: dict[str, set[str]]
+) -> set[str]:
+    """Filter projects to include those on paths from from_repo to to_repo."""
+    included: set[str] = set()
+
+    for project in projects:
+        if Config.can_reach_downstream(
+            from_repo, project.name, dependents
+        ) and Config.can_reach_downstream(project.name, to_repo, dependents):
+            included.add(project.name)
+
+    return included
 
 
 def filter_projects_in_dependency_chain(
@@ -96,7 +194,7 @@ def filter_projects_in_dependency_chain(
     project_by_name = {p.name: p for p in projects}
 
     # Build reverse dependency graph (who depends on whom - edges point from dependency to dependent)
-    dependents = build_dependency_graph(projects)
+    dependents = Config.build_dependency_graph(projects)
 
     # Build forward dependency graph (what each project depends on)
     dependencies: dict[str, set[str]] = {p.name: set(p.depends_on) for p in projects}
@@ -107,80 +205,13 @@ def filter_projects_in_dependency_chain(
     if to_repo is not None and to_repo not in project_by_name:
         raise ValueError(f"Project '{to_repo}' not found in configuration")
 
-    def can_reach_downstream(start: str, end: str) -> bool:
-        """Check if start can reach end by following dependency edges (start's dependencies can reach start)."""
-        if start == end:
-            return True
-        visited: set[str] = set()
-        queue = [start]
-        while queue:
-            current = queue.pop(0)
-            if current == end:
-                return True
-            if current not in visited:
-                visited.add(current)
-                # Follow dependents (downstream)
-                for neighbor in dependents.get(current, set()):
-                    if neighbor not in visited:
-                        queue.append(neighbor)
-        return False
-
-    def can_reach_upstream(start: str, end: str) -> bool:
-        """Check if start can reach end by following upstream edges (what start depends on)."""
-        if start == end:
-            return True
-        visited: set[str] = set()
-        queue = [start]
-        while queue:
-            current = queue.pop(0)
-            if current == end:
-                return True
-            if current not in visited:
-                visited.add(current)
-                # Follow dependencies (upstream)
-                for neighbor in dependencies.get(current, set()):
-                    if neighbor not in visited:
-                        queue.append(neighbor)
-        return False
-
-    # Determine which projects are on valid paths
-    included: set[str] = set()
-
+    # Determine which projects are on valid paths using helper functions
     if from_repo is None and to_repo is not None:
-        # Only --to specified: include to_repo and all its dependencies (transitively)
-        # A project is included if to_repo can reach it by going upstream (meaning it's a dependency)
-        for project in projects:
-            if can_reach_upstream(to_repo, project.name):
-                included.add(project.name)
-
-        # Collect all dependencies of included projects (transitively)
-        all_deps: set[str] = set()
-        queue = list(included)
-        while queue:
-            current = queue.pop(0)
-            for dep in dependencies.get(current, set()):
-                if dep not in all_deps and dep not in included:
-                    all_deps.add(dep)
-                    queue.append(dep)
-        final_names = included | all_deps
+        final_names = _filter_projects_to_target(projects, to_repo, dependencies)
     elif from_repo is not None and to_repo is None:
-        # Only --from specified: include from_repo and all projects reachable downstream
-        # A project is included if from_repo can reach it by going downstream
-        for project in projects:
-            if can_reach_downstream(from_repo, project.name):
-                included.add(project.name)
-        final_names = included
+        final_names = _filter_projects_from_source(projects, from_repo, dependents)
     else:
-        # Both --from and --to specified: include projects on paths from from_repo to to_repo
-        # A project is on a path if:
-        # - from_repo can reach it downstream (it's reachable from from_repo)
-        # - AND it can reach to_repo downstream (to_repo is reachable from it)
-        for project in projects:
-            if can_reach_downstream(from_repo, project.name) and can_reach_downstream(
-                project.name, to_repo
-            ):
-                included.add(project.name)
-        final_names = included
+        final_names = _filter_projects_between(projects, from_repo, to_repo, dependents)
 
     return [p for p in projects if p.name in final_names]
 

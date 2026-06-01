@@ -70,6 +70,7 @@ ignore = [
     "ERA001", # found commented-out code
     "EM102",  # Exception must not use an f-string literal, assign to variable first
     "ANN401", # allow type `Any` in type annotations
+    "E501",   # line too long (handled by formatter)
 ]
 
 [lint.mccabe]
