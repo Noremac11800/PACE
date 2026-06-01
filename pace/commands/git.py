@@ -108,20 +108,64 @@ def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
 
 
+def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, branch: str) -> None:
+    """Checkout a specific branch in a single repo and update its status.
+
+    Args:
+        repo_url: URL of the repository
+        dest_dir: Directory containing the repository
+        statuses: ReposGitStatus instance to update
+        branch: Branch name to checkout
+    """
+    repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
+    repo_path = dest_dir / repo_name
+
+    if not repo_path.exists():
+        statuses.set(repo_name, Text("Skipped (repo not found)", style="yellow"))
+        return
+
+    statuses.set(repo_name, Spinner("dots", text=f"Checking out {branch}...", style="cyan"))
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_path), "checkout", branch],
+            capture_output=True,
+            text=True,
+            timeout=300,
+            check=False,
+        )
+        if result.returncode == 0:
+            statuses.set(repo_name, Text("Done ✓", style="green"))
+        else:
+            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
+    except subprocess.TimeoutExpired:
+        statuses.set(repo_name, Text("Timeout", style="red"))
+    except OSError as e:
+        statuses.set(repo_name, Text(f"Error: {e}", style="red"))
+
+
 def run(console: Console, config: Config, _args: list[str]) -> None:
-    """Clone all repositories in parallel.
+    """Execute git commands across all repositories in parallel.
 
     Args:
         console: Rich console instance for output
         config: PACE configuration
-        args: Additional arguments to pass to git (unused)
+        args: Additional arguments to pass to git
     """
+    min_checkout_args = 2
     command: Callable[[str, Path, ReposGitStatus], None] | None = None
+    checkout_branch: str | None = None
+
     if len(_args) > 0:
         if _args[0] == "pull":
             command = _pull_repo
         elif _args[0] == "clone":
             command = _clone_repo
+        elif _args[0] == "checkout":
+            if len(_args) < min_checkout_args:
+                console.print("Error: checkout command requires a branch name", style="red")
+                return
+            checkout_branch = _args[1]
         else:
             console.print(f"Unknown command: {_args[0]}", style="red")
             return
@@ -137,10 +181,19 @@ def run(console: Console, config: Config, _args: list[str]) -> None:
         Live(statuses.get_table(), console=console, refresh_per_second=10) as live,
         ThreadPoolExecutor() as executor,
     ):
-        futures = {
-            executor.submit(command, project.repo_url, config.repodir, statuses): project
-            for project in config.projects
-            if project.repo_url is not None
-        }
+        if checkout_branch:
+            futures = {
+                executor.submit(
+                    _checkout_repo, project.repo_url, config.repodir, statuses, checkout_branch
+                ): project
+                for project in config.projects
+                if project.repo_url is not None
+            }
+        else:
+            futures = {
+                executor.submit(command, project.repo_url, config.repodir, statuses): project
+                for project in config.projects
+                if project.repo_url is not None
+            }
         for _ in as_completed(futures):
             live.update(statuses.get_table())
