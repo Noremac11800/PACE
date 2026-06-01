@@ -2,9 +2,9 @@
 
 import subprocess
 import threading
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.live import Live
@@ -13,9 +13,6 @@ from rich.table import Table
 from rich.text import Text
 
 from pace.config import Config
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 
 class ReposGitStatus:
@@ -144,6 +141,44 @@ def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, bran
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
 
 
+_SIMPLE_COMMANDS: dict[str, Callable[[str, Path, ReposGitStatus], None]] = {
+    "pull": _pull_repo,
+    "clone": _clone_repo,
+}
+
+
+def _parse_args(
+    console: Console,
+    args: list[str],
+) -> tuple[Callable[[str, Path, ReposGitStatus], None] | None, str | None]:
+    """Parse git subcommand arguments and return the command function and optional branch.
+
+    Args:
+        console: Rich console instance for error output
+        args: Arguments passed to the git command
+
+    Returns:
+        A tuple of (command_function, checkout_branch).  Both are None on error (after
+        printing a message).  command_function is None and checkout_branch is set when
+        the subcommand is ``checkout``.
+    """
+    if not args:
+        console.print("No command specified", style="red")
+        return None, None
+
+    subcommand = args[0]
+    if subcommand in _SIMPLE_COMMANDS:
+        return _SIMPLE_COMMANDS[subcommand], None
+    if subcommand == "checkout":
+        if len(args) < 2:  # noqa: PLR2004
+            console.print("Error: checkout command requires a branch name", style="red")
+            return None, None
+        return None, args[1]
+
+    console.print(f"Unknown command: {subcommand}", style="red")
+    return None, None
+
+
 def run(console: Console, config: Config, args: list[str]) -> None:
     """Execute git commands across all repositories in parallel.
 
@@ -152,25 +187,8 @@ def run(console: Console, config: Config, args: list[str]) -> None:
         config: PACE configuration
         args: Additional arguments to pass to git
     """
-    min_checkout_args = 2
-    command: Callable[[str, Path, ReposGitStatus], None] | None = None
-    checkout_branch: str | None = None
-
-    if len(args) > 0:
-        if args[0] == "pull":
-            command = _pull_repo
-        elif args[0] == "clone":
-            command = _clone_repo
-        elif args[0] == "checkout":
-            if len(args) < min_checkout_args:
-                console.print("Error: checkout command requires a branch name", style="red")
-                return
-            checkout_branch = args[1]
-        else:
-            console.print(f"Unknown command: {args[0]}", style="red")
-            return
-    else:
-        console.print("No command specified", style="red")
+    command, checkout_branch = _parse_args(console, args)
+    if command is None and checkout_branch is None:
         return
 
     statuses = ReposGitStatus()

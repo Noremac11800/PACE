@@ -145,11 +145,13 @@
       <div class="col-span-2 sm:col-span-1">
         <label
           class="block text-xs font-semibold text-surface-700-300 mb-1"
+          for="depends-on-{project.name}"
         >
           Depends on
         </label>
         <div class="relative mt-1.5">
           <button
+            id="depends-on-{project.name}"
             class="w-full px-3 py-2 rounded-lg bg-surface-100-900 border border-surface-300-700 text-sm text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal text-left flex items-center justify-between"
             onclick={onToggleDropdown}
           >

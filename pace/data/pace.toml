@@ -181,13 +181,13 @@ sln_group = "AppModules"
 explicit_frameworks = []
 depends_on = ["appmodule-toolkit"]
 
-[[projects]]
-name = "appmodule-featureforms"
-csproj_path = "src/Esri.AppModule.FeatureForms/Esri.AppModule.FeatureForms.csproj"
-repo_url = "git@devtopia.esri.com:Melbourne/appmodule-featureforms.git"
-sln_group = "AppModules"
-explicit_frameworks = []
-depends_on = ["appmodule-toolkit"]
+#[[projects]]
+#name = "appmodule-featureforms"
+#csproj_path = "src/Esri.AppModule.FeatureForms/Esri.AppModule.FeatureForms.csproj"
+#repo_url = "git@devtopia.esri.com:Melbourne/appmodule-featureforms.git"
+#sln_group = "AppModules"
+#explicit_frameworks = []
+#depends_on = ["appmodule-toolkit"]
 
 [[projects]]
 name = "appmodule-quickcapture"
@@ -197,21 +197,21 @@ sln_group = "AppModules"
 explicit_frameworks = []
 depends_on = ["appmodule-toolkit"]
 
-[[projects]]
-name = "appmodule-webforms"
-csproj_path = "src/Esri.AppModule.WebForms/Esri.AppModule.WebForms.csproj"
-repo_url = "git@devtopia.esri.com:Melbourne/appmodule-webforms.git"
-sln_group = "AppModules"
-explicit_frameworks = []
-depends_on = ["appmodule-toolkit"]
+#[[projects]]
+#name = "appmodule-webforms"
+#csproj_path = "src/Esri.AppModule.WebForms/Esri.AppModule.WebForms.csproj"
+#repo_url = "git@devtopia.esri.com:Melbourne/appmodule-webforms.git"
+#sln_group = "AppModules"
+#explicit_frameworks = []
+#depends_on = ["appmodule-toolkit"]
 
-[[projects]]
-name = "appmodule-mapping"
-csproj_path = "src/Esri.AppModule.Mapping/Esri.AppModule.Mapping.csproj"
-repo_url = "git@devtopia.esri.com:Melbourne/appmodule-mapping.git"
-sln_group = "AppModules"
-explicit_frameworks = []
-depends_on = ["appmodule-survey123"]
+#[[projects]]
+#name = "appmodule-mapping"
+#csproj_path = "src/Esri.AppModule.Mapping/Esri.AppModule.Mapping.csproj"
+#repo_url = "git@devtopia.esri.com:Melbourne/appmodule-mapping.git"
+#sln_group = "AppModules"
+#explicit_frameworks = []
+#depends_on = ["appmodule-survey123"]
 
 [[projects]]
 name = "apps-sdk"
@@ -219,7 +219,7 @@ csproj_path = "src/Esri.Apps.Sdk/Esri.Apps.Sdk.csproj"
 repo_url = "git@devtopia.esri.com:Melbourne/apps-sdk.git"
 sln_group = "AppModules"
 explicit_frameworks = []
-depends_on = ["appmodule-survey123", "appmodule-featureforms", "appmodule-quickcapture", "appmodule-webforms"]
+depends_on = ["appmodule-survey123", "appmodule-quickcapture"]
 
 [[projects]]
 name = "Survey123-Mobile"

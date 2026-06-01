@@ -11,7 +11,7 @@ import rich
 from rich.console import Console
 from rich.traceback import install
 
-from pace.commands import dotnet, git
+from pace.commands import clean, dotnet, git
 from pace.config import Config, load_config
 from pace.rich_demos import columns, progress_bar
 
@@ -42,6 +42,18 @@ class _Options:
         "", "--print-config-path", "Print the path to the configuration file and exit"
     )
     VERSION = _Option("-v", "--version", "Print the version and exit")
+    FROM_REPO = _Option(
+        "",
+        "--from",
+        "Starting repository name. Only projects in the dependency chain from this repo will be included.",
+        metavar="<reponame>",
+    )
+    TO_REPO = _Option(
+        "",
+        "--to",
+        "Ending repository name. Only projects in the dependency chain up to this repo will be included.",
+        metavar="<reponame>",
+    )
 
 
 class PaceFormatter(argparse.HelpFormatter):
@@ -91,9 +103,24 @@ def main() -> int:
         default=False,
     )
     parser.add_argument(_Options.VERSION.long, action="version", version="pace 0.1.0")
+    parser.add_argument(
+        _Options.FROM_REPO.long,
+        dest="from_repo",
+        metavar=_Options.FROM_REPO.metavar,
+        help=_Options.FROM_REPO.description,
+        default=None,
+    )
+    parser.add_argument(
+        _Options.TO_REPO.long,
+        dest="to_repo",
+        metavar=_Options.TO_REPO.metavar,
+        help=_Options.TO_REPO.description,
+        default=None,
+    )
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
+    subparsers.add_parser("clean", help="Delete build artifacts and NuGet cache for all projects")
     subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
     _git_parser = subparsers.add_parser("git", help="Execute git commands across all repositories")
 
@@ -151,15 +178,17 @@ def _run(
 ) -> int:
     if args.config is not None:
         if args.config.exists():
-            config = load_config(args.config)
+            config = load_config(args.config, from_repo=args.from_repo, to_repo=args.to_repo)
         else:
             return 1
     else:
-        config = load_config()
+        config = load_config(from_repo=args.from_repo, to_repo=args.to_repo)
 
     was_option_given = process_options(console, config, args)
 
     match args.command:
+        case "clean":
+            clean.run(console, config)
         case "dotnet":
             dotnet.run(console, config, unknownargs)
         case "git":

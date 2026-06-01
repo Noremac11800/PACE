@@ -151,6 +151,10 @@
     }
   }
 
+  function focusOnMount(node: HTMLElement): void {
+    node.focus();
+  }
+
   function cancelImport(): void {
     importName = "";
     importError = null;
@@ -174,14 +178,14 @@
   </button>
 
   {#if configPickerOpen}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      class="fixed inset-0 z-10"
+    <button
+      class="fixed inset-0 z-10 cursor-default"
+      aria-label="Close config picker"
       onclick={() => {
         configPickerOpen = false;
         showNewInput = false;
       }}
-    ></div>
+    ></button>
     <div
       class="fixed z-20 w-auto min-w-64 max-w-none rounded-lg border border-surface-200-800 bg-surface-50-950 shadow-xl"
       style="right: 1rem; top: 4.5rem;"
@@ -237,7 +241,7 @@
             placeholder="new-name"
             bind:value={renameName}
             onkeydown={(e) => e.key === "Enter" && handleRename()}
-            autofocus
+            use:focusOnMount
           />
           <button
             class="btn preset-tonal text-xs px-2 py-1"
@@ -261,7 +265,7 @@
             placeholder="new-config-name"
             bind:value={duplicateName}
             onkeydown={(e) => e.key === "Enter" && handleDuplicate()}
-            autofocus
+            use:focusOnMount
           />
           <button
             class="btn preset-tonal text-xs px-2 py-1"
@@ -285,7 +289,7 @@
             placeholder="config-name"
             bind:value={newConfigName}
             onkeydown={(e) => e.key === "Enter" && handleCreateNew()}
-            autofocus
+            use:focusOnMount
           />
           <button
             class="btn preset-tonal text-xs px-2 py-1"
@@ -309,7 +313,7 @@
             placeholder="config-name"
             bind:value={importName}
             onkeydown={(e) => e.key === "Enter" && handleImport()}
-            autofocus
+            use:focusOnMount
           />
           <button
             class="btn preset-tonal text-xs px-2 py-1"

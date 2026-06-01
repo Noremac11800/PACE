@@ -22,7 +22,9 @@
     class="flex items-start justify-between py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
     <div class="flex-1 pr-4">
-      <label class="block text-sm font-semibold text-surface-900-50"
+      <label
+        class="block text-sm font-semibold text-surface-900-50"
+        for="setting-switch-{label}"
         >{label}</label
       >
       {#if description}
@@ -32,11 +34,13 @@
       {/if}
     </div>
     <button
+      id="setting-switch-{label}"
       class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50-950 {value
         ? 'bg-primary-500'
         : 'bg-surface-300-700 hover:bg-surface-400-600'}"
       onclick={() => onChange(!value)}
       type="button"
+      aria-label={label}
       aria-pressed={value}
     >
       <span
@@ -58,7 +62,9 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <label class="block text-sm font-semibold text-surface-900-50 mb-2"
+    <label
+      class="block text-sm font-semibold text-surface-900-50 mb-2"
+      for="setting-input-{label}"
       >{label}</label
     >
     {#if description}
@@ -67,6 +73,7 @@
       </p>
     {/if}
     <input
+      id="setting-input-{label}"
       type="text"
       class="w-full px-4 py-2.5 rounded-lg bg-surface-100-900 border border-surface-300-700 text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200"
       placeholder={placeholder || ""}
@@ -85,7 +92,9 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <label class="block text-sm font-semibold text-surface-900-50 mb-2"
+    <label
+      class="block text-sm font-semibold text-surface-900-50 mb-2"
+      for="setting-folder-{label}"
       >{label}</label
     >
     {#if description}
@@ -95,6 +104,7 @@
     {/if}
     <div class="input-group grid grid-cols-[1fr_auto]">
       <input
+        id="setting-folder-{label}"
         class="ig-input"
         type="text"
         placeholder="Select a folder..."
@@ -131,7 +141,9 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <label class="block text-sm font-semibold text-surface-900-50 mb-2"
+    <label
+      class="block text-sm font-semibold text-surface-900-50 mb-2"
+      for="setting-file-{label}"
       >{label}</label
     >
     {#if description}
@@ -141,6 +153,7 @@
     {/if}
     <div class="input-group grid grid-cols-[1fr_auto]">
       <input
+        id="setting-file-{label}"
         class="ig-input"
         type="text"
         placeholder="Select a file..."
@@ -177,7 +190,9 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <label class="block text-sm font-semibold text-surface-900-50 mb-2"
+    <label
+      class="block text-sm font-semibold text-surface-900-50 mb-2"
+      for="setting-select-{label}"
       >{label}</label
     >
     {#if description}
@@ -186,6 +201,7 @@
       </p>
     {/if}
     <select
+      id="setting-select-{label}"
       class="w-full px-4 py-2.5 rounded-lg bg-surface-100-900 border border-surface-300-700 text-surface-900-50 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200 cursor-pointer"
       {value}
       onchange={(e) => onChange(e.currentTarget.value)}
@@ -207,8 +223,8 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <label class="block text-sm font-semibold text-surface-900-50 mb-2"
-      >{label}</label
+    <p class="block text-sm font-semibold text-surface-900-50 mb-2"
+      >{label}</p
     >
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
