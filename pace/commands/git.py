@@ -144,7 +144,7 @@ def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, bran
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
 
 
-def run(console: Console, config: Config, _args: list[str]) -> None:
+def run(console: Console, config: Config, args: list[str]) -> None:
     """Execute git commands across all repositories in parallel.
 
     Args:
@@ -156,18 +156,18 @@ def run(console: Console, config: Config, _args: list[str]) -> None:
     command: Callable[[str, Path, ReposGitStatus], None] | None = None
     checkout_branch: str | None = None
 
-    if len(_args) > 0:
-        if _args[0] == "pull":
+    if len(args) > 0:
+        if args[0] == "pull":
             command = _pull_repo
-        elif _args[0] == "clone":
+        elif args[0] == "clone":
             command = _clone_repo
-        elif _args[0] == "checkout":
-            if len(_args) < min_checkout_args:
+        elif args[0] == "checkout":
+            if len(args) < min_checkout_args:
                 console.print("Error: checkout command requires a branch name", style="red")
                 return
-            checkout_branch = _args[1]
+            checkout_branch = args[1]
         else:
-            console.print(f"Unknown command: {_args[0]}", style="red")
+            console.print(f"Unknown command: {args[0]}", style="red")
             return
     else:
         console.print("No command specified", style="red")
