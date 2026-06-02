@@ -1,3 +1,25 @@
+export interface BuildTabSettings {
+  fromProject: string;
+  toProject: string;
+  buildConfig: "Debug" | "Release";
+  selectedFrameworks: string[];
+  msbuildDevSolution: boolean;
+  msbuildAllSolution: boolean;
+  msbuildGeneratePackage: boolean;
+  msbuildPackageOutputPath: string;
+}
+
+export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
+  fromProject: "",
+  toProject: "",
+  buildConfig: "Release",
+  selectedFrameworks: [],
+  msbuildDevSolution: false,
+  msbuildAllSolution: false,
+  msbuildGeneratePackage: false,
+  msbuildPackageOutputPath: "",
+};
+
 export interface Settings {
   general: {
     theme: "light" | "dark" | "system";
@@ -17,6 +39,8 @@ export interface Settings {
     fontSize: "small" | "medium" | "large";
     compactMode: boolean;
   };
+  buildTab: BuildTabSettings;
+  lastActiveConfig: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -38,6 +62,8 @@ export const DEFAULT_SETTINGS: Settings = {
     fontSize: "medium",
     compactMode: false,
   },
+  buildTab: { ...DEFAULT_BUILD_TAB_SETTINGS },
+  lastActiveConfig: "",
 };
 
 export const settings: Settings = $state(DEFAULT_SETTINGS);
@@ -50,6 +76,9 @@ export function setSettingsFromJSON(json: string): void {
   try {
     const parsed = JSON.parse(json);
     Object.assign(settings, parsed);
+    if (parsed.buildTab) {
+      Object.assign(settings.buildTab, parsed.buildTab);
+    }
   } catch (e) {
     console.error("Failed to parse settings JSON:", e);
   }

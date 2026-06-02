@@ -13,6 +13,7 @@
     loadAvailableConfigs,
     loadConfig,
   } from "$lib/config-store.svelte";
+  import { settings } from "$lib/settings.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
   import BuildTab from "$lib/orchestrator/BuildTab.svelte";
   import DeployTab from "$lib/orchestrator/DeployTab.svelte";
@@ -52,7 +53,14 @@
       configStore.availableConfigs.length > 0 &&
       !configStore.activeConfigName
     ) {
-      await loadConfig(configStore.availableConfigs[0].filename);
+      const saved = settings.lastActiveConfig;
+      const match = saved
+        ? configStore.availableConfigs.find((c) => c.filename === saved)
+        : null;
+      const toLoad = match
+        ? match.filename
+        : configStore.availableConfigs[0].filename;
+      await loadConfig(toLoad);
     }
   });
 </script>
@@ -90,7 +98,7 @@
   </div>
 
   <!-- Tab Content -->
-  <div class="flex-1 overflow-auto p-4">
+  <div class="flex-1 overflow-hidden flex flex-col">
     {#if configStore.loading}
       <div class="flex-1 flex items-center justify-center min-h-[200px]">
         <div class="text-center">
@@ -99,7 +107,7 @@
         </div>
       </div>
     {:else if configStore.error}
-      <div class="flex items-center justify-center min-h-[200px]">
+      <div class="flex items-center justify-center min-h-[200px] p-4">
         <div
           class="card bg-error-500/10 border border-error-500 p-6 text-center max-w-md"
         >
@@ -108,28 +116,32 @@
         </div>
       </div>
     {:else if activeTab === "editor"}
-      {#if configStore.activeConfig}
-        <ConfigEditorTab />
-      {:else}
-        <div
-          class="flex items-center justify-center min-h-[200px] text-surface-500-400 text-sm"
-        >
-          Select or create a config to start editing.
-        </div>
-      {/if}
+      <div class="flex-1 overflow-auto p-4">
+        {#if configStore.activeConfig}
+          <ConfigEditorTab />
+        {:else}
+          <div
+            class="flex items-center justify-center min-h-[200px] text-surface-500-400 text-sm"
+          >
+            Select or create a config to start editing.
+          </div>
+        {/if}
+      </div>
     {:else if configStore.activeConfig}
       {#if activeTab === "projects"}
-        <ProjectsTab config={configStore.activeConfig} />
+        <div class="flex-1 overflow-auto p-4">
+          <ProjectsTab config={configStore.activeConfig} />
+        </div>
       {:else if activeTab === "build"}
-        <BuildTab />
+        <div class="flex-1 flex flex-col overflow-hidden"><BuildTab /></div>
       {:else if activeTab === "deploy"}
-        <DeployTab />
+        <div class="flex-1 overflow-auto p-4"><DeployTab /></div>
       {:else if activeTab === "git"}
-        <GitTab />
+        <div class="flex-1 overflow-auto p-4"><GitTab /></div>
       {/if}
     {:else}
       <div
-        class="flex items-center justify-center min-h-[200px] text-surface-500-400 text-sm"
+        class="flex items-center justify-center min-h-[200px] p-4 text-surface-500-400 text-sm"
       >
         No config loaded. Use the picker above to select or create one.
       </div>

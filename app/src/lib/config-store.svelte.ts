@@ -10,6 +10,8 @@ import { homeDir } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-dialog";
 import * as TOML from "js-toml";
 import type { PaceConfig, PaceProject } from "./pace-config";
+import { settings } from "./settings.svelte";
+import { saveSettings } from "./app-init";
 
 export interface ConfigEntry {
   filename: string;
@@ -84,6 +86,8 @@ export async function loadConfig(filename: string): Promise<void> {
       projects: (parsed.projects as PaceConfig["projects"]) ?? [],
     };
     configStore.activeConfigName = filename;
+    settings.lastActiveConfig = filename;
+    saveSettings().catch((e) => console.error("Failed to persist lastActiveConfig:", e));
   } catch (error) {
     configStore.error = `Failed to load ${filename}: ${error}`;
     configStore.activeConfig = null;
