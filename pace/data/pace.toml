@@ -1,5 +1,7 @@
 repodir = "/tmp/PACE"
 
+nuget_cache_path = "C:\\Users\\cam13469\\nuget-packages"
+
 # Global deps
 [[projects]]
 name = "toolkit-msbuild"

@@ -19,6 +19,7 @@ export interface PaceConfig {
   repodir: string;
   projects: PaceProject[];
   build_props: PaceBuildProp[];
+  nuget_cache_path?: string;
 }
 
 export interface ProjectGitStatus {

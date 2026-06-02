@@ -113,6 +113,19 @@
     >
   </div>
 
+  <!-- NuGet Cache Path -->
+  {#if config.nuget_cache_path}
+    <div class="card bg-surface-50-950 p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <Package size={18} class="text-primary-500" />
+        <span class="font-semibold text-surface-900-100">NuGet Cache Path</span>
+      </div>
+      <code class="text-sm bg-surface-200-800 px-3 py-2 rounded block"
+        >{config.nuget_cache_path}</code
+      >
+    </div>
+  {/if}
+
   <!-- Projects Overview -->
   <div class="card bg-surface-50-950 p-4">
     <div class="flex items-center gap-2 mb-4">

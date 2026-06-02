@@ -45,11 +45,13 @@ class Config(BaseModel):
     Attributes:
         repodir: Directory where repositories are cloned.
         projects: List of projects.
+        nuget_cache_path: Optional path to a custom NuGet package cache directory.
     """
 
     repodir: Path = Path()
     projects: list[Project]
     build_props: list[BuildProp] = []
+    nuget_cache_path: Path | None = None
 
     @model_validator(mode="after")
     def apply_env_overrides(self) -> "Config":

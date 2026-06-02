@@ -7,6 +7,7 @@
     Hammer,
     Rocket,
     PenLine,
+    Package,
   } from "@lucide/svelte";
   import {
     configStore,
@@ -19,14 +20,16 @@
   import DeployTab from "$lib/orchestrator/DeployTab.svelte";
   import GitTab from "$lib/orchestrator/GitTab.svelte";
   import ConfigEditorTab from "$lib/orchestrator/ConfigEditorTab.svelte";
+  import NugetTab from "$lib/orchestrator/NugetTab.svelte";
   import ConfigSelector from "$lib/panels/ConfigSelector.svelte";
 
-  let activeTab = $state<"projects" | "build" | "deploy" | "git" | "editor">(
-    "projects",
-  );
+  let activeTab = $state<
+    "projects" | "build" | "deploy" | "git" | "editor" | "nuget"
+  >("projects");
 
   const allTabs = [
     { id: "projects" as const, label: "Projects", icon: Folder },
+    { id: "nuget" as const, label: "NuGet", icon: Package },
     { id: "build" as const, label: "Build", icon: Hammer },
     { id: "deploy" as const, label: "Deploy", icon: Rocket },
     { id: "git" as const, label: "Git", icon: GitBranch },
@@ -114,6 +117,10 @@
           <p class="text-error-500 font-semibold mb-2">Error</p>
           <p class="text-surface-700-300 break-all">{configStore.error}</p>
         </div>
+      </div>
+    {:else if activeTab === "nuget"}
+      <div class="flex-1 overflow-auto p-4">
+        <NugetTab />
       </div>
     {:else if activeTab === "editor"}
       <div class="flex-1 overflow-auto p-4">

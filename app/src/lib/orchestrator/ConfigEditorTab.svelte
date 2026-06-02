@@ -22,7 +22,9 @@
 
   function snapshotConfig(): PaceConfig {
     const snap = $state.snapshot(configStore.activeConfig);
-    return structuredClone(snap ?? { repodir: "", projects: [] }) as PaceConfig;
+    return structuredClone(
+      snap ?? { repodir: "", projects: [], build_props: [] },
+    ) as PaceConfig;
   }
 
   let draft = $state<PaceConfig>(snapshotConfig());
@@ -51,7 +53,7 @@
         draft = structuredClone(snap) as PaceConfig;
         groups = deriveGroups(draft.projects);
       } else {
-        draft = { repodir: "", projects: [] };
+        draft = { repodir: "", projects: [], build_props: [] };
         groups = [];
       }
       expandedProjects = new Set();
@@ -119,6 +121,13 @@
     }
   }
 
+  async function pickNugetCachePath(): Promise<void> {
+    const selected = await open({ directory: true, multiple: false });
+    if (selected && typeof selected === "string") {
+      draft.nuget_cache_path = selected;
+    }
+  }
+
   function removeProject(index: number): void {
     draft.projects = draft.projects.filter((_, i) => i !== index);
     const next = new Set<number>();
@@ -181,6 +190,42 @@
         title="Browse"
       >
         <FolderOpen size={16} />
+      </button>
+    </div>
+  </div>
+
+  <!-- NuGet Cache Path -->
+  <div class="card bg-surface-50-950 p-4">
+    <span class="block text-sm font-semibold text-surface-900-100 mb-2"
+      >NuGet Cache Path</span
+    >
+    <p class="text-xs text-surface-500-400 mb-3">
+      Optional path to a local NuGet package cache directory. When set, this is
+      used in the Packages tab.
+    </p>
+    <div class="input-group grid grid-cols-[1fr_auto_auto]">
+      <input
+        class="ig-input font-mono text-sm"
+        type="text"
+        placeholder="/path/to/nuget/packages"
+        bind:value={draft.nuget_cache_path}
+      />
+      <button
+        class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+        type="button"
+        onclick={pickNugetCachePath}
+        title="Browse"
+      >
+        <FolderOpen size={16} />
+      </button>
+      <button
+        class="ig-cell btn preset-tonal hover:text-error-500 transition-colors"
+        type="button"
+        onclick={() => (draft.nuget_cache_path = undefined)}
+        title="Clear"
+        disabled={!draft.nuget_cache_path}
+      >
+        <Trash2 size={16} />
       </button>
     </div>
   </div>

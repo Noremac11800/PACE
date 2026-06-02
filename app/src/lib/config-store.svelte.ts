@@ -86,6 +86,7 @@ export async function loadConfig(filename: string): Promise<void> {
       repodir: (parsed.repodir as string) ?? "",
       projects: (parsed.projects as PaceConfig["projects"]) ?? [],
       build_props: ((parsed["build-props"] ?? parsed.build_props) as PaceConfig["build_props"]) ?? [],
+      nuget_cache_path: (parsed.nuget_cache_path as string | undefined) ?? undefined,
     };
     configStore.activeConfigName = filename;
     settings.lastActiveConfig = filename;
@@ -236,6 +237,11 @@ function serializeToml(config: PaceConfig): string {
 
   if (config.repodir) {
     lines.push(`repodir = ${JSON.stringify(config.repodir)}`);
+    lines.push("");
+  }
+
+  if (config.nuget_cache_path) {
+    lines.push(`nuget_cache_path = ${JSON.stringify(config.nuget_cache_path)}`);
     lines.push("");
   }
 
