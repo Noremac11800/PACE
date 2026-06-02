@@ -1,5 +1,11 @@
 import { Command } from "@tauri-apps/plugin-shell";
 
+export interface PaceBuildProp {
+  name: string;
+  datatype: "boolean" | "string" | "path";
+  default: string | boolean;
+}
+
 export interface PaceProject {
   name: string;
   csproj_path: string;
@@ -12,6 +18,7 @@ export interface PaceProject {
 export interface PaceConfig {
   repodir: string;
   projects: PaceProject[];
+  build_props: PaceBuildProp[];
 }
 
 export interface ProjectGitStatus {

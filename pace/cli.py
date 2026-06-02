@@ -61,7 +61,7 @@ class PaceFormatter(argparse.HelpFormatter):
 
     def _format_usage(self, usage: Any, actions: Any, groups: Any, prefix: Any) -> str:  # noqa: ARG002
         """Override usage formatting to match the desired style."""
-        return f"usage: [-h] [{_Options.CONFIG.short} {_Options.CONFIG.metavar}] [OPTIONS] command...\n\n"  # noqa: E501
+        return f"usage: [-h] [{_Options.CONFIG.short} {_Options.CONFIG.metavar}] [OPTIONS] command...\n\n"
 
 
 def main() -> int:

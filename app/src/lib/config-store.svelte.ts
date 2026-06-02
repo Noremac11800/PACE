@@ -47,6 +47,7 @@ export function emptyConfig(): PaceConfig {
   return {
     repodir: "",
     projects: [],
+    build_props: [],
   };
 }
 
@@ -84,6 +85,7 @@ export async function loadConfig(filename: string): Promise<void> {
     configStore.activeConfig = {
       repodir: (parsed.repodir as string) ?? "",
       projects: (parsed.projects as PaceConfig["projects"]) ?? [],
+      build_props: ((parsed["build-props"] ?? parsed.build_props) as PaceConfig["build_props"]) ?? [],
     };
     configStore.activeConfigName = filename;
     settings.lastActiveConfig = filename;

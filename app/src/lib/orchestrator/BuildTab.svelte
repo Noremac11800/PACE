@@ -30,12 +30,11 @@
     (settings.buildTab.selectedFrameworks[0] as Framework) ?? "",
   );
 
-  let msbuildDevSolution = $state(settings.buildTab.msbuildDevSolution);
-  let msbuildAllSolution = $state(settings.buildTab.msbuildAllSolution);
-  let msbuildGeneratePackage = $state(settings.buildTab.msbuildGeneratePackage);
-  let msbuildPackageOutputPath = $state(
-    settings.buildTab.msbuildPackageOutputPath,
-  );
+  let msbuildProps = $state<Record<string, string>>({
+    ...settings.buildTab.msbuildProps,
+  });
+
+  const buildProps = $derived(configStore.activeConfig?.build_props ?? []);
 
   let settingsInitialized = $state(false);
 
@@ -50,10 +49,7 @@
       toProject,
       buildConfig,
       selectedFrameworks: selectedFramework ? [selectedFramework] : [],
-      msbuildDevSolution,
-      msbuildAllSolution,
-      msbuildGeneratePackage,
-      msbuildPackageOutputPath,
+      msbuildProps: { ...msbuildProps },
     };
     untrack(() => {
       settings.buildTab = snapshot;
@@ -69,16 +65,13 @@
     toProject = d.toProject;
     buildConfig = d.buildConfig;
     selectedFramework = "";
-    msbuildDevSolution = d.msbuildDevSolution;
-    msbuildAllSolution = d.msbuildAllSolution;
-    msbuildGeneratePackage = d.msbuildGeneratePackage;
-    msbuildPackageOutputPath = d.msbuildPackageOutputPath;
+    msbuildProps = {};
   }
 
-  async function pickPackageOutputPath() {
+  async function pickPath(propName: string) {
     const selected = await open({ directory: true, multiple: false });
     if (selected && typeof selected === "string") {
-      msbuildPackageOutputPath = selected;
+      msbuildProps = { ...msbuildProps, [propName]: selected };
     }
   }
 
@@ -182,11 +175,12 @@
     parts.push("dotnet");
     parts.push("-c", buildConfig);
     if (selectedFramework) parts.push("-f", selectedFramework);
-    if (msbuildDevSolution) parts.push("-p:DevSolution=true");
-    if (msbuildAllSolution) parts.push("-p:AllSolution=true");
-    if (msbuildGeneratePackage) parts.push("-p:GeneratePackageOnBuild=true");
-    if (msbuildPackageOutputPath)
-      parts.push(`-p:PackageOutputPath=${msbuildPackageOutputPath}`);
+    for (const prop of buildProps) {
+      const val = msbuildProps[prop.name];
+      const effective = val !== undefined ? val : String(prop.default);
+      if (effective !== "" && effective !== String(prop.default))
+        parts.push(`-p:${prop.name}=${effective}`);
+    }
     return parts.join(" ");
   });
 
@@ -278,14 +272,12 @@
 
     const dotnetPassthrough: string[] = ["-c", buildConfig];
     if (selectedFramework) dotnetPassthrough.push("-f", selectedFramework);
-    if (msbuildDevSolution) dotnetPassthrough.push("-p:DevSolution=true");
-    if (msbuildAllSolution) dotnetPassthrough.push("-p:AllSolution=true");
-    if (msbuildGeneratePackage)
-      dotnetPassthrough.push("-p:GeneratePackageOnBuild=true");
-    if (msbuildPackageOutputPath)
-      dotnetPassthrough.push(
-        `-p:PackageOutputPath=${msbuildPackageOutputPath}`,
-      );
+    for (const prop of buildProps) {
+      const val = msbuildProps[prop.name];
+      const effective = val !== undefined ? val : String(prop.default);
+      if (effective !== "" && effective !== String(prop.default))
+        dotnetPassthrough.push(`-p:${prop.name}=${effective}`);
+    }
 
     const extraPaceArgs: string[] = [];
     if (fromProject) extraPaceArgs.push("--from", fromProject);
@@ -463,79 +455,115 @@
     </div>
 
     <!-- MSBuild Properties -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-      <span class="font-semibold text-surface-900-100">MSBuild Properties</span>
+    {#if buildProps.length > 0}
+      <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
+        <span class="font-semibold text-surface-900-100"
+          >MSBuild Properties</span
+        >
 
-      <!-- Bool toggles -->
-      <div class="flex flex-col gap-2">
-        {#each [{ id: "dev", label: "DevSolution", bind: () => msbuildDevSolution, set: (v: boolean) => {
-              msbuildDevSolution = v;
-            } }, { id: "all", label: "AllSolution", bind: () => msbuildAllSolution, set: (v: boolean) => {
-              msbuildAllSolution = v;
-            } }, { id: "gen", label: "GeneratePackageOnBuild", bind: () => msbuildGeneratePackage, set: (v: boolean) => {
-              msbuildGeneratePackage = v;
-            } }] as prop}
-          <label
-            class="flex items-center gap-3 cursor-pointer group"
-            for="msbuild-{prop.id}"
-          >
-            <div
-              role="checkbox"
-              aria-checked={prop.bind()}
-              tabindex="0"
-              id="msbuild-{prop.id}"
-              class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {prop.bind()
-                ? 'bg-primary-500'
-                : 'bg-surface-300-700'}"
-              onclick={() => prop.set(!prop.bind())}
-              onkeydown={(e) => e.key === " " && prop.set(!prop.bind())}
+        {#each buildProps as prop}
+          {#if prop.datatype === "boolean"}
+            {@const val =
+              msbuildProps[prop.name] !== undefined
+                ? msbuildProps[prop.name] === "true"
+                : prop.default === true || prop.default === "true"}
+            <label
+              class="flex items-center gap-3 cursor-pointer group"
+              for="msbuild-{prop.name}"
             >
               <div
-                class="w-4 h-4 rounded-full bg-white shadow transition-transform {prop.bind()
-                  ? 'translate-x-4'
-                  : 'translate-x-0'}"
-              ></div>
+                role="checkbox"
+                aria-checked={val}
+                tabindex="0"
+                id="msbuild-{prop.name}"
+                class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {val
+                  ? 'bg-primary-500'
+                  : 'bg-surface-300-700'}"
+                onclick={() =>
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: val ? "false" : "true",
+                  })}
+                onkeydown={(e) =>
+                  e.key === " " &&
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: val ? "false" : "true",
+                  })}
+              >
+                <div
+                  class="w-4 h-4 rounded-full bg-white shadow transition-transform {val
+                    ? 'translate-x-4'
+                    : 'translate-x-0'}"
+                ></div>
+              </div>
+              <span
+                class="text-sm font-mono text-surface-900-100 group-hover:text-primary-500 transition-colors"
+                >{prop.name}</span
+              >
+              <span
+                class="text-xs ml-auto {val
+                  ? 'text-primary-400'
+                  : 'text-surface-500-400'}">{val ? "true" : "false"}</span
+              >
+            </label>
+          {:else if prop.datatype === "path"}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="msbuild-{prop.name}"
+              >
+                {prop.name}
+              </label>
+              <div class="input-group grid grid-cols-[1fr_auto]">
+                <input
+                  id="msbuild-{prop.name}"
+                  class="ig-input font-mono text-sm"
+                  type="text"
+                  placeholder="{String(prop.default) ||
+                    '/path/to/dir'} (optional)"
+                  value={msbuildProps[prop.name] ?? String(prop.default)}
+                  oninput={(e) =>
+                    (msbuildProps = {
+                      ...msbuildProps,
+                      [prop.name]: (e.target as HTMLInputElement).value,
+                    })}
+                />
+                <button
+                  class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+                  type="button"
+                  onclick={() => pickPath(prop.name)}
+                  title="Browse"
+                >
+                  <FolderOpen size={16} />
+                </button>
+              </div>
             </div>
-            <span
-              class="text-sm font-mono text-surface-900-100 group-hover:text-primary-500 transition-colors"
-              >{prop.label}</span
-            >
-            {#if prop.bind()}
-              <span class="text-xs text-primary-400 ml-auto">true</span>
-            {:else}
-              <span class="text-xs text-surface-500-400 ml-auto">false</span>
-            {/if}
-          </label>
+          {:else}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="msbuild-{prop.name}"
+              >
+                {prop.name}
+              </label>
+              <input
+                id="msbuild-{prop.name}"
+                class="input font-mono text-sm"
+                type="text"
+                placeholder={String(prop.default) || "(optional)"}
+                value={msbuildProps[prop.name] ?? String(prop.default)}
+                oninput={(e) =>
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: (e.target as HTMLInputElement).value,
+                  })}
+              />
+            </div>
+          {/if}
         {/each}
       </div>
-
-      <!-- PackageOutputPath -->
-      <div class="flex flex-col gap-1">
-        <label
-          class="text-xs font-medium text-surface-600-400"
-          for="pkg-output-path"
-        >
-          PackageOutputPath
-        </label>
-        <div class="input-group grid grid-cols-[1fr_auto]">
-          <input
-            id="pkg-output-path"
-            class="ig-input font-mono text-sm"
-            type="text"
-            placeholder="/path/to/packages (optional)"
-            bind:value={msbuildPackageOutputPath}
-          />
-          <button
-            class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-            type="button"
-            onclick={pickPackageOutputPath}
-            title="Browse"
-          >
-            <FolderOpen size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
+    {/if}
 
     <!-- Command preview -->
     <div class="card bg-surface-50-950 p-4">
@@ -612,7 +640,7 @@
             <div
               class="{line.type === 'err'
                 ? 'text-error-400'
-                : 'text-surface-900-100'} break-words"
+                : 'text-surface-900-100'} wrap-break-word"
             >
               {line.text}
             </div>

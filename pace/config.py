@@ -9,6 +9,20 @@ import tomli
 from pydantic import BaseModel, model_validator
 
 
+class BuildProp(BaseModel):
+    """A configurable MSBuild property defined in the PACE config.
+
+    Attributes:
+        name: MSBuild property name (e.g. DevSolution).
+        datatype: Value type — "boolean", "string", or "path".
+        default: Default value as a string.
+    """
+
+    name: str
+    datatype: str = "string"
+    default: str | bool | Path = ""
+
+
 class Project(BaseModel):
     """Project model for PACE.
 
@@ -35,6 +49,7 @@ class Config(BaseModel):
 
     repodir: Path = Path()
     projects: list[Project]
+    build_props: list[BuildProp] = []
 
     @model_validator(mode="after")
     def apply_env_overrides(self) -> "Config":
@@ -237,6 +252,9 @@ def load_config(
     try:
         with file_path.open("rb") as f:
             data = tomli.load(f)
+            # TOML uses "build-props" (hyphen); map to build_props
+            if "build-props" in data:
+                data["build_props"] = data.pop("build-props")
             config = Config(**data)
 
             # Filter projects based on dependency chain

@@ -3,10 +3,7 @@ export interface BuildTabSettings {
   toProject: string;
   buildConfig: "Debug" | "Release";
   selectedFrameworks: string[];
-  msbuildDevSolution: boolean;
-  msbuildAllSolution: boolean;
-  msbuildGeneratePackage: boolean;
-  msbuildPackageOutputPath: string;
+  msbuildProps: Record<string, string>;
 }
 
 export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
@@ -14,10 +11,7 @@ export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
   toProject: "",
   buildConfig: "Release",
   selectedFrameworks: [],
-  msbuildDevSolution: false,
-  msbuildAllSolution: false,
-  msbuildGeneratePackage: false,
-  msbuildPackageOutputPath: "",
+  msbuildProps: {},
 };
 
 export interface Settings {

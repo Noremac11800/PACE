@@ -236,3 +236,23 @@ repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Studio.git"
 sln_group = "Apps"
 explicit_frameworks = []
 depends_on = ["apps-sdk"]
+
+[[build-props]]
+name = "DevSolution"
+datatype = "boolean"
+default = false
+
+[[build-props]]
+name = "AllSolution"
+datatype = "boolean"
+default = false
+
+[[build-props]]
+name = "GeneratePackageOnBuild"
+datatype = "boolean"
+default = false
+
+[[build-props]]
+name = "PackageOutputPath"
+datatype = "path"
+default = ""
