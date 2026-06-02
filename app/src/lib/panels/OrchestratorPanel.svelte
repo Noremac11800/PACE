@@ -118,10 +118,6 @@
           <p class="text-surface-700-300 break-all">{configStore.error}</p>
         </div>
       </div>
-    {:else if activeTab === "nuget"}
-      <div class="flex-1 overflow-auto p-4">
-        <NugetTab />
-      </div>
     {:else if activeTab === "editor"}
       <div class="flex-1 overflow-auto p-4">
         {#if configStore.activeConfig}
@@ -140,6 +136,12 @@
         class:hidden={activeTab !== "projects"}
       >
         <ProjectsTab config={configStore.activeConfig} />
+      </div>
+      <div
+        class="flex-1 overflow-auto p-4"
+        class:hidden={activeTab !== "nuget"}
+      >
+        <NugetTab />
       </div>
       <div
         class="flex-1 flex flex-col overflow-hidden"

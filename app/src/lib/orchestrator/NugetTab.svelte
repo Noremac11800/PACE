@@ -13,8 +13,6 @@
     CheckCircle,
     XCircle,
     AlertCircle,
-    ChevronDown,
-    ChevronRight,
     Loader,
   } from "@lucide/svelte";
   import { configStore, saveConfig } from "$lib/config-store.svelte";
@@ -43,8 +41,6 @@
   let customCachePackages = $state<CachedPackage[]>([]);
   let customCacheLoading = $state(false);
   let customCacheError = $state<string | null>(null);
-
-  let expandedPackages = $state<Set<string>>(new Set());
 
   let nugetConfigDir = $state<string>("");
 
@@ -265,16 +261,6 @@
     }
   }
 
-  function togglePackage(key: string) {
-    const next = new Set(expandedPackages);
-    if (next.has(key)) {
-      next.delete(key);
-    } else {
-      next.add(key);
-    }
-    expandedPackages = next;
-  }
-
   onMount(async () => {
     loadSources();
     loadDefaultCachePackages();
@@ -439,49 +425,47 @@
         <AlertCircle size={16} class="shrink-0" />
         <span class="break-all">{defaultCacheError}</span>
       </div>
-    {:else if filteredDefaultPackages.length === 0}
-      <p class="text-sm text-surface-500-400">No matching packages found.</p>
-    {:else}
-      <div class="text-xs text-surface-500-400 mb-1">
-        {filteredDefaultPackages.length} package{filteredDefaultPackages.length ===
-        1
-          ? ""
-          : "s"} found
+    {:else if defaultCachePackages.length > 0}
+      {@const filtered = filteredDefaultPackages}
+      <div class="text-xs text-surface-500-400">
+        {filtered.length} matching package{filtered.length === 1 ? "" : "s"} (of
+        {defaultCachePackages.length} total)
       </div>
-      <div class="flex flex-col gap-1 max-h-72 overflow-y-auto">
-        {#each filteredDefaultPackages as pkg}
-          {@const key = "default:" + pkg.name}
-          <div class="rounded bg-surface-100-900/40">
-            <button
-              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-surface-100-900/60 transition-colors rounded"
-              onclick={() => togglePackage(key)}
+      {#if filtered.length === 0}
+        <div
+          class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
+        >
+          <AlertCircle size={16} class="shrink-0" />
+          No packages matched the projects in the active config.
+        </div>
+      {:else}
+        <div class="flex flex-col gap-0.5 max-h-72 overflow-y-auto">
+          {#each filtered as pkg}
+            <div
+              class="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-100-900/40"
             >
-              {#if expandedPackages.has(key)}
-                <ChevronDown size={14} class="text-primary-500 shrink-0" />
-              {:else}
-                <ChevronRight size={14} class="text-surface-500-400 shrink-0" />
-              {/if}
-              <span class="font-mono text-surface-900-100 flex-1 truncate"
+              <span
+                class="font-mono text-xs text-surface-900-100 flex-1 truncate"
                 >{pkg.name}</span
               >
-              <span class="text-xs text-surface-500-400 shrink-0"
-                >{pkg.versions.length} version{pkg.versions.length === 1
-                  ? ""
-                  : "s"}</span
-              >
-            </button>
-            {#if expandedPackages.has(key)}
-              <div class="px-3 pb-2 flex flex-wrap gap-1.5">
+              <div class="flex flex-wrap gap-1 shrink-0">
                 {#each pkg.versions as ver}
                   <span
-                    class="text-xs font-mono px-2 py-0.5 rounded bg-surface-200-800 text-surface-700-300"
+                    class="text-xs font-mono px-1.5 py-0.5 rounded bg-surface-200-800 text-surface-700-300"
                     >{ver}</span
                   >
                 {/each}
               </div>
-            {/if}
-          </div>
-        {/each}
+            </div>
+          {/each}
+        </div>
+      {/if}
+    {:else if !defaultCacheLoading}
+      <div
+        class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
+      >
+        <AlertCircle size={16} class="shrink-0" />
+        No packages found in the default cache directory.
       </div>
     {/if}
   </div>
@@ -558,7 +542,14 @@
         {filtered.length} matching package{filtered.length === 1 ? "" : "s"} (of
         {customCachePackages.length} total)
       </div>
-      {#if filtered.length > 0}
+      {#if filtered.length === 0}
+        <div
+          class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
+        >
+          <AlertCircle size={16} class="shrink-0" />
+          No packages matched the projects in the active config.
+        </div>
+      {:else}
         <div class="flex flex-col gap-0.5 max-h-72 overflow-y-auto">
           {#each filtered as pkg}
             <div
@@ -580,11 +571,14 @@
           {/each}
         </div>
       {/if}
-    {:else if customCachePath}
-      <p class="text-sm text-surface-500-400">
-        Click refresh to load packages from this path.
-      </p>
-    {:else}
+    {:else if customCachePath && !customCacheLoading}
+      <div
+        class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
+      >
+        <AlertCircle size={16} class="shrink-0" />
+        No .nupkg files found in this directory.
+      </div>
+    {:else if !customCachePath}
       <p class="text-sm text-surface-500-400">
         Select a folder to load packages from a custom NuGet cache location.
       </p>
