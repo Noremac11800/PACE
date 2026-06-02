@@ -128,17 +128,27 @@
         {/if}
       </div>
     {:else if configStore.activeConfig}
-      {#if activeTab === "projects"}
-        <div class="flex-1 overflow-auto p-4">
-          <ProjectsTab config={configStore.activeConfig} />
-        </div>
-      {:else if activeTab === "build"}
-        <div class="flex-1 flex flex-col overflow-hidden"><BuildTab /></div>
-      {:else if activeTab === "deploy"}
-        <div class="flex-1 overflow-auto p-4"><DeployTab /></div>
-      {:else if activeTab === "git"}
-        <div class="flex-1 overflow-auto p-4"><GitTab /></div>
-      {/if}
+      <div
+        class="flex-1 overflow-auto p-4"
+        class:hidden={activeTab !== "projects"}
+      >
+        <ProjectsTab config={configStore.activeConfig} />
+      </div>
+      <div
+        class="flex-1 flex flex-col overflow-hidden"
+        class:hidden={activeTab !== "build"}
+      >
+        <BuildTab />
+      </div>
+      <div
+        class="flex-1 overflow-auto p-4"
+        class:hidden={activeTab !== "deploy"}
+      >
+        <DeployTab />
+      </div>
+      <div class="flex-1 overflow-auto p-4" class:hidden={activeTab !== "git"}>
+        <GitTab />
+      </div>
     {:else}
       <div
         class="flex items-center justify-center min-h-[200px] p-4 text-surface-500-400 text-sm"
