@@ -41,13 +41,18 @@
   </div>
 
   <!-- Section Content -->
-  <div class="flex-1 overflow-hidden">
-    {#if activeSection === "codesigning"}
+  <div class="flex-1 overflow-hidden relative">
+    <div
+      class="absolute inset-0"
+      class:hidden={activeSection !== "codesigning"}
+    >
       <CodesigningConfig />
-    {:else if activeSection === "publishing"}
+    </div>
+    <div class="absolute inset-0" class:hidden={activeSection !== "publishing"}>
       <PublishingConfig />
-    {:else if activeSection === "upload"}
+    </div>
+    <div class="absolute inset-0" class:hidden={activeSection !== "upload"}>
       <UploadConfig />
-    {/if}
+    </div>
   </div>
 </div>

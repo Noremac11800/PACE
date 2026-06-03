@@ -444,9 +444,8 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="flex-1 overflow-y-auto">
-      {#if activeTab === "ios"}
-        <div class="flex flex-col gap-4">
+    <div class="flex-1 overflow-y-auto relative">
+      <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "ios"}>
           <p class="text-sm text-surface-600-400">
             Configure code signing settings for iOS apps. The "*" entry is used
             as the default for all bundle IDs.
@@ -543,10 +542,8 @@
             <Plus size={14} /> Add Bundle ID
           </button>
         </div>
-      {/if}
 
-      {#if activeTab === "windows"}
-        <div class="flex flex-col gap-4">
+        <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "windows"}>
           <p class="text-sm text-surface-600-400">
             Configure code signing settings for Windows apps using certificate
             thumbprint. The "*" entry is used as the default.
@@ -619,10 +616,8 @@
             <Plus size={14} /> Add Certificate
           </button>
         </div>
-      {/if}
 
-      {#if activeTab === "android"}
-        <div class="flex flex-col gap-4">
+        <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "android"}>
           <p class="text-sm text-surface-600-400">
             Configure code signing settings for Android apps using keystore
             files. The "*" entry is used as the default.
@@ -726,7 +721,7 @@
             <Plus size={14} /> Add Keystore
           </button>
         </div>
-      {/if}
+      </div>
     </div>
   </div>
 </div>

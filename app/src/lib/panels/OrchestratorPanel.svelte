@@ -118,8 +118,12 @@
           <p class="text-surface-700-300 break-all">{configStore.error}</p>
         </div>
       </div>
-    {:else if activeTab === "editor"}
-      <div class="flex-1 overflow-auto p-4">
+    {:else}
+      <!-- Editor Tab -->
+      <div
+        class="flex-1 overflow-auto p-4"
+        class:hidden={activeTab !== "editor"}
+      >
         {#if configStore.activeConfig}
           <ConfigEditorTab />
         {:else}
@@ -130,40 +134,45 @@
           </div>
         {/if}
       </div>
-    {:else if configStore.activeConfig}
-      <div
-        class="flex-1 overflow-auto p-4"
-        class:hidden={activeTab !== "projects"}
-      >
-        <ProjectsTab config={configStore.activeConfig} />
-      </div>
-      <div
-        class="flex-1 overflow-auto p-4"
-        class:hidden={activeTab !== "nuget"}
-      >
-        <NugetTab />
-      </div>
-      <div
-        class="flex-1 flex flex-col overflow-hidden"
-        class:hidden={activeTab !== "build"}
-      >
-        <BuildTab />
-      </div>
-      <div
-        class="flex-1 overflow-auto p-4"
-        class:hidden={activeTab !== "deploy"}
-      >
-        <DeployTab />
-      </div>
-      <div class="flex-1 overflow-auto p-4" class:hidden={activeTab !== "git"}>
-        <GitTab />
-      </div>
-    {:else}
-      <div
-        class="flex items-center justify-center min-h-[200px] p-4 text-surface-500-400 text-sm"
-      >
-        No config loaded. Use the picker above to select or create one.
-      </div>
+      <!-- Other Tabs (only show if config loaded) -->
+      {#if configStore.activeConfig}
+        <div
+          class="flex-1 overflow-auto p-4"
+          class:hidden={activeTab !== "projects"}
+        >
+          <ProjectsTab config={configStore.activeConfig} />
+        </div>
+        <div
+          class="flex-1 overflow-auto p-4"
+          class:hidden={activeTab !== "nuget"}
+        >
+          <NugetTab />
+        </div>
+        <div
+          class="flex-1 flex flex-col overflow-hidden"
+          class:hidden={activeTab !== "build"}
+        >
+          <BuildTab />
+        </div>
+        <div
+          class="flex-1 overflow-auto p-4"
+          class:hidden={activeTab !== "deploy"}
+        >
+          <DeployTab />
+        </div>
+        <div
+          class="flex-1 overflow-auto p-4"
+          class:hidden={activeTab !== "git"}
+        >
+          <GitTab />
+        </div>
+      {:else}
+        <div
+          class="flex items-center justify-center min-h-[200px] p-4 text-surface-500-400 text-sm"
+        >
+          No config loaded. Use the picker above to select or create one.
+        </div>
+      {/if}
     {/if}
   </div>
 </div>

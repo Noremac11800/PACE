@@ -14,6 +14,24 @@ export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
   msbuildProps: {},
 };
 
+export interface PublishTabSettings {
+  selectedProject: string;
+  selectedPlatforms: ("ios" | "android" | "windows")[];
+  buildConfig: "Debug" | "Release";
+  iosBundleId: string;
+  windowsKey: string;
+  androidKey: string;
+}
+
+export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
+  selectedProject: "",
+  selectedPlatforms: [],
+  buildConfig: "Release",
+  iosBundleId: "*",
+  windowsKey: "*",
+  androidKey: "*",
+};
+
 export interface Settings {
   general: {
     theme: "light" | "dark" | "system";
@@ -34,6 +52,7 @@ export interface Settings {
     compactMode: boolean;
   };
   buildTab: BuildTabSettings;
+  publishTab: PublishTabSettings;
   lastActiveConfig: string;
 }
 
@@ -57,6 +76,7 @@ export const DEFAULT_SETTINGS: Settings = {
     compactMode: false,
   },
   buildTab: { ...DEFAULT_BUILD_TAB_SETTINGS },
+  publishTab: { ...DEFAULT_PUBLISH_TAB_SETTINGS },
   lastActiveConfig: "",
 };
 
@@ -72,6 +92,9 @@ export function setSettingsFromJSON(json: string): void {
     Object.assign(settings, parsed);
     if (parsed.buildTab) {
       Object.assign(settings.buildTab, parsed.buildTab);
+    }
+    if (parsed.publishTab) {
+      Object.assign(settings.publishTab, parsed.publishTab);
     }
   } catch (e) {
     console.error("Failed to parse settings JSON:", e);
