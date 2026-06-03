@@ -19,6 +19,7 @@ export async function initializeApp(): Promise<void> {
   await ensurePaceDir();
   await loadSettings();
   applyTheme(settings.general.theme);
+  applyFontSize(settings.appearance.fontSize);
   await syncPaceConfig();
 }
 
@@ -66,6 +67,10 @@ export function applyTheme(themeValue: "light" | "dark" | "system"): void {
   } else {
     theme.set(themeValue);
   }
+}
+
+export function applyFontSize(fontSize: "small" | "medium" | "large"): void {
+  document.documentElement.setAttribute("data-font-size", fontSize);
 }
 
 async function syncPaceConfig(): Promise<void> {

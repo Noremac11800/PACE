@@ -19,6 +19,19 @@
   --base-font-family: "Lato", sans-serif;
   --anchor-font-family: "Lato", sans-serif;
 
+  /* Font size scaling */
+  &:where([data-font-size="small"]) {
+    font-size: 14px;
+  }
+
+  &:where([data-font-size="medium"]) {
+    font-size: 16px;
+  }
+
+  &:where([data-font-size="large"]) {
+    font-size: 18px;
+  }
+
   [data-scope="tabs"] {
     &[data-part="list"] {
       border-color: transparent;

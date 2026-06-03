@@ -10,7 +10,8 @@
   import { page } from "$app/state";
   import { beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
-  import { initializeApp } from "$lib/app-init";
+  import { initializeApp, applyFontSize } from "$lib/app-init";
+  import { settings } from "$lib/settings.svelte";
 
   const { children } = $props();
 
@@ -31,6 +32,10 @@
     const currentLocale = $locale ?? "en";
     html.lang = currentLocale;
     html.dir = isRtlLocale(currentLocale) ? "rtl" : "ltr";
+  });
+
+  $effect(() => {
+    applyFontSize(settings.appearance.fontSize);
   });
 
   beforeNavigate((navigation) => {
