@@ -12,6 +12,9 @@
     Smartphone,
     RotateCcw,
     Folder,
+    Check,
+    X,
+    Loader,
   } from "@lucide/svelte";
   import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
   import {
@@ -162,6 +165,10 @@
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
 
+  // Build status tracking for each platform
+  type BuildStatus = "pending" | "building" | "success" | "error";
+  let buildStatuses = $state<Record<string, BuildStatus>>({});
+
   const platformOrder: Platform[] = ["ios", "android", "windows"];
 
   const orderedSelectedPlatforms = $derived(
@@ -298,6 +305,12 @@
     currentPlatformIndex = 0;
     progress = 0;
 
+    // Initialize build statuses
+    buildStatuses = {};
+    for (const platform of orderedSelectedPlatforms) {
+      buildStatuses[platform] = "pending";
+    }
+
     try {
       for (let i = 0; i < orderedSelectedPlatforms.length; i++) {
         currentPlatformIndex = i;
@@ -306,6 +319,8 @@
           (i / orderedSelectedPlatforms.length) * 100,
         );
         progress = platformProgress;
+        progressLabel = `Building ${platform}...`;
+        buildStatuses[platform] = "building";
 
         addLine(
           `\n========== Starting build for ${platform} ==========\n`,
@@ -315,6 +330,7 @@
         const success = await runBuildForPlatform(platform);
 
         if (!success) {
+          buildStatuses[platform] = "error";
           addLine(
             `\n========== Build failed for ${platform} ==========\n`,
             "err",
@@ -324,6 +340,7 @@
           break;
         }
 
+        buildStatuses[platform] = "success";
         addLine(
           `\n========== Build completed for ${platform} ==========\n`,
           "out",
@@ -355,17 +372,9 @@
     currentProcess = null;
   }
 
-  let commandPreview = $state("Select a project to see preview");
-
-  $effect(() => {
-    if (!selectedProject) {
-      commandPreview = "Select a project to see preview";
-      return;
-    }
-    if (selectedPlatforms.length === 0) {
-      commandPreview = "Select platforms to see preview";
-      return;
-    }
+  // Command preview data structure for UI rendering
+  const commandPreviews = $derived.by(() => {
+    if (!selectedProject || selectedPlatforms.length === 0) return [];
 
     const project = projects.find((p) => p.name === selectedProject);
     const repodir = configStore.activeConfig?.repodir ?? "<repodir>";
@@ -373,34 +382,12 @@
       ? `${repodir}/${project.name}/${project.csproj_path}`
       : "<csproj_path>";
 
-    if (selectedPlatforms.length === 1) {
-      const platform = selectedPlatforms[0];
-      const runtime = getRuntimeForPlatform(platform);
-      const framework = getFrameworkForPlatform(platform);
-
-      // Access reactive deps
-      const config = codesigningConfig;
-      const android = androidKey;
-      const ios = iosBundleId;
-      const signInfo = androidCodesignInfo;
-
-      buildCommandPreview(
-        csprojPath,
-        buildConfig,
-        runtime,
-        framework,
-        noRestore,
-        platform,
-        config,
-        android,
-        ios,
-        signInfo,
-      ).then((preview) => {
-        commandPreview = preview;
-      });
-    } else {
-      commandPreview = `dotnet publish ${csprojPath} -c ${buildConfig} (multiple platforms: ${selectedPlatforms.join(", ")})`;
-    }
+    // For multiple platforms, we can't easily show async previews in $derived
+    // So we'll return the structure and let the UI handle single preview or summary
+    return orderedSelectedPlatforms.map((platform) => ({
+      platform,
+      csprojPath,
+    }));
   });
 
   const progressBarColor = $derived.by(() => {
@@ -648,36 +635,64 @@
 
     <!-- Command Preview -->
     {#if selectedPlatforms.length > 0}
-      <div class="card bg-surface-50-950 p-3">
-        <div class="flex items-center gap-2 mb-2">
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+        <div class="flex items-center gap-2">
           <Terminal size={14} class="text-primary-500 shrink-0" />
           <span
             class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-            >Command Preview</span
           >
+            Command preview
+          </span>
         </div>
-        <code
-          class="block text-xs font-mono bg-surface-200-800 px-3 py-2 rounded break-all text-surface-900-100"
-        >
-          {commandPreview}
-        </code>
+
+        {#if commandPreviews.length === 0}
+          <div class="text-sm text-surface-500-400">
+            Select a project and platforms to see preview
+          </div>
+        {:else}
+          <div class="flex flex-col gap-3">
+            {#each commandPreviews as { platform, csprojPath }}
+              {@const PLATFORMS_ = PLATFORMS}
+              {@const platformConfig = PLATFORMS_.find(
+                (p) => p.id === platform,
+              )}
+              {@const Icon = platformConfig?.icon}
+              <div class="flex flex-col gap-1">
+                <div
+                  class="text-xs font-medium text-surface-600-400 flex items-center gap-2"
+                >
+                  {#if Icon}
+                    <Icon size={12} />
+                  {/if}
+                  <span>{platformConfig?.label || platform}</span>
+                </div>
+                <code
+                  class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"
+                >
+                  dotnet publish {csprojPath} -c {buildConfig} --runtime {getRuntimeForPlatform(
+                    platform,
+                  )} --framework {getFrameworkForPlatform(platform)} --self-contained
+                  /p:DistributionMethod=enterprise /p:ArchiveOnBuild=true
+                </code>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     {/if}
 
-    <!-- Progress -->
-    {#if isRunning || progress > 0}
-      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
-        <div class="flex items-center justify-between gap-2 text-xs">
-          <span class="text-surface-600-400 truncate">{progressLabel}</span>
+    <!-- Build Status -->
+    {#if isRunning || Object.keys(buildStatuses).length > 0}
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
           <span
-            class="font-mono text-surface-600-400 shrink-0 flex items-center gap-2"
+            class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
           >
-            {#if orderedSelectedPlatforms.length > 1 && isRunning}
-              <span
-                >Platform {currentPlatformIndex + 1} / {orderedSelectedPlatforms.length}</span
-              >
-              <span class="text-surface-400-500">·</span>
-            {/if}
+            Build Status
+          </span>
+          <span
+            class="font-mono text-xs text-surface-600-400 flex items-center gap-2"
+          >
             <span>{progress}%</span>
             <span class="text-surface-400-500">·</span>
             <span>{formatElapsed(elapsedSeconds)}</span>
@@ -691,21 +706,59 @@
           ></div>
         </div>
 
-        <!-- Platform segment strip -->
-        {#if orderedSelectedPlatforms.length > 1}
-          <div class="flex gap-0.5">
-            {#each orderedSelectedPlatforms as platform, i}
+        <div class="flex flex-col gap-2">
+          {#each orderedSelectedPlatforms as platform}
+            {@const PLATFORMS_ = PLATFORMS}
+            {@const platformConfig = PLATFORMS_.find((p) => p.id === platform)}
+            {@const Icon = platformConfig?.icon}
+            {@const status = buildStatuses[platform] || "pending"}
+            <div
+              class="flex items-center gap-3 p-2 rounded bg-surface-100-900 border border-surface-300-700"
+            >
               <div
-                class="h-1.5 flex-1 rounded-full transition-colors duration-200 {i <
-                currentPlatformIndex
-                  ? progressBarColor
-                  : i === currentPlatformIndex && isRunning
-                    ? progressBarColor
-                    : 'bg-surface-200-800'}"
-              ></div>
-            {/each}
-          </div>
-        {/if}
+                class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {status ===
+                'success'
+                  ? 'bg-success-500/20'
+                  : status === 'error'
+                    ? 'bg-error-500/20'
+                    : status === 'building'
+                      ? 'bg-primary-500/20'
+                      : 'bg-surface-300-700/50'}"
+              >
+                {#if status === "success"}
+                  <Check size={16} class="text-success-500" />
+                {:else if status === "error"}
+                  <X size={16} class="text-error-500" />
+                {:else if status === "building"}
+                  <Loader size={16} class="animate-spin text-primary-500" />
+                {:else}
+                  <div class="w-4 h-4 rounded-full bg-surface-500-400"></div>
+                {/if}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div
+                  class="text-sm font-medium text-surface-900-100 flex items-center gap-2"
+                >
+                  {#if Icon}
+                    <Icon size={14} />
+                  {/if}
+                  <span>{platformConfig?.label || platform}</span>
+                </div>
+              </div>
+              <div
+                class="text-xs font-medium uppercase {status === 'success'
+                  ? 'text-success-500'
+                  : status === 'error'
+                    ? 'text-error-500'
+                    : status === 'building'
+                      ? 'text-primary-500'
+                      : 'text-surface-500-400'}"
+              >
+                {status}
+              </div>
+            </div>
+          {/each}
+        </div>
       </div>
     {/if}
 
@@ -736,8 +789,18 @@
 
   <!-- Sticky footer -->
   <div
-    class="shrink-0 flex items-center gap-3 px-4 py-3 border-t border-surface-200-800 bg-surface-50-950"
+    class="shrink-0 flex items-center justify-end gap-3 px-4 py-3 border-t border-surface-200-800 bg-surface-50-950"
   >
+    <button
+      class="btn preset-tonal flex items-center gap-2"
+      onclick={resetToDefaults}
+      disabled={isRunning}
+      title="Reset all publish settings to defaults"
+    >
+      <RotateCcw size={16} />
+      Reset
+    </button>
+
     {#if isRunning}
       <button
         class="btn preset-filled-error-500 flex items-center gap-2"
@@ -756,14 +819,5 @@
         Publish
       </button>
     {/if}
-    <button
-      class="btn preset-tonal flex items-center gap-2"
-      onclick={resetToDefaults}
-      disabled={isRunning}
-      title="Reset all publish settings to defaults"
-    >
-      <RotateCcw size={16} />
-      Reset to defaults
-    </button>
   </div>
 </div>

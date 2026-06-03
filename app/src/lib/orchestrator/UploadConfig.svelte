@@ -17,8 +17,11 @@
     X,
     Loader,
     RotateCw,
+    FolderOpen,
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
+  import { openPath } from "@tauri-apps/plugin-opener";
+  import { dirname } from "@tauri-apps/api/path";
   import {
     settings,
     DEFAULT_UPLOAD_TAB_SETTINGS,
@@ -215,6 +218,15 @@
       selectedPackages = selectedPackages.filter((p) => p !== path);
     } else {
       selectedPackages = [...selectedPackages, path];
+    }
+  }
+
+  async function revealPackage(pkg: PackageFile) {
+    try {
+      const dir = await dirname(pkg.path);
+      await openPath(dir);
+    } catch (e) {
+      console.error("Failed to open package folder:", e);
     }
   }
 
@@ -468,35 +480,51 @@
           {#each availablePackages as pkg}
             {@const Icon = getPlatformIcon(pkg.platform)}
             {@const isSelected = selectedPackages.includes(pkg.path)}
-            <button
-              type="button"
-              onclick={() => togglePackage(pkg.path)}
-              class="flex items-center gap-3 p-3 rounded border transition-colors text-left {isSelected
+            <div
+              class="flex items-center gap-3 p-3 rounded border transition-colors {isSelected
                 ? 'bg-primary-500/10 border-primary-500'
                 : 'bg-surface-100-900 border-surface-300-700 hover:border-primary-500/50'}"
             >
-              <div
-                class="flex items-center justify-center w-5 h-5 rounded border {isSelected
-                  ? 'bg-primary-500 border-primary-500'
-                  : 'border-surface-500'}"
+              <button
+                type="button"
+                onclick={() => togglePackage(pkg.path)}
+                class="flex items-center gap-3 flex-1 min-w-0 text-left"
               >
-                {#if isSelected}
-                  <Check size={12} class="text-white" />
-                {/if}
-              </div>
-              <Icon
-                size={16}
-                class={isSelected ? "text-primary-500" : "text-surface-500-400"}
-              />
-              <div class="flex-1 min-w-0">
-                <div class="text-sm font-medium text-surface-900-100 truncate">
-                  {pkg.name}
+                <div
+                  class="flex items-center justify-center w-5 h-5 rounded border shrink-0 {isSelected
+                    ? 'bg-primary-500 border-primary-500'
+                    : 'border-surface-500'}"
+                >
+                  {#if isSelected}
+                    <Check size={12} class="text-white" />
+                  {/if}
                 </div>
-                <div class="text-xs text-surface-500-400">
-                  {getApiPlatform(pkg.platform)} • {pkg.buildConfig}
+                <Icon
+                  size={16}
+                  class={isSelected
+                    ? "text-primary-500"
+                    : "text-surface-500-400"}
+                />
+                <div class="flex-1 min-w-0">
+                  <div
+                    class="text-sm font-medium text-surface-900-100 truncate"
+                  >
+                    {pkg.name}
+                  </div>
+                  <div class="text-xs text-surface-500-400">
+                    {getApiPlatform(pkg.platform)} • {pkg.buildConfig}
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+              <button
+                type="button"
+                onclick={() => revealPackage(pkg)}
+                class="p-1.5 rounded hover:bg-surface-200-800 text-surface-500-400 hover:text-primary-500 transition-colors shrink-0"
+                title="Show in folder"
+              >
+                <FolderOpen size={14} />
+              </button>
+            </div>
           {/each}
         </div>
         <div class="text-xs text-surface-500-400">
@@ -706,7 +734,7 @@
 
   <!-- Footer Actions -->
   <div
-    class="border-t border-surface-200-800 p-4 flex items-center justify-between gap-4 bg-surface-50-950"
+    class="border-t border-surface-200-800 p-4 flex items-center justify-end gap-3 bg-surface-50-950"
   >
     <button
       class="btn preset-tonal flex items-center gap-2"
