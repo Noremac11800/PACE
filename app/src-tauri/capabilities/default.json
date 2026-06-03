@@ -221,6 +221,12 @@
       "identifier": "opener:allow-open-path",
       "allow": [
         {
+          "path": "$HOME/.pace"
+        },
+        {
+          "path": "$HOME/.pace/**"
+        },
+        {
           "path": "$HOME/**"
         }
       ]
