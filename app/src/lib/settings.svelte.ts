@@ -4,6 +4,7 @@ export interface BuildTabSettings {
   buildConfig: "Debug" | "Release";
   selectedFrameworks: string[];
   msbuildProps: Record<string, string>;
+  noRestore: boolean;
 }
 
 export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
@@ -12,6 +13,7 @@ export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
   buildConfig: "Release",
   selectedFrameworks: [],
   msbuildProps: {},
+  noRestore: false,
 };
 
 export interface PublishTabSettings {

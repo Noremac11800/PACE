@@ -30,9 +30,9 @@
   const allTabs = [
     { id: "projects" as const, label: "Projects", icon: Folder },
     { id: "nuget" as const, label: "NuGet", icon: Package },
+    { id: "git" as const, label: "Git", icon: GitBranch },
     { id: "build" as const, label: "Build", icon: Hammer },
     { id: "deploy" as const, label: "Deploy", icon: Rocket },
-    { id: "git" as const, label: "Git", icon: GitBranch },
     { id: "editor" as const, label: "Config editor", icon: PenLine },
   ];
 

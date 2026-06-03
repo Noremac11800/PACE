@@ -29,6 +29,7 @@
   let selectedFramework = $state<Framework | "">(
     (settings.buildTab.selectedFrameworks[0] as Framework) ?? "",
   );
+  let noRestore = $state<boolean>(settings.buildTab.noRestore);
 
   let msbuildProps = $state<Record<string, string>>({
     ...settings.buildTab.msbuildProps,
@@ -50,6 +51,7 @@
       buildConfig,
       selectedFrameworks: selectedFramework ? [selectedFramework] : [],
       msbuildProps: { ...msbuildProps },
+      noRestore,
     };
     untrack(() => {
       settings.buildTab = snapshot;
@@ -66,6 +68,7 @@
     buildConfig = d.buildConfig;
     selectedFramework = "";
     msbuildProps = {};
+    noRestore = d.noRestore;
   }
 
   async function pickPath(propName: string) {
@@ -175,6 +178,7 @@
     parts.push("dotnet");
     parts.push("-c", buildConfig);
     if (selectedFramework) parts.push("-f", selectedFramework);
+    if (noRestore) parts.push("--no-restore");
     for (const prop of buildProps) {
       const val = msbuildProps[prop.name];
       const effective = val !== undefined ? val : String(prop.default);
@@ -272,6 +276,7 @@
 
     const dotnetPassthrough: string[] = ["-c", buildConfig];
     if (selectedFramework) dotnetPassthrough.push("-f", selectedFramework);
+    if (noRestore) dotnetPassthrough.push("--no-restore");
     for (const prop of buildProps) {
       const val = msbuildProps[prop.name];
       const effective = val !== undefined ? val : String(prop.default);
@@ -452,6 +457,31 @@
           {/each}
         </div>
       </div>
+
+      <!-- No Restore toggle -->
+      <label class="flex items-center gap-3 cursor-pointer group">
+        <div
+          role="checkbox"
+          aria-checked={noRestore}
+          tabindex="0"
+          class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {noRestore
+            ? 'bg-primary-500'
+            : 'bg-surface-300-700'}"
+          onclick={() => (noRestore = !noRestore)}
+          onkeydown={(e) => e.key === " " && (noRestore = !noRestore)}
+        >
+          <div
+            class="w-4 h-4 rounded-full bg-white shadow transition-transform {noRestore
+              ? 'translate-x-4'
+              : 'translate-x-0'}"
+          ></div>
+        </div>
+        <span
+          class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+        >
+          Skip restore (--no-restore)
+        </span>
+      </label>
     </div>
 
     <!-- MSBuild Properties -->
@@ -652,8 +682,18 @@
 
   <!-- Sticky footer -->
   <div
-    class="shrink-0 flex items-center gap-3 px-4 py-3 border-t border-surface-200-800 bg-surface-50-950"
+    class="shrink-0 flex items-center justify-end gap-3 px-4 py-3 border-t border-surface-200-800 bg-surface-50-950"
   >
+    <button
+      class="btn preset-tonal flex items-center gap-2"
+      onclick={resetToDefaults}
+      disabled={isRunning}
+      title="Reset all build settings to defaults"
+    >
+      <RotateCcw size={16} />
+      Reset
+    </button>
+
     {#if isRunning}
       <button
         class="btn preset-filled-error-500 flex items-center gap-2"
@@ -671,14 +711,5 @@
         Build
       </button>
     {/if}
-    <button
-      class="btn preset-tonal flex items-center gap-2"
-      onclick={resetToDefaults}
-      disabled={isRunning}
-      title="Reset all build settings to defaults"
-    >
-      <RotateCcw size={16} />
-      Reset to defaults
-    </button>
   </div>
 </div>
