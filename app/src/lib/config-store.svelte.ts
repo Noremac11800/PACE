@@ -85,12 +85,17 @@ export async function loadConfig(filename: string): Promise<void> {
     configStore.activeConfig = {
       repodir: (parsed.repodir as string) ?? "",
       projects: (parsed.projects as PaceConfig["projects"]) ?? [],
-      build_props: ((parsed["build-props"] ?? parsed.build_props) as PaceConfig["build_props"]) ?? [],
-      nuget_cache_path: (parsed.nuget_cache_path as string | undefined) ?? undefined,
+      build_props:
+        ((parsed["build-props"] ??
+          parsed.build_props) as PaceConfig["build_props"]) ?? [],
+      nuget_cache_path:
+        (parsed.nuget_cache_path as string | undefined) ?? undefined,
     };
     configStore.activeConfigName = filename;
     settings.lastActiveConfig = filename;
-    saveSettings().catch((e) => console.error("Failed to persist lastActiveConfig:", e));
+    saveSettings().catch((e) =>
+      console.error("Failed to persist lastActiveConfig:", e),
+    );
   } catch (error) {
     configStore.error = `Failed to load ${filename}: ${error}`;
     configStore.activeConfig = null;
@@ -263,6 +268,20 @@ function serializeToml(config: PaceConfig): string {
     lines.push(
       `depends_on = [${deps.map((d) => JSON.stringify(d)).join(", ")}]`,
     );
+    lines.push("");
+  }
+
+  for (const section of config.build_props ?? []) {
+    lines.push(`[["build-props"]]`);
+    for (const [key, value] of Object.entries(section)) {
+      if (Array.isArray(value)) {
+        lines.push(
+          `${key} = [${value.map((v) => JSON.stringify(v)).join(", ")}]`,
+        );
+      } else if (value !== undefined && value !== null) {
+        lines.push(`${key} = ${JSON.stringify(value)}`);
+      }
+    }
     lines.push("");
   }
 

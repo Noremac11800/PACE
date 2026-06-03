@@ -436,7 +436,7 @@
               ? 'bg-primary-500 border-primary-500 text-white'
               : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
           >
-            Any
+            All available
           </button>
           {#each FRAMEWORKS as fw}
             <button
