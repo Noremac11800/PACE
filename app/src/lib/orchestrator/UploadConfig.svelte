@@ -16,6 +16,7 @@
     Check,
     X,
     Loader,
+    RotateCw,
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
   import {
@@ -61,6 +62,11 @@
   let availablePackages: PackageFile[] = $state([]);
   let scanningPackages = $state(false);
 
+  // Upload status tracking for parallel uploads
+  type UploadStatus = "pending" | "uploading" | "success" | "error";
+  let uploadStatuses = $state<Record<string, UploadStatus>>({});
+  let uploadProgress = $state<Record<string, string>>({});
+
   // Initialize settings loaded flag
   onMount(() => {
     tick().then(() => {
@@ -101,16 +107,13 @@
   });
 
   async function scanForPackages() {
-    console.log("scanForPackages called:", { selectedProject, repodir });
     if (!selectedProject || !repodir) {
-      console.log("Missing project or repodir, skipping scan");
       return;
     }
 
     // Find the project and get its csproj_path
     const project = projects.find((p) => p.name === selectedProject);
     if (!project?.csproj_path) {
-      console.log("No csproj_path found for project:", selectedProject);
       return;
     }
 
@@ -123,13 +126,6 @@
       project.csproj_path.lastIndexOf("/"),
     );
     const projectPath = `${repodir}/${selectedProject}/${csprojDir}`;
-    console.log("Project path:", projectPath);
-    console.log(
-      "csproj_path:",
-      project.csproj_path,
-      "-> csprojDir:",
-      csprojDir,
-    );
 
     // Recursive function to search directories for package files
     async function searchDirectory(
@@ -138,9 +134,7 @@
       buildConfig: BuildConfig,
     ) {
       try {
-        console.log("Searching directory:", dirPath);
         const entries = await readDir(dirPath);
-        console.log(`Found ${entries.length} entries in ${dirPath}`);
         for (const entry of entries) {
           const entryPath = `${dirPath}/${entry.name}`;
           if (entry.isFile) {
@@ -148,16 +142,17 @@
             if (
               name.endsWith(".ipa") ||
               name.endsWith(".msix") ||
-              name.endsWith(".aab") ||
               name.endsWith(".apk")
             ) {
-              console.log("Found package:", entry.name, "at", entryPath);
-              packages.push({
-                name: entry.name!,
-                path: entryPath,
-                platform,
-                buildConfig,
-              });
+              // Only include files that are in a publish/ directory
+              if (entryPath.includes("/publish/")) {
+                packages.push({
+                  name: entry.name!,
+                  path: entryPath,
+                  platform,
+                  buildConfig,
+                });
+              }
             }
           } else if (entry.isDirectory) {
             // Recursively search subdirectories
@@ -165,7 +160,6 @@
           }
         }
       } catch (e) {
-        console.log("Error reading directory:", dirPath, e);
         // Directory doesn't exist or can't be read, skip silently
       }
     }
@@ -184,27 +178,19 @@
 
     for (const buildConfig of buildConfigs) {
       const basePath = `${projectPath}/bin/${buildConfig}`;
-      console.log(`Checking ${buildConfig} path:`, basePath);
 
       try {
         const entries = await readDir(basePath);
-        console.log(
-          `Found ${entries.length} entries in ${basePath}:`,
-          entries.map((e) => e.name),
-        );
         for (const entry of entries) {
           if (entry.isDirectory) {
             const platform = detectPlatform(entry.name);
-            console.log(`Entry ${entry.name} -> platform: ${platform}`);
             if (platform) {
               const platformPath = `${basePath}/${entry.name}`;
-              console.log(`Starting recursive search in:`, platformPath);
               await searchDirectory(platformPath, platform, buildConfig);
             }
           }
         }
       } catch (e) {
-        console.log(`Error reading ${basePath}:`, e);
         // bin/Debug or bin/Release doesn't exist, skip
       }
     }
@@ -216,8 +202,6 @@
       }
       return a.platform.localeCompare(b.platform);
     });
-
-    console.log(`Scan complete. Found ${packages.length} packages.`);
 
     // Filter out any selected packages that are no longer available
     const availablePaths = new Set(packages.map((p) => p.path));
@@ -291,21 +275,38 @@
     resetOutput();
     isUploading = true;
 
+    // Initialize upload statuses
+    uploadStatuses = {};
+    uploadProgress = {};
     for (const packagePath of selectedPackages) {
-      const pkg = availablePackages.find((p) => p.path === packagePath);
-      if (!pkg) continue;
-
-      const success = await uploadPackage(pkg);
-      if (!success) {
-        addLine(`Failed to upload ${pkg.name}`, "err");
-      }
+      uploadStatuses[packagePath] = "pending";
+      uploadProgress[packagePath] = "";
     }
+
+    // Run all uploads in parallel
+    const uploadPromises = selectedPackages.map(async (packagePath) => {
+      const pkg = availablePackages.find((p) => p.path === packagePath);
+      if (!pkg) {
+        uploadStatuses[packagePath] = "error";
+        return false;
+      }
+
+      uploadStatuses[packagePath] = "uploading";
+      const success = await uploadPackage(pkg, packagePath);
+      uploadStatuses[packagePath] = success ? "success" : "error";
+      return success;
+    });
+
+    await Promise.all(uploadPromises);
 
     isUploading = false;
     currentProcess = null;
   }
 
-  async function uploadPackage(pkg: PackageFile): Promise<boolean> {
+  async function uploadPackage(
+    pkg: PackageFile,
+    packagePath: string,
+  ): Promise<boolean> {
     const apiPlatform = getApiPlatform(pkg.platform);
 
     const paceArgs = [
@@ -332,28 +333,18 @@
         const cmd = Command.create("pace", paceArgs);
 
         cmd.stdout.on("data", (data: string) => {
-          addLine(data, "out");
+          uploadProgress[packagePath] = data.trim();
         });
 
         cmd.stderr.on("data", (data: string) => {
-          addLine(data, "err");
+          uploadProgress[packagePath] = data.trim();
         });
 
         cmd.on("close", (payload: { code: number | null }) => {
-          if (payload.code === 0) {
-            addLine(`✓ Successfully uploaded ${pkg.name}`, "out");
-          } else {
-            addLine(
-              `✗ Failed to upload ${pkg.name} (exit code: ${payload.code})`,
-              "err",
-            );
-          }
           resolve(payload.code === 0);
         });
 
-        cmd.spawn().then((child) => {
-          currentProcess = child;
-        });
+        cmd.spawn();
       } catch (e) {
         addLine(`Error: ${e instanceof Error ? e.message : String(e)}`, "err");
         resolve(false);
@@ -372,21 +363,30 @@
     resetOutput();
   }
 
-  const commandPreview = $derived.by(() => {
-    if (selectedPackages.length === 0) return "Select packages to see preview";
-    if (!username) return "Enter username to see preview";
-    if (!appName) return "Enter app name to see preview";
-    if (!version) return "Enter version to see preview";
+  // Command preview data structure for UI rendering
+  const commandPreviews = $derived.by(() => {
+    if (selectedPackages.length === 0) return [];
+    if (!username || !appName || !version) return [];
 
-    const pkg = availablePackages.find((p) => p.path === selectedPackages[0]);
-    if (!pkg) return "No package selected";
+    return selectedPackages
+      .map((packagePath) => {
+        const pkg = availablePackages.find((p) => p.path === packagePath);
+        if (!pkg) return null;
 
-    const apiPlatform = getApiPlatform(pkg.platform);
-    let cmd = `pace upload "${pkg.path}" --username "${username}" --app-name "${appName}" --platform ${apiPlatform} --release-type ${pkg.buildConfig} --version "${version}"`;
-    if (buildNotes) {
-      cmd += ` --build-description "${buildNotes}"`;
-    }
-    return cmd;
+        const apiPlatform = getApiPlatform(pkg.platform);
+        let cmd = `pace upload "${pkg.path}" --username "${username}" --app-name "${appName}" --platform ${apiPlatform} --release-type ${pkg.buildConfig} --version "${version}"`;
+        if (buildNotes) {
+          cmd += ` --build-description "${buildNotes}"`;
+        }
+
+        return {
+          pkg,
+          command: cmd,
+        };
+      })
+      .filter(
+        (item): item is { pkg: PackageFile; command: string } => item !== null,
+      );
   });
 </script>
 
@@ -435,8 +435,22 @@
         <span class="font-semibold text-surface-900-100"
           >Available packages</span
         >
+        {#if selectedProject}
+          <button
+            type="button"
+            onclick={() => scanForPackages()}
+            disabled={scanningPackages}
+            class="ml-auto p-1.5 rounded hover:bg-surface-200-800 disabled:opacity-50"
+            title="Refresh packages"
+          >
+            <RotateCw
+              size={14}
+              class={scanningPackages ? "animate-spin" : ""}
+            />
+          </button>
+        {/if}
         {#if scanningPackages}
-          <span class="text-xs text-surface-500-400 ml-auto">Scanning...</span>
+          <span class="text-xs text-surface-500-400">Scanning...</span>
         {/if}
       </div>
 
@@ -446,7 +460,7 @@
         </div>
       {:else if availablePackages.length === 0}
         <div class="text-sm text-surface-500-400">
-          No .ipa, .msix, .aab, or .apk files found in Debug/Release
+          No .ipa, .msix, or .apk files found in Debug/Release/publish
           directories.
         </div>
       {:else}
@@ -558,47 +572,133 @@
     </div>
 
     <!-- Command Preview -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
+    <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
       <div class="flex items-center gap-2">
-        <Terminal size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">Command preview</span>
-      </div>
-      <div class="bg-surface-900-100 rounded p-3 overflow-x-auto">
-        <code class="text-xs text-surface-50-950 font-mono whitespace-pre"
-          >{commandPreview}</code
+        <Terminal size={14} class="text-primary-500 shrink-0" />
+        <span
+          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
         >
+          Command preview
+        </span>
       </div>
+
+      {#if commandPreviews.length === 0}
+        <div class="text-sm text-surface-500-400">
+          Select packages and fill in required fields to see preview
+        </div>
+      {:else}
+        <div class="flex flex-col gap-3">
+          {#each commandPreviews as { pkg, command }}
+            {@const Icon = getPlatformIcon(pkg.platform)}
+            <div class="flex flex-col gap-1">
+              <div
+                class="text-xs font-medium text-surface-600-400 flex items-center gap-2"
+              >
+                <Icon size={12} />
+                <span>{pkg.name}</span>
+                <span class="text-surface-500-400"
+                  >({pkg.platform} {pkg.buildConfig})</span
+                >
+              </div>
+              <code
+                class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"
+              >
+                {command}
+              </code>
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
 
-    <!-- Output -->
-    {#if showOutput}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
-        <div class="flex items-center gap-2">
-          <Terminal size={18} class="text-primary-500" />
-          <span class="font-semibold text-surface-900-100">Output</span>
-          {#if isUploading}
-            <Loader size={14} class="animate-spin ml-2 text-primary-500" />
-          {/if}
+    <!-- Upload Status -->
+    {#if isUploading || Object.keys(uploadStatuses).length > 0}
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+        <span
+          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
+        >
+          Upload Status
+        </span>
+        <div class="flex flex-col gap-2">
+          {#each selectedPackages as packagePath}
+            {@const pkg = availablePackages.find((p) => p.path === packagePath)}
+            {#if pkg}
+              {@const status = uploadStatuses[packagePath] || "pending"}
+              {@const progress = uploadProgress[packagePath] || ""}
+              <div
+                class="flex items-center gap-3 p-2 rounded bg-surface-100-900 border border-surface-300-700"
+              >
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {status ===
+                  'success'
+                    ? 'bg-success-500/20'
+                    : status === 'error'
+                      ? 'bg-error-500/20'
+                      : status === 'uploading'
+                        ? 'bg-primary-500/20'
+                        : 'bg-surface-300-700/50'}"
+                >
+                  {#if status === "success"}
+                    <Check size={16} class="text-success-500" />
+                  {:else if status === "error"}
+                    <X size={16} class="text-error-500" />
+                  {:else if status === "uploading"}
+                    <Loader size={16} class="animate-spin text-primary-500" />
+                  {:else}
+                    <div class="w-4 h-4 rounded-full bg-surface-500-400"></div>
+                  {/if}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div
+                    class="text-sm font-medium text-surface-900-100 truncate"
+                  >
+                    {pkg.name}
+                  </div>
+                  <div class="text-xs text-surface-500-400">
+                    {pkg.platform} • {pkg.buildConfig}
+                    {#if progress}
+                      <span class="text-primary-500 ml-2">{progress}</span>
+                    {/if}
+                  </div>
+                </div>
+                <div
+                  class="text-xs font-medium uppercase {status === 'success'
+                    ? 'text-success-500'
+                    : status === 'error'
+                      ? 'text-error-500'
+                      : status === 'uploading'
+                        ? 'text-primary-500'
+                        : 'text-surface-500-400'}"
+                >
+                  {status}
+                </div>
+              </div>
+            {/if}
+          {/each}
         </div>
+      </div>
+    {/if}
+
+    <!-- Output -->
+    {#if outputLines.length > 0}
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
+        <span
+          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
+          >Output</span
+        >
         <div
           bind:this={outputRef}
-          class="bg-surface-900-100 rounded p-3 h-48 overflow-y-auto font-mono text-xs flex flex-col gap-1"
+          class="h-48 overflow-auto bg-surface-200-800 rounded p-3 font-mono text-xs leading-relaxed"
         >
-          {#if outputLines.length === 0}
-            <span class="text-surface-500-400 italic"
-              >Upload output will appear here...</span
+          {#each outputLines as line}
+            <div
+              class="{line.type === 'err'
+                ? 'text-error-400'
+                : 'text-surface-900-100'} wrap-break-word"
             >
-          {:else}
-            {#each outputLines as line}
-              <span
-                class={line.type === "err"
-                  ? "text-error-500"
-                  : "text-surface-50-950"}
-              >
-                {line.text}
-              </span>
-            {/each}
-          {/if}
+              {line.text}
+            </div>
+          {/each}
         </div>
       </div>
     {/if}

@@ -14,7 +14,6 @@
     Folder,
   } from "@lucide/svelte";
   import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
-  import { homeDir, join } from "@tauri-apps/api/path";
   import {
     settings,
     DEFAULT_PUBLISH_TAB_SETTINGS,
@@ -22,6 +21,16 @@
   } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { configStore } from "$lib/config-store.svelte";
+  import {
+    type CodesigningData,
+    type AndroidCodesignInfo,
+    DEFAULT_CODESIGNING_CONFIG,
+    getRuntimeForPlatform,
+    getFrameworkForPlatform,
+    getCodesigningParams,
+    parseAndroidCodesignInfo,
+    buildCommandPreview,
+  } from "./publishing.svelte";
 
   const PLATFORMS = [
     { id: "ios" as const, label: "iOS", icon: Apple },
@@ -42,26 +51,20 @@
   let iosBundleId = $state(settings.publishTab.iosBundleId);
   let windowsKey = $state(settings.publishTab.windowsKey);
   let androidKey = $state(settings.publishTab.androidKey);
+  let noRestore = $state(settings.publishTab.noRestore ?? false);
 
   let settingsInitialized = $state(false);
 
   // Derived projects list from active config
   const projects = $derived(configStore.activeConfig?.projects ?? []);
 
-  // Codesigning config from file
-  type CodesigningData = {
-    ios: Record<string, { CodesignKey: string; CodesignProvision: string }>;
-    windows: Record<string, { PackageCertificateThumbprint: string }>;
-    android: Record<
-      string,
-      { KeystorePath: string; CodesignInfoTxtPath: string }
-    >;
-  };
+  let codesigningConfig = $state<CodesigningData>(DEFAULT_CODESIGNING_CONFIG);
 
-  let codesigningConfig = $state<CodesigningData>({
-    ios: { "*": { CodesignKey: "", CodesignProvision: "" } },
-    windows: { "*": { PackageCertificateThumbprint: "" } },
-    android: { "*": { KeystorePath: "", CodesignInfoTxtPath: "" } },
+  // Parsed Android codesign info from text file
+  let androidCodesignInfo = $state<AndroidCodesignInfo>({
+    Alias: "",
+    KeyPass: "",
+    StorePass: "",
   });
 
   onMount(async () => {
@@ -71,15 +74,13 @@
 
   async function loadCodesigningConfig() {
     try {
-      const home = await homeDir();
       const content = await readTextFile(".pace/codesigning.json", {
         baseDir: BaseDirectory.Home,
       });
       const parsed = JSON.parse(content) as CodesigningData;
       codesigningConfig = parsed;
-    } catch (e) {
+    } catch {
       // Use default config if file doesn't exist or is invalid
-      console.log("No codesigning config found, using defaults");
     }
   }
 
@@ -98,6 +99,7 @@
       iosBundleId,
       windowsKey,
       androidKey,
+      noRestore,
     };
     untrack(() => {
       settings.publishTab = snapshot;
@@ -123,7 +125,29 @@
     iosBundleId = d.iosBundleId;
     windowsKey = d.windowsKey;
     androidKey = d.androidKey;
+    noRestore = d.noRestore ?? false;
   }
+
+  // Load Android codesign info when key changes
+  $effect(() => {
+    if (!settingsInitialized) return;
+
+    // Access codesigningConfig to ensure it's tracked as a dependency
+    const androidConfig = codesigningConfig.android;
+
+    if (androidKey) {
+      const config = androidConfig[androidKey];
+      if (config?.CodesignInfoTxtPath) {
+        parseAndroidCodesignInfo(config.CodesignInfoTxtPath).then((info) => {
+          androidCodesignInfo = info;
+        });
+      } else {
+        androidCodesignInfo = { Alias: "", KeyPass: "", StorePass: "" };
+      }
+    } else {
+      androidCodesignInfo = { Alias: "", KeyPass: "", StorePass: "" };
+    }
+  });
 
   // Build execution state
   let isRunning = $state(false);
@@ -178,68 +202,6 @@
     currentPlatformIndex = 0;
   }
 
-  function getRuntimeForPlatform(platform: Platform): string {
-    switch (platform) {
-      case "ios":
-        return "ios-arm64";
-      case "android":
-        return "android-arm64";
-      case "windows":
-        return "win10-x64";
-      default:
-        return "";
-    }
-  }
-
-  function getCodesigningParams(platform: Platform): string[] {
-    const params: string[] = [];
-    switch (platform) {
-      case "ios":
-        if (iosBundleId) {
-          const config = codesigningConfig.ios[iosBundleId];
-          if (config?.CodesignKey) {
-            params.push(`/p:CodesignKey="${config.CodesignKey}"`);
-          }
-          if (config?.CodesignProvision) {
-            params.push(`/p:CodesignProvision=${config.CodesignProvision}`);
-          }
-        }
-        break;
-      case "android":
-        if (androidKey) {
-          const config = codesigningConfig.android[androidKey];
-          if (config?.KeystorePath) {
-            params.push(`/p:AndroidKeyStore=${config.KeystorePath}`);
-          }
-        }
-        break;
-      case "windows":
-        if (windowsKey) {
-          const config = codesigningConfig.windows[windowsKey];
-          if (config?.PackageCertificateThumbprint) {
-            params.push(
-              `/p:PackageCertificateThumbprint=${config.PackageCertificateThumbprint}`,
-            );
-          }
-        }
-        break;
-    }
-    return params;
-  }
-
-  function getFrameworkForPlatform(platform: Platform): string {
-    switch (platform) {
-      case "ios":
-        return "net10.0-ios";
-      case "android":
-        return "net10.0-android";
-      case "windows":
-        return "net10.0-windows10.0.20348.0";
-      default:
-        return "";
-    }
-  }
-
   async function runBuildForPlatform(platform: Platform): Promise<boolean> {
     const project = projects.find((p) => p.name === selectedProject);
     if (!project?.csproj_path) {
@@ -278,8 +240,25 @@
       "/p:ArchiveOnBuild=true",
     ];
 
+    // Add --no-restore if enabled
+    if (noRestore) {
+      publishArgs.push("--no-restore");
+    }
+
+    // Add Android-specific params for Debug builds
+    if (platform === "android" && buildConfig === "Debug") {
+      publishArgs.push("/p:EmbedAssembliesIntoApk=true");
+    }
+
     // Add platform-specific codesigning params
-    const codesigningParams = getCodesigningParams(platform);
+    const codesigningParams = await getCodesigningParams(
+      platform,
+      codesigningConfig,
+      androidKey,
+      iosBundleId,
+      windowsKey,
+      androidCodesignInfo,
+    );
     publishArgs.push(...codesigningParams);
 
     return new Promise((resolve) => {
@@ -376,10 +355,18 @@
     currentProcess = null;
   }
 
-  const commandPreview = $derived.by(() => {
-    if (!selectedProject) return "Select a project to see preview";
-    if (selectedPlatforms.length === 0)
-      return "Select platforms to see preview";
+  let commandPreview = $state("Select a project to see preview");
+
+  $effect(() => {
+    if (!selectedProject) {
+      commandPreview = "Select a project to see preview";
+      return;
+    }
+    if (selectedPlatforms.length === 0) {
+      commandPreview = "Select platforms to see preview";
+      return;
+    }
+
     const project = projects.find((p) => p.name === selectedProject);
     const repodir = configStore.activeConfig?.repodir ?? "<repodir>";
     const csprojPath = project?.csproj_path
@@ -388,25 +375,31 @@
 
     if (selectedPlatforms.length === 1) {
       const platform = selectedPlatforms[0];
-      const framework = getFrameworkForPlatform(platform);
       const runtime = getRuntimeForPlatform(platform);
+      const framework = getFrameworkForPlatform(platform);
 
-      let preview = `dotnet publish ${csprojPath} -c ${buildConfig} --runtime ${runtime} --framework ${framework} --self-contained /p:DistributionMethod=enterprise /p:DevSolution=${buildConfig === "Debug" ? "true" : "false"} /p:ArchiveOnBuild=true`;
+      // Access reactive deps
+      const config = codesigningConfig;
+      const android = androidKey;
+      const ios = iosBundleId;
+      const signInfo = androidCodesignInfo;
 
-      // Add codesigning preview for selected platform
-      if (platform === "ios" && iosBundleId) {
-        const config = codesigningConfig.ios[iosBundleId];
-        if (config?.CodesignKey) {
-          preview += ` /p:CodesignKey="${config.CodesignKey}"`;
-        }
-        if (config?.CodesignProvision) {
-          preview += ` /p:CodesignProvision=${config.CodesignProvision}`;
-        }
-      }
-
-      return preview;
+      buildCommandPreview(
+        csprojPath,
+        buildConfig,
+        runtime,
+        framework,
+        noRestore,
+        platform,
+        config,
+        android,
+        ios,
+        signInfo,
+      ).then((preview) => {
+        commandPreview = preview;
+      });
     } else {
-      return `dotnet publish ${csprojPath} -c ${buildConfig} (multiple platforms: ${selectedPlatforms.join(", ")})`;
+      commandPreview = `dotnet publish ${csprojPath} -c ${buildConfig} (multiple platforms: ${selectedPlatforms.join(", ")})`;
     }
   });
 
@@ -419,29 +412,24 @@
 
 <div class="h-full flex flex-col">
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-    <!-- Project Selection -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <Folder size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">Project</span>
-      </div>
-
-      {#if projects.length === 0}
-        <div class="text-sm text-surface-500-400">
-          No projects available. Load a config with projects first.
-        </div>
-      {:else}
-        <div class="flex flex-col gap-1">
-          <span class="text-xs font-medium text-surface-600-400"
-            >Select Project</span
+    <!-- Project & Platform Selection -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <Folder size={16} class="text-primary-500" />
+          <span class="font-semibold text-surface-900-100 text-sm">Project</span
           >
+        </div>
+        {#if projects.length === 0}
+          <div class="text-xs text-surface-500-400">No projects available.</div>
+        {:else}
           <div class="relative">
             <select
               bind:value={selectedProject}
-              class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
+              class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
               style="background-image:none"
             >
-              <option value="">— Select a project —</option>
+              <option value="">— Select —</option>
               {#each projects as project}
                 <option value={project.name}>{project.name}</option>
               {/each}
@@ -451,173 +439,225 @@
               class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
             />
           </div>
-        </div>
-      {/if}
-    </div>
-
-    <!-- Platform Selection -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <Globe size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">Target Platforms</span>
+        {/if}
       </div>
 
-      <div class="flex flex-wrap gap-2">
-        {#each PLATFORMS as platform}
-          {@const Icon = platform.icon}
-          {@const isSelected = selectedPlatforms.includes(platform.id)}
-          <button
-            type="button"
-            onclick={() => togglePlatform(platform.id)}
-            class="flex items-center gap-2 px-4 py-2 rounded text-sm font-medium border transition-colors {isSelected
-              ? 'bg-primary-500 border-primary-500 text-white'
-              : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <Globe size={16} class="text-primary-500" />
+          <span class="font-semibold text-surface-900-100 text-sm"
+            >Platforms</span
           >
-            <Icon size={16} />
-            {platform.label}
-          </button>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Build Configuration -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <Hammer size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100"
-          >Build Configuration</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium text-surface-600-400"
-          >Configuration</span
-        >
+        </div>
         <div class="flex flex-wrap gap-2">
-          {#each ["Debug", "Release"] as const as cfg}
+          {#each PLATFORMS as platform}
+            {@const Icon = platform.icon}
+            {@const isSelected = selectedPlatforms.includes(platform.id)}
             <button
               type="button"
-              onclick={() => (buildConfig = cfg)}
-              class="px-3 py-1.5 rounded text-xs font-medium border transition-colors {buildConfig ===
-              cfg
+              onclick={() => togglePlatform(platform.id)}
+              class="flex items-center gap-2 px-3 py-2 rounded text-sm font-medium border transition-colors {isSelected
                 ? 'bg-primary-500 border-primary-500 text-white'
                 : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
             >
-              {cfg}
+              <Icon size={16} />
+              {platform.label}
             </button>
           {/each}
         </div>
       </div>
     </div>
 
+    <!-- Build Configuration -->
+    <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <Hammer size={16} class="text-primary-500" />
+          <span class="font-semibold text-surface-900-100 text-sm">Build</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex gap-2">
+            {#each ["Debug", "Release"] as const as cfg}
+              <button
+                type="button"
+                onclick={() => (buildConfig = cfg)}
+                class="px-3 py-2 rounded text-sm font-medium border transition-colors {buildConfig ===
+                cfg
+                  ? 'bg-primary-500 border-primary-500 text-white'
+                  : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
+              >
+                {cfg}
+              </button>
+            {/each}
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <span class="text-xs font-medium text-surface-600-400"
+              >--no-restore</span
+            >
+            <div class="relative inline-flex items-center">
+              <input
+                type="checkbox"
+                bind:checked={noRestore}
+                class="peer sr-only"
+              />
+              <div
+                class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
+              ></div>
+              <div
+                class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
+              ></div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <!-- Codesigning Configuration -->
     {#if selectedPlatforms.length > 0}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-        <div class="flex items-center gap-2">
-          <span class="font-semibold text-surface-900-100"
-            >Codesigning Configuration</span
-          >
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+        <span class="font-semibold text-surface-900-100 text-sm"
+          >Codesigning</span
+        >
+        <div class="grid gap-3">
+          {#if selectedPlatforms.includes("ios")}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="ios-bundle">iOS Bundle</label
+              >
+              <div class="relative">
+                <select
+                  id="ios-bundle"
+                  bind:value={iosBundleId}
+                  class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
+                  style="background-image:none"
+                >
+                  <option value="*">— Default (*) —</option>
+                  {#each iosBundleIds.filter((id) => id !== "*") as bundleId}
+                    <option value={bundleId}>{bundleId}</option>
+                  {/each}
+                </select>
+                <ChevronDown
+                  size={14}
+                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
+                />
+              </div>
+            </div>
+          {/if}
+
+          {#if selectedPlatforms.includes("windows")}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="windows-cert">Windows Cert</label
+              >
+              <div class="relative">
+                <select
+                  id="windows-cert"
+                  bind:value={windowsKey}
+                  class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
+                  style="background-image:none"
+                >
+                  <option value="*">— Default (*) —</option>
+                  {#each windowsKeys.filter((k) => k !== "*") as key}
+                    <option value={key}>{key}</option>
+                  {/each}
+                </select>
+                <ChevronDown
+                  size={14}
+                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
+                />
+              </div>
+            </div>
+          {/if}
+
+          {#if selectedPlatforms.includes("android")}
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-1">
+                <label
+                  class="text-xs font-medium text-surface-600-400"
+                  for="android-keystore">Android Keystore</label
+                >
+                <div class="relative">
+                  <select
+                    id="android-keystore"
+                    bind:value={androidKey}
+                    class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
+                    style="background-image:none"
+                  >
+                    <option value="*">— Default (*) —</option>
+                    {#each androidKeys.filter((k) => k !== "*") as key}
+                      <option value={key}>{key}</option>
+                    {/each}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
+                  />
+                </div>
+              </div>
+              {#if androidKey && androidKey !== "*"}
+                {@const config = codesigningConfig.android[androidKey]}
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="flex flex-col gap-1">
+                    <span class="font-medium text-surface-600-400">Alias</span>
+                    <span
+                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.Alias
+                        ? 'text-surface-900-100'
+                        : 'text-surface-500-400 italic'}"
+                    >
+                      {androidCodesignInfo?.Alias || "Not loaded"}
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <span class="font-medium text-surface-600-400"
+                      >Key Pass</span
+                    >
+                    <span
+                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.KeyPass
+                        ? 'text-surface-900-100'
+                        : 'text-surface-500-400 italic'}"
+                    >
+                      {androidCodesignInfo?.KeyPass ? "••••••" : "Not loaded"}
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-1 col-span-2">
+                    <span class="font-medium text-surface-600-400"
+                      >Store Pass</span
+                    >
+                    <span
+                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.StorePass
+                        ? 'text-surface-900-100'
+                        : 'text-surface-500-400 italic'}"
+                    >
+                      {androidCodesignInfo?.StorePass ? "••••••" : "Not loaded"}
+                    </span>
+                  </div>
+                  {#if !androidCodesignInfo?.Alias && config?.CodesignInfoTxtPath}
+                    <div class="col-span-2 text-xs text-surface-500-400">
+                      Info file: {config.CodesignInfoTxtPath}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+          {/if}
         </div>
-
-        {#if selectedPlatforms.includes("ios")}
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-medium text-surface-600-400"
-              for="ios-bundle"
-            >
-              iOS Bundle ID
-            </label>
-            <div class="relative">
-              <select
-                id="ios-bundle"
-                bind:value={iosBundleId}
-                class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                style="background-image:none"
-              >
-                <option value="*">— Default (*) —</option>
-                {#each iosBundleIds.filter((id) => id !== "*") as bundleId}
-                  <option value={bundleId}>{bundleId}</option>
-                {/each}
-              </select>
-              <ChevronDown
-                size={14}
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-              />
-            </div>
-          </div>
-        {/if}
-
-        {#if selectedPlatforms.includes("windows")}
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-medium text-surface-600-400"
-              for="windows-cert"
-            >
-              Windows Certificate
-            </label>
-            <div class="relative">
-              <select
-                id="windows-cert"
-                bind:value={windowsKey}
-                class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                style="background-image:none"
-              >
-                <option value="*">— Default (*) —</option>
-                {#each windowsKeys.filter((k) => k !== "*") as key}
-                  <option value={key}>{key}</option>
-                {/each}
-              </select>
-              <ChevronDown
-                size={14}
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-              />
-            </div>
-          </div>
-        {/if}
-
-        {#if selectedPlatforms.includes("android")}
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-medium text-surface-600-400"
-              for="android-keystore"
-            >
-              Android Keystore
-            </label>
-            <div class="relative">
-              <select
-                id="android-keystore"
-                bind:value={androidKey}
-                class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                style="background-image:none"
-              >
-                <option value="*">— Default (*) —</option>
-                {#each androidKeys.filter((k) => k !== "*") as key}
-                  <option value={key}>{key}</option>
-                {/each}
-              </select>
-              <ChevronDown
-                size={14}
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-              />
-            </div>
-          </div>
-        {/if}
       </div>
     {/if}
 
     <!-- Command Preview -->
     {#if selectedPlatforms.length > 0}
-      <div class="card bg-surface-50-950 p-4">
+      <div class="card bg-surface-50-950 p-3">
         <div class="flex items-center gap-2 mb-2">
-          <Terminal size={16} class="text-primary-500 shrink-0" />
+          <Terminal size={14} class="text-primary-500 shrink-0" />
           <span
             class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
+            >Command Preview</span
           >
-            Command Preview
-          </span>
         </div>
         <code
-          class="block text-sm font-mono bg-surface-200-800 px-3 py-2 rounded break-all text-surface-900-100"
+          class="block text-xs font-mono bg-surface-200-800 px-3 py-2 rounded break-all text-surface-900-100"
         >
           {commandPreview}
         </code>
@@ -626,7 +666,7 @@
 
     <!-- Progress -->
     {#if isRunning || progress > 0}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
         <div class="flex items-center justify-between gap-2 text-xs">
           <span class="text-surface-600-400 truncate">{progressLabel}</span>
           <span
@@ -671,7 +711,7 @@
 
     <!-- Output log -->
     {#if outputLines.length > 0}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-2">
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
         <span
           class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
           >Output</span

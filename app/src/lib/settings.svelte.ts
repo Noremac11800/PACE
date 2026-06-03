@@ -21,6 +21,7 @@ export interface PublishTabSettings {
   iosBundleId: string;
   windowsKey: string;
   androidKey: string;
+  noRestore: boolean;
 }
 
 export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
@@ -30,6 +31,7 @@ export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
   iosBundleId: "*",
   windowsKey: "*",
   androidKey: "*",
+  noRestore: false,
 };
 
 export interface UploadTabSettings {
