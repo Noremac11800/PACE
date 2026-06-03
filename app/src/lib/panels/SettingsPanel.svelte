@@ -4,16 +4,12 @@
     PanelRightClose,
     PanelRightOpen,
     Monitor,
-    Terminal,
-    Folder,
     Palette,
   } from "@lucide/svelte";
   import { settings } from "$lib/settings.svelte";
   import { saveSettings, applyTheme } from "$lib/app-init";
   import {
     SettingSwitch,
-    SettingInput,
-    SettingFolderPicker,
     SettingSelect,
     SettingRadioGroup,
   } from "$lib/snippets/SettingsSnippets.svelte";
@@ -26,8 +22,6 @@
 
   const toc: TocEntry[] = [
     { id: "general", label: "General", icon: Monitor },
-    { id: "cli-paths", label: "CLI paths", icon: Terminal },
-    { id: "project-defaults", label: "Project defaults", icon: Folder },
     { id: "appearance", label: "Appearance", icon: Palette },
   ];
 
@@ -105,59 +99,6 @@
             "Automatically check for CLI and app updates on startup",
             settings.general.autoCheckUpdates,
             (v) => (settings.general.autoCheckUpdates = v),
-          )}
-        </div>
-      </section>
-
-      <!-- CLI Paths Section -->
-      <section id="cli-paths" class="border-b border-surface-200-800 pb-8">
-        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
-          <Terminal size={24} class="text-primary-500" />
-          CLI paths
-        </h2>
-        <div class="space-y-1">
-          {@render SettingFolderPicker(
-            "PACE CLI Path",
-            "Path to the PACE CLI executable",
-            settings.cliPaths.paceCliPath,
-            (v) => (settings.cliPaths.paceCliPath = v),
-          )}
-          {@render SettingFolderPicker(
-            "Git Path",
-            "Path to the Git executable",
-            settings.cliPaths.gitPath,
-            (v) => (settings.cliPaths.gitPath = v),
-          )}
-          {@render SettingFolderPicker(
-            ".NET Path",
-            "Path to the .NET SDK",
-            settings.cliPaths.dotnetPath,
-            (v) => (settings.cliPaths.dotnetPath = v),
-          )}
-        </div>
-      </section>
-
-      <!-- Project Defaults Section -->
-      <section
-        id="project-defaults"
-        class="border-b border-surface-200-800 pb-8"
-      >
-        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
-          <Folder size={24} class="text-primary-500" />
-          Project defaults
-        </h2>
-        <div class="space-y-1">
-          {@render SettingFolderPicker(
-            "Default Solution Directory",
-            "Default directory for new solutions",
-            settings.projectDefaults.defaultSolutionDirectory,
-            (v) => (settings.projectDefaults.defaultSolutionDirectory = v),
-          )}
-          {@render SettingInput(
-            "Default Branch",
-            "Default branch name for new repositories",
-            settings.projectDefaults.defaultBranch,
-            (v) => (settings.projectDefaults.defaultBranch = v),
           )}
         </div>
       </section>
