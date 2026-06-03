@@ -11,7 +11,7 @@ import rich
 from rich.console import Console
 from rich.traceback import install
 
-from pace.commands import clean, dotnet, git
+from pace.commands import clean, dotnet, git, upload
 from pace.config import Config, load_config
 from pace.rich_demos import columns, progress_bar
 
@@ -124,6 +124,64 @@ def main() -> int:
     subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
     _git_parser = subparsers.add_parser("git", help="Execute git commands across all repositories")
 
+    # Upload command with arguments
+    upload_parser = subparsers.add_parser(
+        "upload", help="Upload app packages to the deployment server"
+    )
+    upload_parser.add_argument(
+        "package_path",
+        metavar="<path-to-app-package>",
+        help="Path to the app package file (.ipa, .msix, .aab, .apk)",
+        type=Path,
+    )
+    upload_parser.add_argument(
+        "--username",
+        required=True,
+        help="Name of the uploader",
+        metavar="<username>",
+    )
+    upload_parser.add_argument(
+        "--app-name",
+        required=True,
+        help="Name of the application",
+        metavar="<appname>",
+    )
+    upload_parser.add_argument(
+        "--platform",
+        required=True,
+        choices=["iOS", "Android", "Windows"],
+        help="Target platform",
+        metavar="<platform>",
+    )
+    upload_parser.add_argument(
+        "--release-type",
+        required=True,
+        choices=["Debug", "Release"],
+        help="Build configuration",
+        metavar="<type>",
+    )
+    upload_parser.add_argument(
+        "--version",
+        required=True,
+        help="Version number or identifier",
+        metavar="<version>",
+    )
+    upload_parser.add_argument(
+        "-n",
+        "--build-description",
+        help="Build notes/description",
+        metavar="<description>",
+        default=None,
+    )
+    upload_parser.add_argument(
+        "-N",
+        "--build-description-from-file",
+        help="Read build description from file",
+        metavar="<filepath>",
+        type=Path,
+        default=None,
+    )
+
     demo_parser = subparsers.add_parser("demo", help="Run a built-in demo")
     demo_parser.add_argument(
         "name",
@@ -193,6 +251,25 @@ def _run(
             dotnet.run(console, config, unknownargs)
         case "git":
             git.run(console, config, unknownargs)
+        case "upload":
+            # Handle build description from file if provided
+            build_description = args.build_description
+            if args.build_description_from_file:
+                try:
+                    build_description = args.build_description_from_file.read_text()
+                except Exception as e:
+                    console.print(f"[red]Error reading build description file: {e}[/red]")
+                    return 1
+            upload.run(
+                console,
+                args.package_path,
+                args.username,
+                args.app_name,
+                args.platform,
+                args.release_type,
+                args.version,
+                build_description,
+            )
         case "demo":
             _DEMOS[args.name](console, unknownargs)
         case _:

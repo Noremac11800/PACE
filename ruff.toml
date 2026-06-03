@@ -71,6 +71,7 @@ ignore = [
     "EM102",  # Exception must not use an f-string literal, assign to variable first
     "ANN401", # allow type `Any` in type annotations
     "E501",   # line too long (handled by formatter)
+    "BLE001", # do not catch blind exception
 ]
 
 [lint.mccabe]

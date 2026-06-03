@@ -445,282 +445,289 @@
 
     <!-- Tab Content -->
     <div class="flex-1 overflow-y-auto relative">
-      <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "ios"}>
-          <p class="text-sm text-surface-600-400">
-            Configure code signing settings for iOS apps. The "*" entry is used
-            as the default for all bundle IDs.
-          </p>
-          {#each iosBundleIds as bundleId}
-            <div
-              class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
-                  >Bundle ID</span
+      <div
+        class="absolute inset-0 flex flex-col gap-4"
+        class:hidden={activeTab !== "ios"}
+      >
+        <p class="text-sm text-surface-600-400">
+          Configure code signing settings for iOS apps. The "*" entry is used as
+          the default for all bundle IDs.
+        </p>
+        {#each iosBundleIds as bundleId}
+          <div
+            class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
+          >
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
+                >Bundle ID</span
+              >
+              {#if bundleId !== "*"}
+                <button
+                  class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
+                  onclick={() => removeiOSBundleId(bundleId)}
+                  title="Remove bundle ID"><Trash2 size={14} /></button
                 >
-                {#if bundleId !== "*"}
-                  <button
-                    class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
-                    onclick={() => removeiOSBundleId(bundleId)}
-                    title="Remove bundle ID"><Trash2 size={14} /></button
-                  >
-                {/if}
+              {/if}
+            </div>
+            <input
+              type="text"
+              class="input font-mono text-sm"
+              value={bundleId}
+              disabled={bundleId === "*"}
+              placeholder="com.example.app"
+              onchange={(e) =>
+                updateiOSBundleId(
+                  bundleId,
+                  (e.target as HTMLInputElement).value,
+                )}
+            />
+            <div class="flex flex-col gap-1">
+              <label
+                for="codesign-key-{bundleId}"
+                class="text-xs font-medium text-surface-600-400"
+                >Codesign Key</label
+              >
+              <input
+                id="codesign-key-{bundleId}"
+                type="text"
+                class="input text-sm"
+                placeholder="iPhone Distribution: Company Name"
+                value={config.ios[bundleId]?.CodesignKey || ""}
+                oninput={(e) => {
+                  config.ios[bundleId].CodesignKey = (
+                    e.target as HTMLInputElement
+                  ).value;
+                  config = { ...config };
+                  saveConfig();
+                }}
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <label
+                  for="codesign-provision-{bundleId}"
+                  class="text-xs font-medium text-surface-600-400"
+                  >Codesign Provision</label
+                >
+                <button
+                  class="btn-icon text-surface-500-400 hover:text-surface-700-300"
+                  onclick={() =>
+                    (showProvision[bundleId] = !showProvision[bundleId])}
+                  title={showProvision[bundleId] ? "Hide" : "Show"}
+                >
+                  {#if showProvision[bundleId]}<EyeOff size={14} />{:else}<Eye
+                      size={14}
+                    />{/if}
+                </button>
               </div>
               <input
-                type="text"
-                class="input font-mono text-sm"
-                value={bundleId}
-                disabled={bundleId === "*"}
-                placeholder="com.example.app"
-                onchange={(e) =>
-                  updateiOSBundleId(
-                    bundleId,
-                    (e.target as HTMLInputElement).value,
-                  )}
+                id="codesign-provision-{bundleId}"
+                type={showProvision[bundleId] ? "text" : "password"}
+                class="input text-sm"
+                placeholder="Provisioning profile identifier"
+                value={config.ios[bundleId]?.CodesignProvision || ""}
+                oninput={(e) => {
+                  config.ios[bundleId].CodesignProvision = (
+                    e.target as HTMLInputElement
+                  ).value;
+                  config = { ...config };
+                  saveConfig();
+                }}
               />
-              <div class="flex flex-col gap-1">
-                <label
-                  for="codesign-key-{bundleId}"
-                  class="text-xs font-medium text-surface-600-400"
-                  >Codesign Key</label
+            </div>
+          </div>
+        {/each}
+        <button
+          class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
+          onclick={addiOSBundleId}
+        >
+          <Plus size={14} /> Add Bundle ID
+        </button>
+      </div>
+
+      <div
+        class="absolute inset-0 flex flex-col gap-4"
+        class:hidden={activeTab !== "windows"}
+      >
+        <p class="text-sm text-surface-600-400">
+          Configure code signing settings for Windows apps using certificate
+          thumbprint. The "*" entry is used as the default.
+        </p>
+        {#each windowsKeys as key}
+          <div
+            class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
+          >
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
+                >Certificate Name</span
+              >
+              {#if key !== "*"}
+                <button
+                  class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
+                  onclick={() => removeWindowsKey(key)}
+                  title="Remove certificate"><Trash2 size={14} /></button
                 >
+              {/if}
+            </div>
+            <input
+              type="text"
+              class="input font-mono text-sm"
+              value={key}
+              disabled={key === "*"}
+              placeholder="cert-name"
+              onchange={(e) =>
+                updateWindowsKey(key, (e.target as HTMLInputElement).value)}
+            />
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <label
+                  for="thumbprint-{key}"
+                  class="text-xs font-medium text-surface-600-400"
+                  >Package Certificate Thumbprint</label
+                >
+                <button
+                  class="btn-icon text-surface-500-400 hover:text-surface-700-300"
+                  onclick={() => (showThumbprint[key] = !showThumbprint[key])}
+                  title={showThumbprint[key] ? "Hide" : "Show"}
+                >
+                  {#if showThumbprint[key]}<EyeOff size={14} />{:else}<Eye
+                      size={14}
+                    />{/if}
+                </button>
+              </div>
+              <input
+                id="thumbprint-{key}"
+                type={showThumbprint[key] ? "text" : "password"}
+                class="input font-mono text-sm"
+                placeholder="Certificate thumbprint hash"
+                value={config.windows[key]?.PackageCertificateThumbprint || ""}
+                oninput={(e) => {
+                  config.windows[key].PackageCertificateThumbprint = (
+                    e.target as HTMLInputElement
+                  ).value;
+                  config = { ...config };
+                  saveConfig();
+                }}
+              />
+            </div>
+          </div>
+        {/each}
+        <button
+          class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
+          onclick={addWindowsKey}
+        >
+          <Plus size={14} /> Add Certificate
+        </button>
+      </div>
+
+      <div
+        class="absolute inset-0 flex flex-col gap-4"
+        class:hidden={activeTab !== "android"}
+      >
+        <p class="text-sm text-surface-600-400">
+          Configure code signing settings for Android apps using keystore files.
+          The "*" entry is used as the default.
+        </p>
+        {#each androidKeys as key}
+          <div
+            class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
+          >
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
+                >Keystore Name</span
+              >
+              {#if key !== "*"}
+                <button
+                  class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
+                  onclick={() => removeAndroidKey(key)}
+                  title="Remove keystore"><Trash2 size={14} /></button
+                >
+              {/if}
+            </div>
+            <input
+              type="text"
+              class="input font-mono text-sm"
+              value={key}
+              disabled={key === "*"}
+              placeholder="keystore-name"
+              onchange={(e) =>
+                updateAndroidKey(key, (e.target as HTMLInputElement).value)}
+            />
+            <div class="flex flex-col gap-1">
+              <label
+                for="keystore-{key}"
+                class="text-xs font-medium text-surface-600-400"
+                >Keystore Path</label
+              >
+              <div class="input-group grid grid-cols-[1fr_auto]">
                 <input
-                  id="codesign-key-{bundleId}"
+                  id="keystore-{key}"
                   type="text"
-                  class="input text-sm"
-                  placeholder="iPhone Distribution: Company Name"
-                  value={config.ios[bundleId]?.CodesignKey || ""}
+                  class="ig-input font-mono text-sm"
+                  placeholder="$HOME/Certificates/myapp.keystore"
+                  value={config.android[key]?.KeystorePath || ""}
                   oninput={(e) => {
-                    config.ios[bundleId].CodesignKey = (
+                    config.android[key].KeystorePath = (
                       e.target as HTMLInputElement
                     ).value;
                     config = { ...config };
                     saveConfig();
                   }}
                 />
+                <button
+                  class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+                  type="button"
+                  onclick={() => pickFile("KeystorePath", key)}
+                  title="Browse for keystore file"
+                  ><FolderOpen size={16} /></button
+                >
               </div>
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <label
-                    for="codesign-provision-{bundleId}"
-                    class="text-xs font-medium text-surface-600-400"
-                    >Codesign Provision</label
-                  >
-                  <button
-                    class="btn-icon text-surface-500-400 hover:text-surface-700-300"
-                    onclick={() =>
-                      (showProvision[bundleId] = !showProvision[bundleId])}
-                    title={showProvision[bundleId] ? "Hide" : "Show"}
-                  >
-                    {#if showProvision[bundleId]}<EyeOff size={14} />{:else}<Eye
-                        size={14}
-                      />{/if}
-                  </button>
-                </div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label
+                for="codesigninfo-{key}"
+                class="text-xs font-medium text-surface-600-400"
+                >Codesign Info Text Path</label
+              >
+              <div class="input-group grid grid-cols-[1fr_auto]">
                 <input
-                  id="codesign-provision-{bundleId}"
-                  type={showProvision[bundleId] ? "text" : "password"}
-                  class="input text-sm"
-                  placeholder="Provisioning profile identifier"
-                  value={config.ios[bundleId]?.CodesignProvision || ""}
+                  id="codesigninfo-{key}"
+                  type="text"
+                  class="ig-input font-mono text-sm"
+                  placeholder="$HOME/Certificates/myapp.txt"
+                  value={config.android[key]?.CodesignInfoTxtPath || ""}
                   oninput={(e) => {
-                    config.ios[bundleId].CodesignProvision = (
+                    config.android[key].CodesignInfoTxtPath = (
                       e.target as HTMLInputElement
                     ).value;
                     config = { ...config };
                     saveConfig();
                   }}
                 />
+                <button
+                  class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+                  type="button"
+                  onclick={() => pickFile("CodesignInfoTxtPath", key)}
+                  title="Browse for codesign info file"
+                  ><FolderOpen size={16} /></button
+                >
               </div>
+              <p class="text-xs text-surface-500-400 mt-1">
+                Text file containing keystore password and key alias
+                information.
+              </p>
             </div>
-          {/each}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
-            onclick={addiOSBundleId}
-          >
-            <Plus size={14} /> Add Bundle ID
-          </button>
-        </div>
-
-        <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "windows"}>
-          <p class="text-sm text-surface-600-400">
-            Configure code signing settings for Windows apps using certificate
-            thumbprint. The "*" entry is used as the default.
-          </p>
-          {#each windowsKeys as key}
-            <div
-              class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
-                  >Certificate Name</span
-                >
-                {#if key !== "*"}
-                  <button
-                    class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
-                    onclick={() => removeWindowsKey(key)}
-                    title="Remove certificate"><Trash2 size={14} /></button
-                  >
-                {/if}
-              </div>
-              <input
-                type="text"
-                class="input font-mono text-sm"
-                value={key}
-                disabled={key === "*"}
-                placeholder="cert-name"
-                onchange={(e) =>
-                  updateWindowsKey(key, (e.target as HTMLInputElement).value)}
-              />
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <label
-                    for="thumbprint-{key}"
-                    class="text-xs font-medium text-surface-600-400"
-                    >Package Certificate Thumbprint</label
-                  >
-                  <button
-                    class="btn-icon text-surface-500-400 hover:text-surface-700-300"
-                    onclick={() => (showThumbprint[key] = !showThumbprint[key])}
-                    title={showThumbprint[key] ? "Hide" : "Show"}
-                  >
-                    {#if showThumbprint[key]}<EyeOff size={14} />{:else}<Eye
-                        size={14}
-                      />{/if}
-                  </button>
-                </div>
-                <input
-                  id="thumbprint-{key}"
-                  type={showThumbprint[key] ? "text" : "password"}
-                  class="input font-mono text-sm"
-                  placeholder="Certificate thumbprint hash"
-                  value={config.windows[key]?.PackageCertificateThumbprint ||
-                    ""}
-                  oninput={(e) => {
-                    config.windows[key].PackageCertificateThumbprint = (
-                      e.target as HTMLInputElement
-                    ).value;
-                    config = { ...config };
-                    saveConfig();
-                  }}
-                />
-              </div>
-            </div>
-          {/each}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
-            onclick={addWindowsKey}
-          >
-            <Plus size={14} /> Add Certificate
-          </button>
-        </div>
-
-        <div class="absolute inset-0 flex flex-col gap-4" class:hidden={activeTab !== "android"}>
-          <p class="text-sm text-surface-600-400">
-            Configure code signing settings for Android apps using keystore
-            files. The "*" entry is used as the default.
-          </p>
-          {#each androidKeys as key}
-            <div
-              class="flex flex-col gap-3 border-b border-surface-200-800 pb-4 last:border-0"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-xs font-medium text-surface-600-400 uppercase tracking-wide"
-                  >Keystore Name</span
-                >
-                {#if key !== "*"}
-                  <button
-                    class="ml-auto btn-icon text-error-500 hover:text-error-600 transition-colors"
-                    onclick={() => removeAndroidKey(key)}
-                    title="Remove keystore"><Trash2 size={14} /></button
-                  >
-                {/if}
-              </div>
-              <input
-                type="text"
-                class="input font-mono text-sm"
-                value={key}
-                disabled={key === "*"}
-                placeholder="keystore-name"
-                onchange={(e) =>
-                  updateAndroidKey(key, (e.target as HTMLInputElement).value)}
-              />
-              <div class="flex flex-col gap-1">
-                <label
-                  for="keystore-{key}"
-                  class="text-xs font-medium text-surface-600-400"
-                  >Keystore Path</label
-                >
-                <div class="input-group grid grid-cols-[1fr_auto]">
-                  <input
-                    id="keystore-{key}"
-                    type="text"
-                    class="ig-input font-mono text-sm"
-                    placeholder="$HOME/Certificates/myapp.keystore"
-                    value={config.android[key]?.KeystorePath || ""}
-                    oninput={(e) => {
-                      config.android[key].KeystorePath = (
-                        e.target as HTMLInputElement
-                      ).value;
-                      config = { ...config };
-                      saveConfig();
-                    }}
-                  />
-                  <button
-                    class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-                    type="button"
-                    onclick={() => pickFile("KeystorePath", key)}
-                    title="Browse for keystore file"
-                    ><FolderOpen size={16} /></button
-                  >
-                </div>
-              </div>
-              <div class="flex flex-col gap-1">
-                <label
-                  for="codesigninfo-{key}"
-                  class="text-xs font-medium text-surface-600-400"
-                  >Codesign Info Text Path</label
-                >
-                <div class="input-group grid grid-cols-[1fr_auto]">
-                  <input
-                    id="codesigninfo-{key}"
-                    type="text"
-                    class="ig-input font-mono text-sm"
-                    placeholder="$HOME/Certificates/myapp.txt"
-                    value={config.android[key]?.CodesignInfoTxtPath || ""}
-                    oninput={(e) => {
-                      config.android[key].CodesignInfoTxtPath = (
-                        e.target as HTMLInputElement
-                      ).value;
-                      config = { ...config };
-                      saveConfig();
-                    }}
-                  />
-                  <button
-                    class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-                    type="button"
-                    onclick={() => pickFile("CodesignInfoTxtPath", key)}
-                    title="Browse for codesign info file"
-                    ><FolderOpen size={16} /></button
-                  >
-                </div>
-                <p class="text-xs text-surface-500-400 mt-1">
-                  Text file containing keystore password and key alias
-                  information.
-                </p>
-              </div>
-            </div>
-          {/each}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
-            onclick={addAndroidKey}
-          >
-            <Plus size={14} /> Add Keystore
-          </button>
-        </div>
+          </div>
+        {/each}
+        <button
+          class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2 self-start"
+          onclick={addAndroidKey}
+        >
+          <Plus size={14} /> Add Keystore
+        </button>
       </div>
     </div>
   </div>

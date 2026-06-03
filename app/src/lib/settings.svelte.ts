@@ -32,6 +32,24 @@ export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
   androidKey: "*",
 };
 
+export interface UploadTabSettings {
+  selectedProject: string;
+  selectedPackages: string[];
+  username: string;
+  appName: string;
+  version: string;
+  buildNotes: string;
+}
+
+export const DEFAULT_UPLOAD_TAB_SETTINGS: UploadTabSettings = {
+  selectedProject: "",
+  selectedPackages: [],
+  username: "",
+  appName: "",
+  version: "",
+  buildNotes: "",
+};
+
 export interface Settings {
   general: {
     theme: "light" | "dark" | "system";
@@ -53,6 +71,7 @@ export interface Settings {
   };
   buildTab: BuildTabSettings;
   publishTab: PublishTabSettings;
+  uploadTab: UploadTabSettings;
   lastActiveConfig: string;
 }
 
@@ -77,6 +96,7 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   buildTab: { ...DEFAULT_BUILD_TAB_SETTINGS },
   publishTab: { ...DEFAULT_PUBLISH_TAB_SETTINGS },
+  uploadTab: { ...DEFAULT_UPLOAD_TAB_SETTINGS },
   lastActiveConfig: "",
 };
 
@@ -95,6 +115,9 @@ export function setSettingsFromJSON(json: string): void {
     }
     if (parsed.publishTab) {
       Object.assign(settings.publishTab, parsed.publishTab);
+    }
+    if (parsed.uploadTab) {
+      Object.assign(settings.uploadTab, parsed.uploadTab);
     }
   } catch (e) {
     console.error("Failed to parse settings JSON:", e);
