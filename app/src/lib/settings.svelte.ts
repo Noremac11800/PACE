@@ -61,6 +61,7 @@ export interface Settings {
     theme: "light" | "dark" | "system";
     language: string;
     autoCheckUpdates: boolean;
+    storageEndpointUrl: string;
   };
   cliPaths: {
     paceCliPath: string;
@@ -86,6 +87,7 @@ export const DEFAULT_SETTINGS: Settings = {
     theme: "system",
     language: "en",
     autoCheckUpdates: true,
+    storageEndpointUrl: "apptopia.esri.com",
   },
   cliPaths: {
     paceCliPath: "",
@@ -128,4 +130,15 @@ export function setSettingsFromJSON(json: string): void {
   } catch (e) {
     console.error("Failed to parse settings JSON:", e);
   }
+}
+
+export function resetSettings(): void {
+  Object.assign(settings.general, DEFAULT_SETTINGS.general);
+  Object.assign(settings.cliPaths, DEFAULT_SETTINGS.cliPaths);
+  Object.assign(settings.projectDefaults, DEFAULT_SETTINGS.projectDefaults);
+  Object.assign(settings.appearance, DEFAULT_SETTINGS.appearance);
+  Object.assign(settings.buildTab, DEFAULT_SETTINGS.buildTab);
+  Object.assign(settings.publishTab, DEFAULT_SETTINGS.publishTab);
+  Object.assign(settings.uploadTab, DEFAULT_SETTINGS.uploadTab);
+  settings.lastActiveConfig = DEFAULT_SETTINGS.lastActiveConfig;
 }

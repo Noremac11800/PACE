@@ -1,6 +1,7 @@
 <script module lang="ts">
   import { open } from "@tauri-apps/plugin-dialog";
-  import { FolderOpen, FileText } from "@lucide/svelte";
+  import { openPath, openUrl } from "@tauri-apps/plugin-opener";
+  import { FolderOpen, FileText, ExternalLink } from "@lucide/svelte";
 
   export {
     SettingSwitch,
@@ -24,8 +25,7 @@
     <div class="flex-1 pr-4">
       <label
         class="block text-sm font-semibold text-surface-900-50"
-        for="setting-switch-{label}"
-        >{label}</label
+        for="setting-switch-{label}">{label}</label
       >
       {#if description}
         <p class="text-xs text-surface-600-300 mt-1 leading-relaxed">
@@ -64,8 +64,7 @@
   >
     <label
       class="block text-sm font-semibold text-surface-900-50 mb-2"
-      for="setting-input-{label}"
-      >{label}</label
+      for="setting-input-{label}">{label}</label
     >
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
@@ -94,8 +93,7 @@
   >
     <label
       class="block text-sm font-semibold text-surface-900-50 mb-2"
-      for="setting-folder-{label}"
-      >{label}</label
+      for="setting-folder-{label}">{label}</label
     >
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
@@ -143,8 +141,7 @@
   >
     <label
       class="block text-sm font-semibold text-surface-900-50 mb-2"
-      for="setting-file-{label}"
-      >{label}</label
+      for="setting-file-{label}">{label}</label
     >
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
@@ -192,8 +189,7 @@
   >
     <label
       class="block text-sm font-semibold text-surface-900-50 mb-2"
-      for="setting-select-{label}"
-      >{label}</label
+      for="setting-select-{label}">{label}</label
     >
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
@@ -223,9 +219,7 @@
   <div
     class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
   >
-    <p class="block text-sm font-semibold text-surface-900-50 mb-2"
-      >{label}</p
-    >
+    <p class="block text-sm font-semibold text-surface-900-50 mb-2">{label}</p>
     {#if description}
       <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
         {description}

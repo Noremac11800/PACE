@@ -18,9 +18,10 @@
     Loader,
     RotateCw,
     FolderOpen,
+    ExternalLink,
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
-  import { openPath } from "@tauri-apps/plugin-opener";
+  import { openPath, openUrl } from "@tauri-apps/plugin-opener";
   import { dirname, join } from "@tauri-apps/api/path";
   import {
     settings,
@@ -29,6 +30,19 @@
   } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { configStore } from "$lib/config-store.svelte";
+
+  async function openStorageEndpoint() {
+    let url = settings.general.storageEndpointUrl;
+    if (!url) return;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = "https://" + url;
+    }
+    try {
+      await openUrl(url);
+    } catch (e) {
+      console.error("Failed to open URL:", e);
+    }
+  }
 
   type Platform = "ios" | "android" | "windows";
   type BuildConfig = "Debug" | "Release";
@@ -392,6 +406,30 @@
 
 <div class="h-full flex flex-col">
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    <!-- Storage Endpoint Link -->
+    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <CloudUpload size={18} class="text-primary-500" />
+          <span class="font-semibold text-surface-900-100"
+            >Storage Endpoint</span
+          >
+        </div>
+        <button
+          class="btn preset-tonal flex items-center gap-2 text-sm"
+          onclick={openStorageEndpoint}
+          disabled={!settings.general.storageEndpointUrl}
+          title="Open storage endpoint in browser"
+        >
+          <ExternalLink size={14} />
+          Go to website
+        </button>
+      </div>
+      <div class="text-xs text-surface-600-400">
+        {settings.general.storageEndpointUrl || "Not configured"}
+      </div>
+    </div>
+
     <!-- Project Selection -->
     <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
       <div class="flex items-center gap-2">

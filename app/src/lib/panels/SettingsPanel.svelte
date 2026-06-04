@@ -5,8 +5,12 @@
     PanelRightOpen,
     Monitor,
     Palette,
+    Database,
+    ExternalLink,
+    RotateCcw,
   } from "@lucide/svelte";
-  import { settings } from "$lib/settings.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
+  import { settings, resetSettings } from "$lib/settings.svelte";
   import { saveSettings, applyTheme } from "$lib/app-init";
   import {
     SettingSwitch,
@@ -23,6 +27,7 @@
   const toc: TocEntry[] = [
     { id: "general", label: "General", icon: Monitor },
     { id: "appearance", label: "Appearance", icon: Palette },
+    { id: "storage", label: "Storage", icon: Database },
   ];
 
   let activeSection = $state("general");
@@ -48,10 +53,26 @@
 <div class="h-full flex flex-col overflow-hidden">
   <!-- Header -->
   <div
-    class="flex items-center gap-2 p-4 bg-surface-50-950 border-b border-surface-200-800"
+    class="flex items-center justify-between p-4 bg-surface-50-950 border-b border-surface-200-800"
   >
-    <Settings size={24} class="text-primary-500" />
-    <h2 class="h3 text-primary-500">Settings</h2>
+    <div class="flex items-center gap-2">
+      <Settings size={24} class="text-primary-500" />
+      <h2 class="h3 text-primary-500">Settings</h2>
+    </div>
+    <button
+      class="btn preset-tonal flex items-center gap-2 text-sm"
+      onclick={() => {
+        if (confirm("Reset all settings to default? This cannot be undone.")) {
+          resetSettings();
+          applyTheme(settings.general.theme);
+          saveSettings();
+        }
+      }}
+      title="Reset all settings to default"
+    >
+      <RotateCcw size={14} />
+      Reset to default
+    </button>
   </div>
 
   <!-- Content Grid -->
@@ -68,20 +89,6 @@
           General
         </h2>
         <div class="space-y-1">
-          {@render SettingSelect(
-            "Theme",
-            "Choose your preferred color theme",
-            settings.general.theme,
-            (v) => {
-              settings.general.theme = v as "light" | "dark" | "system";
-              applyTheme(settings.general.theme);
-            },
-            [
-              { value: "light", label: "Light" },
-              { value: "dark", label: "Dark" },
-              { value: "system", label: "System" },
-            ],
-          )}
           {@render SettingSelect(
             "Language",
             "Select the application language",
@@ -104,12 +111,26 @@
       </section>
 
       <!-- Appearance Section -->
-      <section id="appearance" class="pb-8">
+      <section id="appearance" class="border-b border-surface-200-800 pb-8">
         <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
           <Palette size={24} class="text-primary-500" />
           Appearance
         </h2>
         <div class="space-y-1">
+          {@render SettingSelect(
+            "Theme",
+            "Choose your preferred color theme",
+            settings.general.theme,
+            (v) => {
+              settings.general.theme = v as "light" | "dark" | "system";
+              applyTheme(settings.general.theme);
+            },
+            [
+              { value: "light", label: "Light" },
+              { value: "dark", label: "Dark" },
+              { value: "system", label: "System" },
+            ],
+          )}
           {@render SettingRadioGroup(
             "Font Size",
             "Select the base font size for the application",
@@ -125,12 +146,59 @@
               { value: "large", label: "Large" },
             ],
           )}
-          {@render SettingSwitch(
-            "Compact Mode",
-            "Use a more compact layout to show more content",
-            settings.appearance.compactMode,
-            (v) => (settings.appearance.compactMode = v),
-          )}
+        </div>
+      </section>
+
+      <!-- Storage Section -->
+      <section id="storage" class="pb-8">
+        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
+          <Database size={24} class="text-primary-500" />
+          Storage
+        </h2>
+        <div class="space-y-1">
+          <!-- Storage Endpoint URL Input with Open Button -->
+          <div
+            class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
+          >
+            <label
+              class="block text-sm font-semibold text-surface-900-50 mb-2"
+              for="storage-endpoint-url">Application Storage Endpoint URL</label
+            >
+            <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
+              Configure the endpoint URL for application storage uploads
+            </p>
+            <div class="input-group grid grid-cols-[1fr_auto]">
+              <input
+                id="storage-endpoint-url"
+                type="text"
+                class="ig-input"
+                placeholder="apptopia.esri.com"
+                bind:value={settings.general.storageEndpointUrl}
+              />
+              <button
+                class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+                type="button"
+                title="Open in browser"
+                onclick={async () => {
+                  let url = settings.general.storageEndpointUrl;
+                  if (!url) return;
+                  if (
+                    !url.startsWith("http://") &&
+                    !url.startsWith("https://")
+                  ) {
+                    url = "https://" + url;
+                  }
+                  try {
+                    await openUrl(url);
+                  } catch (e) {
+                    console.error("Failed to open URL:", e);
+                  }
+                }}
+              >
+                <ExternalLink size={16} />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </div>
