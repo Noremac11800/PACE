@@ -8,11 +8,15 @@
     Rocket,
     PenLine,
     Package,
+    RefreshCw,
+    FolderOpen,
   } from "@lucide/svelte";
+  import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import {
     configStore,
     loadAvailableConfigs,
     loadConfig,
+    getActiveConfigPath,
   } from "$lib/config-store.svelte";
   import { settings } from "$lib/settings.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
@@ -22,6 +26,25 @@
   import ConfigEditorTab from "$lib/orchestrator/ConfigEditorTab.svelte";
   import NugetTab from "$lib/orchestrator/NugetTab.svelte";
   import ConfigSelector from "$lib/panels/ConfigSelector.svelte";
+
+  let refreshing = $state(false);
+
+  async function refreshConfig() {
+    if (!configStore.activeConfigName || refreshing) return;
+    refreshing = true;
+    try {
+      await loadConfig(configStore.activeConfigName);
+    } finally {
+      refreshing = false;
+    }
+  }
+
+  async function openConfigFolder() {
+    const configPath = await getActiveConfigPath();
+    if (configPath) {
+      await revealItemInDir(configPath);
+    }
+  }
 
   let activeTab = $state<
     "projects" | "build" | "deploy" | "git" | "editor" | "nuget"
@@ -78,7 +101,25 @@
       <h2 class="h3 text-primary-500">Orchestrator</h2>
     </div>
 
-    <ConfigSelector />
+    <div class="flex items-center gap-2">
+      <button
+        class="btn preset-tonal p-2 hover:preset-filled-primary-500 transition-colors"
+        onclick={refreshConfig}
+        disabled={refreshing || !configStore.activeConfigName}
+        title="Refresh config"
+      >
+        <RefreshCw size={16} class={refreshing ? "animate-spin" : ""} />
+      </button>
+      <button
+        class="btn preset-tonal p-2 hover:preset-filled-primary-500 transition-colors"
+        onclick={openConfigFolder}
+        disabled={!configStore.activeConfigName}
+        title="Open config folder"
+      >
+        <FolderOpen size={16} />
+      </button>
+      <ConfigSelector />
+    </div>
   </div>
 
   <!-- Tabs -->

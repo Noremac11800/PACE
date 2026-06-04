@@ -10,7 +10,9 @@
     Loader,
     ChevronRight,
     ChevronDown,
+    FolderOpen,
   } from "@lucide/svelte";
+  import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import {
     checkProjectGitStatus,
     type PaceConfig,
@@ -33,6 +35,9 @@
   $effect(() => {
     if (config) {
       loadAllGitStatuses(config);
+      // Expand all groups by default
+      const allGroups = getOrderedGroups();
+      expandedGroups = new Set(allGroups);
     }
   });
 
@@ -97,16 +102,32 @@
   function isGroupExpanded(group: string): boolean {
     return expandedGroups.has(group);
   }
+
+  async function openFolder(path: string) {
+    if (path) {
+      await revealItemInDir(path);
+    }
+  }
 </script>
 
 <div class="flex flex-col gap-4">
   <!-- Repository Directory -->
   <div class="card bg-surface-50-950 p-4">
-    <div class="flex items-center gap-2 mb-2">
-      <Folder size={18} class="text-primary-500" />
-      <span class="font-semibold text-surface-900-100"
-        >Repository Directory</span
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <Folder size={18} class="text-primary-500" />
+        <span class="font-semibold text-surface-900-100"
+          >Repository Directory</span
+        >
+      </div>
+      <button
+        class="btn preset-tonal p-1.5 hover:preset-filled-primary-500 transition-colors"
+        onclick={() => openFolder(config.repodir)}
+        disabled={!config.repodir}
+        title="Open repository folder"
       >
+        <FolderOpen size={14} />
+      </button>
     </div>
     <code class="text-sm bg-surface-200-800 px-3 py-2 rounded block"
       >{config.repodir}</code
@@ -116,9 +137,20 @@
   <!-- NuGet Cache Path -->
   {#if config.nuget_cache_path}
     <div class="card bg-surface-50-950 p-4">
-      <div class="flex items-center gap-2 mb-2">
-        <Package size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">NuGet Cache Path</span>
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <Package size={18} class="text-primary-500" />
+          <span class="font-semibold text-surface-900-100"
+            >NuGet Cache Path</span
+          >
+        </div>
+        <button
+          class="btn preset-tonal p-1.5 hover:preset-filled-primary-500 transition-colors"
+          onclick={() => openFolder(config.nuget_cache_path!)}
+          title="Open NuGet cache folder"
+        >
+          <FolderOpen size={14} />
+        </button>
       </div>
       <code class="text-sm bg-surface-200-800 px-3 py-2 rounded block"
         >{config.nuget_cache_path}</code

@@ -57,7 +57,7 @@
         groups = [];
       }
       expandedProjects = new Set();
-      collapsedGroups = new Set();
+      collapsedGroups = new Set(groups);
     }
   });
 
@@ -231,102 +231,107 @@
   </div>
 
   <!-- Projects -->
-  <div class="flex items-center justify-between mb-1 px-1">
-    <div class="flex items-center gap-2">
-      <span class="font-semibold text-surface-900-100">Projects</span>
-      <span class="text-xs text-surface-500-400">({draft.projects.length})</span
-      >
-    </div>
-    <button
-      class="btn preset-tonal text-sm flex items-center gap-1.5 hover:preset-filled-primary-500 transition-colors"
-      onclick={addSolutionGroup}
-    >
-      <Plus size={14} />
-      Add solution group
-    </button>
-  </div>
-
-  {#each groups as group (group)}
-    {@const collapsed = collapsedGroups.has(group)}
-    {@const groupProjects = getProjectsByGroup(group)}
-    <div class="card bg-surface-50-950 p-4">
-      <!-- Group Header -->
-      <div class="flex items-center gap-2 mb-3">
-        <button
-          class="btn p-1 text-surface-400-600 hover:text-surface-900-100 shrink-0"
-          onclick={() => toggleGroup(group)}
-          title={collapsed ? "Expand" : "Collapse"}
+  <div class="card bg-surface-50-950 p-4">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-surface-900-100">Projects</span>
+        <span class="text-xs text-surface-500-400"
+          >({draft.projects.length})</span
         >
-          {#if collapsed}
-            <ChevronDown size={16} />
-          {:else}
-            <ChevronUp size={16} />
-          {/if}
-        </button>
-        <Layers size={16} class="text-primary-500 shrink-0" />
-        <input
-          class="flex-1 min-w-0 px-2 py-1 rounded bg-transparent border border-transparent hover:border-surface-300-700 focus:border-primary-500 focus:outline-none text-sm font-semibold text-surface-900-100 transition-colors"
-          type="text"
-          value={group}
-          onblur={(e) => renameGroup(group, e.currentTarget.value)}
-          onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-        />
-        <span class="text-xs text-surface-500-400 shrink-0"
-          >({groupProjects.length})</span
-        >
-        <button
-          class="btn preset-tonal text-xs flex items-center gap-1 hover:preset-filled-primary-500 transition-colors shrink-0"
-          onclick={() => addProjectToGroup(group)}
-        >
-          <Plus size={12} />
-          Add
-        </button>
-        <button
-          class="btn p-1 text-error-500 hover:text-error-400 shrink-0"
-          onclick={() => deleteGroup(group)}
-          title="Delete group and its projects"
-        >
-          <Trash2 size={14} />
-        </button>
       </div>
+      <button
+        class="btn preset-tonal text-sm flex items-center gap-1.5 hover:preset-filled-primary-500 transition-colors"
+        onclick={addSolutionGroup}
+      >
+        <Plus size={14} />
+        Add solution group
+      </button>
+    </div>
 
-      {#if !collapsed}
-        <div class="flex flex-col gap-2">
-          {#each groupProjects as project}
-            {@const index = projectIndex(project)}
-            <ProjectCard
-              {project}
-              {groups}
-              allProjects={draft.projects}
-              expanded={expandedProjects.has(index)}
-              dropdownOpen={dependsOnDropdownOpen.has(index)}
-              onToggle={() => toggleProject(index)}
-              onRemove={() => removeProject(index)}
-              onToggleDropdown={() => {
-                const next = new Set(dependsOnDropdownOpen);
-                if (next.has(index)) next.delete(index);
-                else next.add(index);
-                dependsOnDropdownOpen = next;
-              }}
+    <div class="flex flex-col gap-4">
+      {#each groups as group (group)}
+        {@const collapsed = collapsedGroups.has(group)}
+        {@const groupProjects = getProjectsByGroup(group)}
+        <div class="card bg-surface-100-900/50 p-4">
+          <!-- Group Header -->
+          <div class="flex items-center gap-2 mb-3">
+            <button
+              class="btn p-1 text-surface-400-600 hover:text-surface-900-100 shrink-0"
+              onclick={() => toggleGroup(group)}
+              title={collapsed ? "Expand" : "Collapse"}
+            >
+              {#if collapsed}
+                <ChevronDown size={16} />
+              {:else}
+                <ChevronUp size={16} />
+              {/if}
+            </button>
+            <Layers size={16} class="text-primary-500 shrink-0" />
+            <input
+              class="flex-1 min-w-0 px-2 py-1 rounded bg-transparent border border-transparent hover:border-surface-300-700 focus:border-primary-500 focus:outline-none text-sm font-semibold text-surface-900-100 transition-colors"
+              type="text"
+              value={group}
+              onblur={(e) => renameGroup(group, e.currentTarget.value)}
+              onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
             />
-          {/each}
-          {#if groupProjects.length === 0}
-            <p class="text-xs text-surface-500-400 text-center py-3">
-              No projects in this group yet.
-            </p>
+            <span class="text-xs text-surface-500-400 shrink-0"
+              >({groupProjects.length})</span
+            >
+            <button
+              class="btn preset-tonal text-xs flex items-center gap-1 hover:preset-filled-primary-500 transition-colors shrink-0"
+              onclick={() => addProjectToGroup(group)}
+            >
+              <Plus size={12} />
+              Add
+            </button>
+            <button
+              class="btn p-1 text-error-500 hover:text-error-400 shrink-0"
+              onclick={() => deleteGroup(group)}
+              title="Delete group and its projects"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+
+          {#if !collapsed}
+            <div class="flex flex-col gap-2">
+              {#each groupProjects as project}
+                {@const index = projectIndex(project)}
+                <ProjectCard
+                  {project}
+                  {groups}
+                  allProjects={draft.projects}
+                  expanded={expandedProjects.has(index)}
+                  dropdownOpen={dependsOnDropdownOpen.has(index)}
+                  onToggle={() => toggleProject(index)}
+                  onRemove={() => removeProject(index)}
+                  onToggleDropdown={() => {
+                    const next = new Set(dependsOnDropdownOpen);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    dependsOnDropdownOpen = next;
+                  }}
+                />
+              {/each}
+              {#if groupProjects.length === 0}
+                <p class="text-xs text-surface-500-400 text-center py-3">
+                  No projects in this group yet.
+                </p>
+              {/if}
+            </div>
           {/if}
+        </div>
+      {/each}
+
+      {#if groups.length === 0}
+        <div
+          class="bg-surface-100-900/50 p-8 text-center text-surface-500-400 text-sm rounded"
+        >
+          No solution groups yet. Click <span class="font-semibold"
+            >Add solution group</span
+          > to get started.
         </div>
       {/if}
     </div>
-  {/each}
-
-  {#if groups.length === 0}
-    <div
-      class="card bg-surface-50-950 p-8 text-center text-surface-500-400 text-sm"
-    >
-      No solution groups yet. Click <span class="font-semibold"
-        >Add solution group</span
-      > to get started.
-    </div>
-  {/if}
+  </div>
 </div>
