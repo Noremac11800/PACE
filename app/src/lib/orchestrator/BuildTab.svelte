@@ -14,6 +14,7 @@
   import { settings, DEFAULT_BUILD_TAB_SETTINGS } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { commandStatus, setBuildingStatus } from "./command-status.svelte";
+  import CopyButton from "$lib/components/CopyButton.svelte";
 
   const FRAMEWORKS = [
     { id: "net10.0-android", label: "Android" },
@@ -601,12 +602,15 @@
 
     <!-- Command preview -->
     <div class="card bg-surface-50-950 p-4">
-      <div class="flex items-center gap-2 mb-2">
-        <Terminal size={16} class="text-primary-500 shrink-0" />
-        <span
-          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-          >Command Preview</span
-        >
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2">
+          <Terminal size={16} class="text-primary-500 shrink-0" />
+          <span
+            class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
+            >Command Preview</span
+          >
+        </div>
+        <CopyButton text={commandPreview} />
       </div>
       <code
         class="block text-sm font-mono bg-surface-200-800 px-3 py-2 rounded break-all text-surface-900-100"

@@ -31,6 +31,7 @@
   import { saveSettings } from "$lib/app-init";
   import { configStore } from "$lib/config-store.svelte";
   import { setUploadingStatus } from "./command-status.svelte";
+  import CopyButton from "$lib/components/CopyButton.svelte";
 
   async function openStorageEndpoint() {
     let url = settings.general.storageEndpointUrl;
@@ -650,13 +651,16 @@
             {@const Icon = getPlatformIcon(pkg.platform)}
             <div class="flex flex-col gap-1">
               <div
-                class="text-xs font-medium text-surface-600-400 flex items-center gap-2"
+                class="text-xs font-medium text-surface-600-400 flex items-center justify-between"
               >
-                <Icon size={12} />
-                <span>{pkg.name}</span>
-                <span class="text-surface-500-400"
-                  >({pkg.platform} {pkg.buildConfig})</span
-                >
+                <div class="flex items-center gap-2">
+                  <Icon size={12} />
+                  <span>{pkg.name}</span>
+                  <span class="text-surface-500-400"
+                    >({pkg.platform} {pkg.buildConfig})</span
+                  >
+                </div>
+                <CopyButton text={command} />
               </div>
               <code
                 class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"

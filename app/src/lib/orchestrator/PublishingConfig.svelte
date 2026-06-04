@@ -37,6 +37,7 @@
     buildCommandPreview,
   } from "./publishing.svelte";
   import { setPublishingStatus } from "./command-status.svelte";
+  import CopyButton from "$lib/components/CopyButton.svelte";
 
   const PLATFORMS = [
     { id: "ios" as const, label: "iOS", icon: Apple },
@@ -854,12 +855,15 @@
               {@const Icon = platformConfig?.icon}
               <div class="flex flex-col gap-1">
                 <div
-                  class="text-xs font-medium text-surface-600-400 flex items-center gap-2"
+                  class="text-xs font-medium text-surface-600-400 flex items-center justify-between"
                 >
-                  {#if Icon}
-                    <Icon size={12} />
-                  {/if}
-                  <span>{platformConfig?.label || platform}</span>
+                  <div class="flex items-center gap-2">
+                    {#if Icon}
+                      <Icon size={12} />
+                    {/if}
+                    <span>{platformConfig?.label || platform}</span>
+                  </div>
+                  <CopyButton text={command} />
                 </div>
                 <code
                   class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"
