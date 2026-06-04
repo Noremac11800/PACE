@@ -199,7 +199,13 @@
       "identifier": "fs:allow-read-dir",
       "allow": [
         {
-          "path": "*/**"
+          "path": "**/*"
+        },
+        {
+          "path": "$HOME/*"
+        },
+        {
+          "path": "$HOME/.pace/**"
         }
       ]
     },
@@ -215,7 +221,13 @@
       "identifier": "opener:allow-open-path",
       "allow": [
         {
-          "path": "*/**"
+          "path": "**/*"
+        },
+        {
+          "path": "$HOME/*"
+        },
+        {
+          "path": "$HOME/.pace/**"
         }
       ]
     },

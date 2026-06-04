@@ -175,7 +175,7 @@
           }
         }
       } catch (e) {
-        console.error("Error reading directory:", e);
+        // console.error("Error reading directory:", e);
       }
     }
 
