@@ -10,6 +10,7 @@
     Package,
     RefreshCw,
     FolderOpen,
+    Loader,
   } from "@lucide/svelte";
   import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import {
@@ -19,6 +20,7 @@
     getActiveConfigPath,
   } from "$lib/config-store.svelte";
   import { settings } from "$lib/settings.svelte";
+  import { commandStatus } from "$lib/orchestrator/command-status.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
   import BuildTab from "$lib/orchestrator/BuildTab.svelte";
   import DeployTab from "$lib/orchestrator/DeployTab.svelte";
@@ -128,6 +130,10 @@
   >
     {#each tabs as tab}
       {@const Icon = tab.icon}
+      {@const isBuildRunning = tab.id === "build" && commandStatus.isBuilding}
+      {@const isDeployRunning =
+        tab.id === "deploy" &&
+        (commandStatus.isPublishing || commandStatus.isUploading)}
       <button
         class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap {activeTab ===
         tab.id
@@ -135,7 +141,11 @@
           : 'text-surface-600-400 hover:text-surface-900-100 hover:bg-surface-100-900/30'}"
         onclick={() => (activeTab = tab.id)}
       >
-        <Icon size={16} />
+        {#if isBuildRunning || isDeployRunning}
+          <Loader size={16} class="animate-spin text-primary-500" />
+        {:else}
+          <Icon size={16} />
+        {/if}
         {tab.label}
       </button>
     {/each}

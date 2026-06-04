@@ -11,10 +11,15 @@
     TriangleAlert,
     Check,
     Cog,
+    Loader,
   } from "@lucide/svelte";
   import { View } from "$lib/panels/view-types";
   import { updateStatus } from "$lib/update-status.svelte";
   import { theme } from "$lib/theme";
+  import {
+    commandStatus,
+    isAnyCommandRunning,
+  } from "$lib/orchestrator/command-status.svelte";
 
   interface Props {
     activeView: View;
@@ -80,12 +85,16 @@
   <button
     class="btn {activeView === View.ORCHESTRATOR
       ? 'preset-filled-primary-500'
-      : 'preset-tonal'} p-2"
+      : 'preset-tonal'} p-2 relative"
     onclick={() => (activeView = View.ORCHESTRATOR)}
     title="Orchestrator"
     disabled={!paceReady}
   >
-    <Cog size={20} />
+    {#if isAnyCommandRunning()}
+      <Loader size={20} class="animate-spin" />
+    {:else}
+      <Cog size={20} />
+    {/if}
   </button>
   <button
     class="btn {activeView === View.CONSOLE

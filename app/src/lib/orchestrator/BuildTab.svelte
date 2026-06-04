@@ -13,6 +13,7 @@
   import { configStore, paceArgs } from "$lib/config-store.svelte";
   import { settings, DEFAULT_BUILD_TAB_SETTINGS } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
+  import { commandStatus, setBuildingStatus } from "./command-status.svelte";
 
   const FRAMEWORKS = [
     { id: "net10.0-android", label: "Android" },
@@ -271,6 +272,7 @@
     resetOutput();
     startTimer();
     isRunning = true;
+    setBuildingStatus(true);
     progress = 0;
     progressLabel = "Starting...";
 
@@ -319,6 +321,7 @@
     } finally {
       stopTimer();
       isRunning = false;
+      setBuildingStatus(false);
       currentProcess = null;
     }
   }
@@ -330,6 +333,7 @@
     progressLabel = "Cancelled";
     progress = 100;
     isRunning = false;
+    setBuildingStatus(false);
     currentProcess = null;
   }
 

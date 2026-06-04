@@ -36,6 +36,7 @@
     parseAndroidCodesignInfo,
     buildCommandPreview,
   } from "./publishing.svelte";
+  import { setPublishingStatus } from "./command-status.svelte";
 
   const PLATFORMS = [
     { id: "ios" as const, label: "iOS", icon: Apple },
@@ -325,6 +326,7 @@
     resetOutput();
     startTimer();
     isRunning = true;
+    setPublishingStatus(true);
     currentPlatformIndex = 0;
     progress = 0;
 
@@ -381,6 +383,7 @@
     } finally {
       stopTimer();
       isRunning = false;
+      setPublishingStatus(false);
       currentProcess = null;
     }
   }
@@ -392,6 +395,7 @@
     progressLabel = "Cancelled";
     progress = 100;
     isRunning = false;
+    setPublishingStatus(false);
     currentProcess = null;
   }
 

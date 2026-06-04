@@ -30,6 +30,7 @@
   } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { configStore } from "$lib/config-store.svelte";
+  import { setUploadingStatus } from "./command-status.svelte";
 
   async function openStorageEndpoint() {
     let url = settings.general.storageEndpointUrl;
@@ -273,6 +274,7 @@
       currentProcess = null;
     }
     isUploading = false;
+    setUploadingStatus(false);
     addLine("Upload cancelled", "err");
   }
 
@@ -288,6 +290,7 @@
 
     resetOutput();
     isUploading = true;
+    setUploadingStatus(true);
 
     // Initialize upload statuses
     uploadStatuses = {};
@@ -314,6 +317,7 @@
     await Promise.all(uploadPromises);
 
     isUploading = false;
+    setUploadingStatus(false);
     currentProcess = null;
   }
 
