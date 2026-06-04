@@ -545,6 +545,13 @@
                   <div class="text-xs text-surface-500-400">
                     {getApiPlatform(pkg.platform)} • {pkg.buildConfig}
                   </div>
+                  <div
+                    class="text-xs text-surface-500-400 truncate"
+                    style="direction: rtl; text-align: left;"
+                    title={pkg.path}
+                  >
+                    {pkg.path}
+                  </div>
                 </div>
               </button>
               <button
