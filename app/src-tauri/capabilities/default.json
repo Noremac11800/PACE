@@ -206,6 +206,9 @@
         },
         {
           "path": "$HOME/.pace/**"
+        },
+        {
+          "path": "$HOME/.nuget/**"
         }
       ]
     },
@@ -228,6 +231,9 @@
         },
         {
           "path": "$HOME/.pace/**"
+        },
+        {
+          "path": "$HOME/.nuget/**"
         }
       ]
     },

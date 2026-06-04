@@ -205,8 +205,6 @@ export function buildPublishCommand(options: PublishOptions): string[] {
     framework,
     "--self-contained",
     "/p:DistributionMethod=enterprise",
-    "/p:DevSolution=true",
-    "/p:AllSolution=true",
     "/p:ArchiveOnBuild=true",
   ];
 
@@ -240,7 +238,7 @@ export async function buildCommandPreview(
   androidCodesignInfo: AndroidCodesignInfo | undefined,
 ): Promise<string> {
   const runtimeArg = platform !== "windows" ? ` --runtime ${runtime}` : "";
-  let preview = `dotnet publish ${csprojPath} -c ${buildConfig}${runtimeArg} --framework ${framework} --self-contained /p:DistributionMethod=enterprise /p:DevSolution=true /p:AllSolution=true /p:ArchiveOnBuild=true`;
+  let preview = `dotnet publish ${csprojPath} -c ${buildConfig}${runtimeArg} --framework ${framework} --self-contained /p:DistributionMethod=enterprise /p:ArchiveOnBuild=true`;
 
   // Add --no-restore if enabled
   if (noRestore) {

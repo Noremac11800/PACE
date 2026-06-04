@@ -15,7 +15,9 @@
     Check,
     X,
     Loader,
+    FolderOpen,
   } from "@lucide/svelte";
+  import { open } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
   import {
     settings,
@@ -55,6 +57,12 @@
   let windowsKey = $state(settings.publishTab.windowsKey);
   let androidKey = $state(settings.publishTab.androidKey);
   let noRestore = $state(settings.publishTab.noRestore ?? false);
+
+  let msbuildProps = $state<Record<string, string>>({
+    ...settings.publishTab.msbuildProps,
+  });
+
+  const buildProps = $derived(configStore.activeConfig?.build_props ?? []);
 
   let settingsInitialized = $state(false);
 
@@ -103,6 +111,7 @@
       windowsKey,
       androidKey,
       noRestore,
+      msbuildProps: { ...msbuildProps },
     };
     untrack(() => {
       settings.publishTab = snapshot;
@@ -129,6 +138,14 @@
     windowsKey = d.windowsKey;
     androidKey = d.androidKey;
     noRestore = d.noRestore ?? false;
+    msbuildProps = {};
+  }
+
+  async function pickPath(propName: string) {
+    const selected = await open({ directory: true, multiple: false });
+    if (selected && typeof selected === "string") {
+      msbuildProps = { ...msbuildProps, [propName]: selected };
+    }
   }
 
   // Load Android codesign info when key changes
@@ -242,14 +259,20 @@
       framework,
       "--self-contained",
       "/p:DistributionMethod=enterprise",
-      "/p:DevSolution=true",
-      "/p:AllSolution=true",
       "/p:ArchiveOnBuild=true",
     ];
 
     // Add --no-restore if enabled
     if (noRestore) {
       publishArgs.push("--no-restore");
+    }
+
+    // Add MSBuild properties from config
+    for (const prop of buildProps) {
+      const val = msbuildProps[prop.name];
+      const effective = val !== undefined ? val : String(prop.default);
+      if (effective !== "" && effective !== String(prop.default))
+        publishArgs.push(`-p:${prop.name}=${effective}`);
     }
 
     // Add Android-specific params for Debug builds
@@ -396,12 +419,14 @@
     const signInfo = androidCodesignInfo;
     const bc = buildConfig;
     const nr = noRestore;
+    const props = buildProps;
+    const msbProps = { ...msbuildProps };
 
     Promise.all(
       platforms.map(async (platform) => {
         const runtime = getRuntimeForPlatform(platform);
         const framework = getFrameworkForPlatform(platform);
-        const command = await buildCommandPreview(
+        let command = await buildCommandPreview(
           csprojPath,
           bc,
           runtime,
@@ -414,6 +439,13 @@
           wKey,
           signInfo,
         );
+        // Add MSBuild properties to preview
+        for (const prop of props) {
+          const val = msbProps[prop.name];
+          const effective = val !== undefined ? val : String(prop.default);
+          if (effective !== "" && effective !== String(prop.default))
+            command += ` -p:${prop.name}=${effective}`;
+        }
         return { platform, command };
       }),
     ).then((previews) => {
@@ -529,6 +561,117 @@
         </div>
       </div>
     </div>
+
+    <!-- MSBuild Properties -->
+    {#if buildProps.length > 0}
+      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+        <span class="font-semibold text-surface-900-100 text-sm"
+          >MSBuild Properties</span
+        >
+
+        {#each buildProps as prop}
+          {#if prop.datatype === "boolean"}
+            {@const val =
+              msbuildProps[prop.name] !== undefined
+                ? msbuildProps[prop.name] === "true"
+                : prop.default === true || prop.default === "true"}
+            <label
+              class="flex items-center gap-3 cursor-pointer group"
+              for="msbuild-{prop.name}"
+            >
+              <div
+                role="checkbox"
+                aria-checked={val}
+                tabindex="0"
+                id="msbuild-{prop.name}"
+                class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {val
+                  ? 'bg-primary-500'
+                  : 'bg-surface-300-700'}"
+                onclick={() =>
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: val ? "false" : "true",
+                  })}
+                onkeydown={(e) =>
+                  e.key === " " &&
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: val ? "false" : "true",
+                  })}
+              >
+                <div
+                  class="w-4 h-4 rounded-full bg-white shadow transition-transform {val
+                    ? 'translate-x-4'
+                    : 'translate-x-0'}"
+                ></div>
+              </div>
+              <span
+                class="text-sm font-mono text-surface-900-100 group-hover:text-primary-500 transition-colors"
+                >{prop.name}</span
+              >
+              <span
+                class="text-xs ml-auto {val
+                  ? 'text-primary-400'
+                  : 'text-surface-500-400'}">{val ? "true" : "false"}</span
+              >
+            </label>
+          {:else if prop.datatype === "path"}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="msbuild-{prop.name}"
+              >
+                {prop.name}
+              </label>
+              <div class="input-group grid grid-cols-[1fr_auto]">
+                <input
+                  id="msbuild-{prop.name}"
+                  class="ig-input font-mono text-sm"
+                  type="text"
+                  placeholder="{String(prop.default) ||
+                    '/path/to/dir'} (optional)"
+                  value={msbuildProps[prop.name] ?? String(prop.default)}
+                  oninput={(e) =>
+                    (msbuildProps = {
+                      ...msbuildProps,
+                      [prop.name]: (e.target as HTMLInputElement).value,
+                    })}
+                />
+                <button
+                  class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
+                  type="button"
+                  onclick={() => pickPath(prop.name)}
+                  title="Browse"
+                >
+                  <FolderOpen size={16} />
+                </button>
+              </div>
+            </div>
+          {:else}
+            <div class="flex flex-col gap-1">
+              <label
+                class="text-xs font-medium text-surface-600-400"
+                for="msbuild-{prop.name}"
+              >
+                {prop.name}
+              </label>
+              <input
+                id="msbuild-{prop.name}"
+                class="input font-mono text-sm"
+                type="text"
+                placeholder={String(prop.default) || "(optional)"}
+                value={msbuildProps[prop.name] ?? String(prop.default)}
+                oninput={(e) =>
+                  (msbuildProps = {
+                    ...msbuildProps,
+                    [prop.name]: (e.target as HTMLInputElement).value,
+                  })}
+              />
+            </div>
+          {/if}
+        {/each}
+      </div>
+    {/if}
 
     <!-- Codesigning Configuration -->
     {#if selectedPlatforms.length > 0}

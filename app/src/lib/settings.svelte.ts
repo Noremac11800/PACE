@@ -24,6 +24,7 @@ export interface PublishTabSettings {
   windowsKey: string;
   androidKey: string;
   noRestore: boolean;
+  msbuildProps: Record<string, string>;
 }
 
 export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
@@ -34,6 +35,7 @@ export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
   windowsKey: "*",
   androidKey: "*",
   noRestore: false,
+  msbuildProps: {},
 };
 
 export interface UploadTabSettings {
