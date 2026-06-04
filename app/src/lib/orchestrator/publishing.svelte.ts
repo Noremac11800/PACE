@@ -112,6 +112,8 @@ export async function getCodesigningParams(
       if (windowsKey) {
         const config = codesigningConfig.windows[windowsKey];
         if (config?.PackageCertificateThumbprint) {
+          params.push("/p:AppxPackageSigningEnabled=true");
+          params.push("/p:WindowsPackageType=MSIX");
           params.push(
             `/p:PackageCertificateThumbprint=${config.PackageCertificateThumbprint}`,
           );
@@ -234,6 +236,7 @@ export async function buildCommandPreview(
   codesigningConfig: CodesigningData,
   androidKey: string | undefined,
   iosBundleId: string | undefined,
+  windowsKey: string | undefined,
   androidCodesignInfo: AndroidCodesignInfo | undefined,
 ): Promise<string> {
   let preview = `dotnet publish ${csprojPath} -c ${buildConfig} --runtime ${runtime} --framework ${framework} --self-contained /p:DistributionMethod=enterprise /p:DevSolution=${buildConfig === "Debug" ? "true" : "false"} /p:ArchiveOnBuild=true`;
@@ -274,6 +277,15 @@ export async function buildCommandPreview(
     }
     if (androidCodesignInfo?.StorePass) {
       preview += ` /p:AndroidSigningStorePass=${androidCodesignInfo.StorePass}`;
+    }
+  }
+
+  if (platform === "windows" && windowsKey) {
+    const config = codesigningConfig.windows[windowsKey];
+    if (config?.PackageCertificateThumbprint) {
+      preview += " /p:AppxPackageSigningEnabled=true";
+      preview += " /p:WindowsPackageType=MSIX";
+      preview += ` /p:PackageCertificateThumbprint=${config.PackageCertificateThumbprint}`;
     }
   }
 

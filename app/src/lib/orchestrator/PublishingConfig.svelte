@@ -372,9 +372,14 @@
     currentProcess = null;
   }
 
-  // Command preview data structure for UI rendering
-  const commandPreviews = $derived.by(() => {
-    if (!selectedProject || selectedPlatforms.length === 0) return [];
+  // Command previews as async state+effect to support path expansion
+  let commandPreviews = $state<{ platform: Platform; command: string }[]>([]);
+
+  $effect(() => {
+    if (!selectedProject || selectedPlatforms.length === 0) {
+      commandPreviews = [];
+      return;
+    }
 
     const project = projects.find((p) => p.name === selectedProject);
     const repodir = configStore.activeConfig?.repodir ?? "<repodir>";
@@ -382,12 +387,38 @@
       ? `${repodir}/${project.name}/${project.csproj_path}`
       : "<csproj_path>";
 
-    // For multiple platforms, we can't easily show async previews in $derived
-    // So we'll return the structure and let the UI handle single preview or summary
-    return orderedSelectedPlatforms.map((platform) => ({
-      platform,
-      csprojPath,
-    }));
+    // Capture reactive deps before async
+    const platforms = [...orderedSelectedPlatforms];
+    const config = codesigningConfig;
+    const aKey = androidKey;
+    const iKey = iosBundleId;
+    const wKey = windowsKey;
+    const signInfo = androidCodesignInfo;
+    const bc = buildConfig;
+    const nr = noRestore;
+
+    Promise.all(
+      platforms.map(async (platform) => {
+        const runtime = getRuntimeForPlatform(platform);
+        const framework = getFrameworkForPlatform(platform);
+        const command = await buildCommandPreview(
+          csprojPath,
+          bc,
+          runtime,
+          framework,
+          nr,
+          platform,
+          config,
+          aKey,
+          iKey,
+          wKey,
+          signInfo,
+        );
+        return { platform, command };
+      }),
+    ).then((previews) => {
+      commandPreviews = previews;
+    });
   });
 
   const progressBarColor = $derived.by(() => {
@@ -533,28 +564,45 @@
           {/if}
 
           {#if selectedPlatforms.includes("windows")}
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-xs font-medium text-surface-600-400"
-                for="windows-cert">Windows Cert</label
-              >
-              <div class="relative">
-                <select
-                  id="windows-cert"
-                  bind:value={windowsKey}
-                  class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                  style="background-image:none"
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-1">
+                <label
+                  class="text-xs font-medium text-surface-600-400"
+                  for="windows-cert">Windows Cert</label
                 >
-                  <option value="*">— Default (*) —</option>
-                  {#each windowsKeys.filter((k) => k !== "*") as key}
-                    <option value={key}>{key}</option>
-                  {/each}
-                </select>
-                <ChevronDown
-                  size={14}
-                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-                />
+                <div class="relative">
+                  <select
+                    id="windows-cert"
+                    bind:value={windowsKey}
+                    class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
+                    style="background-image:none"
+                  >
+                    <option value="*">— Default (*) —</option>
+                    {#each windowsKeys.filter((k) => k !== "*") as key}
+                      <option value={key}>{key}</option>
+                    {/each}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
+                  />
+                </div>
               </div>
+              {#if windowsKey && windowsKey !== "*"}
+                {@const config = codesigningConfig.windows[windowsKey]}
+                <div class="flex flex-col gap-1 text-xs">
+                  <span class="font-medium text-surface-600-400"
+                    >Thumbprint</span
+                  >
+                  <span
+                    class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 font-mono break-all {config?.PackageCertificateThumbprint
+                      ? 'text-surface-900-100'
+                      : 'text-surface-500-400 italic'}"
+                  >
+                    {config?.PackageCertificateThumbprint || "Not configured"}
+                  </span>
+                </div>
+              {/if}
             </div>
           {/if}
 
@@ -651,7 +699,7 @@
           </div>
         {:else}
           <div class="flex flex-col gap-3">
-            {#each commandPreviews as { platform, csprojPath }}
+            {#each commandPreviews as { platform, command }}
               {@const PLATFORMS_ = PLATFORMS}
               {@const platformConfig = PLATFORMS_.find(
                 (p) => p.id === platform,
@@ -669,10 +717,7 @@
                 <code
                   class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"
                 >
-                  dotnet publish {csprojPath} -c {buildConfig} --runtime {getRuntimeForPlatform(
-                    platform,
-                  )} --framework {getFrameworkForPlatform(platform)} --self-contained
-                  /p:DistributionMethod=enterprise /p:ArchiveOnBuild=true
+                  {command}
                 </code>
               </div>
             {/each}
