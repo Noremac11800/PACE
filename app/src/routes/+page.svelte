@@ -18,6 +18,7 @@
   import { onMount } from "svelte";
 
   let activeView: View = $state(View.HOME);
+  let previousView: View | null = $state(null);
 
   onMount(() => {
     checkPaceInstalled();
@@ -61,28 +62,48 @@
   <Sidebar bind:activeView paceInstalledStatus={paceStatus.installed} />
 
   <!-- Main Content -->
-  <div class="relative min-h-0 bg-surface-100-900/25 overflow-auto">
-    {#if activeView === View.HOME}
+  <div class="relative min-h-0 bg-surface-100-900/25 overflow-hidden">
+    <div class="absolute inset-0" class:hidden={activeView !== View.HOME}>
       <HomePanel onGoToPanel={(view) => (activeView = view)} />
-    {:else if activeView === View.DEPENDENCIES}
+    </div>
+    <div
+      class="absolute inset-0"
+      class:hidden={activeView !== View.DEPENDENCIES}
+    >
       <DependenciesPanel />
-    {:else if activeView === View.DIRECTORY_BUILD_PROPS}
+    </div>
+    <div
+      class="absolute inset-0"
+      class:hidden={activeView !== View.DIRECTORY_BUILD_PROPS}
+    >
       <DirectoryBuildPropsPanel />
-    {:else if activeView === View.PROJECT_GRAPH}
-      <ProjectGraphPanel />
-    {:else if activeView === View.ORCHESTRATOR}
-      <OrchestratorPanel />
-    {:else if activeView === View.CONSOLE}
-      <ConsolePanel />
-    {:else if activeView === View.SETTINGS}
-      <SettingsPanel />
-    {:else if activeView === View.HELP}
-      <HelpPanel />
-    {:else if activeView === View.ABOUT}
-      <AboutPanel />
-    {:else if activeView === View.UPDATES}
-      <UpdatesPanel />
+    </div>
+    {#if activeView === View.PROJECT_GRAPH}
+      <div class="absolute inset-0">
+        <ProjectGraphPanel />
+      </div>
     {/if}
+    <div
+      class="absolute inset-0"
+      class:hidden={activeView !== View.ORCHESTRATOR}
+    >
+      <OrchestratorPanel />
+    </div>
+    <div class="absolute inset-0" class:hidden={activeView !== View.CONSOLE}>
+      <ConsolePanel />
+    </div>
+    <div class="absolute inset-0" class:hidden={activeView !== View.SETTINGS}>
+      <SettingsPanel />
+    </div>
+    <div class="absolute inset-0" class:hidden={activeView !== View.HELP}>
+      <HelpPanel />
+    </div>
+    <div class="absolute inset-0" class:hidden={activeView !== View.ABOUT}>
+      <AboutPanel />
+    </div>
+    <div class="absolute inset-0" class:hidden={activeView !== View.UPDATES}>
+      <UpdatesPanel />
+    </div>
   </div>
 
   <!-- Footer -->

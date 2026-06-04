@@ -33,14 +33,54 @@
   let activeSection = $state("general");
   let tocOpen = $state(true);
   let initialized = $state(false);
+  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  // Explicitly track all settings values for reactivity
   $effect(() => {
-    JSON.stringify(settings);
+    // Track general settings
+    const theme = settings.general.theme;
+    const language = settings.general.language;
+    const autoCheckUpdates = settings.general.autoCheckUpdates;
+    const storageEndpointUrl = settings.general.storageEndpointUrl;
+
+    // Track appearance settings
+    const fontSize = settings.appearance.fontSize;
+    const compactMode = settings.appearance.compactMode;
+
+    // Track CLI paths
+    const paceCliPath = settings.cliPaths.paceCliPath;
+    const gitPath = settings.cliPaths.gitPath;
+    const dotnetPath = settings.cliPaths.dotnetPath;
+
+    // Track project defaults
+    const defaultSolutionDirectory =
+      settings.projectDefaults.defaultSolutionDirectory;
+    const defaultBranch = settings.projectDefaults.defaultBranch;
+
+    // Track tab settings
+    const buildTab = { ...settings.buildTab };
+    const publishTab = { ...settings.publishTab };
+    const uploadTab = { ...settings.uploadTab };
+
+    // Track last active config
+    const lastActiveConfig = settings.lastActiveConfig;
+
     if (!initialized) {
       initialized = true;
       return;
     }
-    saveSettings();
+
+    // Clear any pending save
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+
+    // Debounce the save
+    saveTimeout = setTimeout(() => {
+      saveSettings().catch((err) => {
+        console.error("[SettingsPanel] Failed to save settings:", err);
+      });
+    }, 300);
   });
 
   function scrollTo(id: string) {
