@@ -237,13 +237,13 @@
       csprojPath,
       "-c",
       buildConfig,
-      "--runtime",
-      runtime,
+      ...(platform !== "windows" ? ["--runtime", runtime] : []),
       "--framework",
       framework,
       "--self-contained",
       "/p:DistributionMethod=enterprise",
-      "/p:DevSolution=" + (buildConfig === "Debug" ? "true" : "false"),
+      "/p:DevSolution=true",
+      "/p:AllSolution=true",
       "/p:ArchiveOnBuild=true",
     ];
 

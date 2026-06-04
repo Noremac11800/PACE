@@ -199,13 +199,7 @@
       "identifier": "fs:allow-read-dir",
       "allow": [
         {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "$HOME/.pace/**"
-        },
-        {
-          "path": "$HOME/.nuget/**"
+          "path": "*/**"
         }
       ]
     },
@@ -221,13 +215,7 @@
       "identifier": "opener:allow-open-path",
       "allow": [
         {
-          "path": "$HOME/.pace"
-        },
-        {
-          "path": "$HOME/.pace/**"
-        },
-        {
-          "path": "$HOME/**"
+          "path": "*/**"
         }
       ]
     },

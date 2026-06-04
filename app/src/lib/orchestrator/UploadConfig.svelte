@@ -21,7 +21,7 @@
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
   import { openPath } from "@tauri-apps/plugin-opener";
-  import { dirname } from "@tauri-apps/api/path";
+  import { dirname, join } from "@tauri-apps/api/path";
   import {
     settings,
     DEFAULT_UPLOAD_TAB_SETTINGS,
@@ -123,80 +123,68 @@
     scanningPackages = true;
     const packages: PackageFile[] = [];
 
-    // Get the directory containing the .csproj file
-    const csprojDir = project.csproj_path.substring(
-      0,
-      project.csproj_path.lastIndexOf("/"),
-    );
-    const projectPath = `${repodir}/${selectedProject}/${csprojDir}`;
+    // Get the project directory (where .csproj is located)
+    const csprojDir = await dirname(project.csproj_path);
+    const projectPath = await join(repodir, selectedProject, csprojDir);
 
-    // Recursive function to search directories for package files
-    async function searchDirectory(
-      dirPath: string,
-      platform: Platform,
-      buildConfig: BuildConfig,
-    ) {
-      try {
-        const entries = await readDir(dirPath);
-        for (const entry of entries) {
-          const entryPath = `${dirPath}/${entry.name}`;
-          if (entry.isFile) {
-            const name = entry.name?.toLowerCase() || "";
-            if (
-              name.endsWith(".ipa") ||
-              name.endsWith(".msix") ||
-              name.endsWith(".apk")
-            ) {
-              // Only include files that are in a publish/ directory
-              if (entryPath.includes("/publish/")) {
-                packages.push({
-                  name: entry.name!,
-                  path: entryPath,
-                  platform,
-                  buildConfig,
-                });
-              }
-            }
-          } else if (entry.isDirectory) {
-            // Recursively search subdirectories
-            await searchDirectory(entryPath, platform, buildConfig);
-          }
-        }
-      } catch (e) {
-        // Directory doesn't exist or can't be read, skip silently
-      }
-    }
-
-    // Detect platform from directory name
-    function detectPlatform(dirName: string): Platform | null {
-      const lower = dirName.toLowerCase();
-      if (lower.includes("ios")) return "ios";
-      if (lower.includes("android")) return "android";
-      if (lower.includes("windows") || lower.includes("win")) return "windows";
+    // Detect platform from file extension
+    function detectPlatformFromExtension(filename: string): Platform | null {
+      const lower = filename.toLowerCase();
+      if (lower.endsWith(".ipa")) return "ios";
+      if (lower.endsWith(".apk")) return "android";
+      if (lower.endsWith(".msix")) return "windows";
       return null;
     }
 
-    // Search bin/Debug and bin/Release recursively
-    const buildConfigs = ["Debug", "Release"] as const;
+    // Detect build config from path
+    function detectBuildConfigFromPath(path: string): BuildConfig {
+      const lower = path.toLowerCase();
+      if (lower.includes("debug")) return "Debug";
+      if (lower.includes("release")) return "Release";
+      return "Release"; // Default
+    }
 
-    for (const buildConfig of buildConfigs) {
-      const basePath = `${projectPath}/bin/${buildConfig}`;
+    // Function to search for package files with max depth
+    async function searchDirectory(
+      dirPath: string,
+      maxDepth: number,
+      currentDepth = 0,
+    ) {
+      if (currentDepth >= maxDepth) return;
 
       try {
-        const entries = await readDir(basePath);
+        const entries = await readDir(dirPath);
         for (const entry of entries) {
-          if (entry.isDirectory) {
-            const platform = detectPlatform(entry.name);
+          const entryPath = await join(dirPath, entry.name);
+          if (entry.isFile) {
+            const name = entry.name || "";
+            // Detect platform from file extension
+            const platform = detectPlatformFromExtension(name);
             if (platform) {
-              const platformPath = `${basePath}/${entry.name}`;
-              await searchDirectory(platformPath, platform, buildConfig);
+              const buildConfig = detectBuildConfigFromPath(entryPath);
+              packages.push({
+                name: entry.name!,
+                path: entryPath,
+                platform,
+                buildConfig,
+              });
             }
+          } else if (entry.isDirectory) {
+            // Recursively search subdirectories
+            await searchDirectory(entryPath, maxDepth, currentDepth + 1);
           }
         }
       } catch (e) {
-        // bin/Debug or bin/Release doesn't exist, skip
+        console.error("Error reading directory:", e);
       }
     }
+
+    // Search bin/ with depth 5 and AppPackages/ with depth 2
+    const binPath = await join(projectPath, "bin");
+    const appPackagesPath = await join(projectPath, "AppPackages");
+
+    await searchDirectory(binPath, 5);
+    await searchDirectory(appPackagesPath, 2);
 
     availablePackages = packages.sort((a, b) => {
       // Sort by build config (Release first), then platform
