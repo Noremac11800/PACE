@@ -5,6 +5,9 @@
     FolderOpen,
     ChevronDown,
     ChevronRight,
+    Download,
+    ArrowDownFromLine,
+    Loader,
   } from "@lucide/svelte";
   import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import { untrack } from "svelte";
@@ -14,11 +17,16 @@
     gitStatusStore,
     getGitStatus,
     isLoadingGit,
+    clearGitStatuses,
   } from "$lib/git-status.svelte";
+  import { Command } from "@tauri-apps/plugin-shell";
+  import { paceArgs } from "$lib/config-store.svelte";
   import ProjectGitStatusRow from "$lib/orchestrator/ProjectGitStatusRow.svelte";
   import type { PaceProject } from "$lib/pace-config";
 
   let refreshing = $state(false);
+  let cloning = $state(false);
+  let pulling = $state(false);
   let expandedGroups = $state<Set<string>>(new Set());
   let hasLoaded = $state(false);
 
@@ -77,9 +85,42 @@
 
   async function refreshAll() {
     if (!configStore.activeConfig || refreshing) return;
+    clearGitStatuses();
     refreshing = true;
     await loadGitStatuses(configStore.activeConfig);
     refreshing = false;
+  }
+
+  async function runGitClone() {
+    if (!configStore.activeConfig || cloning || pulling) return;
+    clearGitStatuses();
+    cloning = true;
+    try {
+      const allArgs = await paceArgs(["git", "clone"]);
+      const cmd = Command.create("pace", allArgs);
+      await cmd.execute();
+    } catch (e) {
+      console.error("Git clone failed:", e);
+    } finally {
+      cloning = false;
+      await loadGitStatuses(configStore.activeConfig);
+    }
+  }
+
+  async function runGitPull() {
+    if (!configStore.activeConfig || cloning || pulling) return;
+    clearGitStatuses();
+    pulling = true;
+    try {
+      const allArgs = await paceArgs(["git", "pull"]);
+      const cmd = Command.create("pace", allArgs);
+      await cmd.execute();
+    } catch (e) {
+      console.error("Git pull failed:", e);
+    } finally {
+      pulling = false;
+      await loadGitStatuses(configStore.activeConfig);
+    }
   }
 
   async function openRepoFolder(project: PaceProject) {
@@ -121,7 +162,19 @@
           >
             {summary.total} repos
           </span>
-          {#if summary.loading > 0}
+          {#if cloning}
+            <span
+              class="px-2 py-0.5 rounded bg-primary-500/10 text-primary-500"
+            >
+              Cloning...
+            </span>
+          {:else if pulling}
+            <span
+              class="px-2 py-0.5 rounded bg-primary-500/10 text-primary-500"
+            >
+              Pulling...
+            </span>
+          {:else if summary.loading > 0}
             <span
               class="px-2 py-0.5 rounded bg-primary-500/10 text-primary-500"
             >
@@ -144,14 +197,44 @@
         </div>
       {/if}
     </div>
-    <button
-      class="btn preset-tonal p-2 hover:preset-filled-primary-500 transition-colors"
-      onclick={refreshAll}
-      disabled={refreshing || !configStore.activeConfig}
-      title="Refresh all git statuses"
-    >
-      <RefreshCw size={16} class={refreshing ? "animate-spin" : ""} />
-    </button>
+    <div class="flex items-center gap-2">
+      <button
+        class="btn preset-tonal flex items-center gap-2 px-3 py-2 hover:preset-filled-primary-500 transition-colors"
+        onclick={runGitClone}
+        disabled={cloning || pulling || !configStore.activeConfig}
+        title="Clone all missing repositories"
+      >
+        {#if cloning}
+          <Loader size={16} class="animate-spin" />
+          <span class="text-sm">Cloning...</span>
+        {:else}
+          <Download size={16} />
+          <span class="text-sm">Clone</span>
+        {/if}
+      </button>
+      <button
+        class="btn preset-tonal flex items-center gap-2 px-3 py-2 hover:preset-filled-primary-500 transition-colors"
+        onclick={runGitPull}
+        disabled={cloning || pulling || !configStore.activeConfig}
+        title="Pull all repositories"
+      >
+        {#if pulling}
+          <Loader size={16} class="animate-spin" />
+          <span class="text-sm">Pulling...</span>
+        {:else}
+          <ArrowDownFromLine size={16} />
+          <span class="text-sm">Pull</span>
+        {/if}
+      </button>
+      <button
+        class="btn preset-tonal p-2 hover:preset-filled-primary-500 transition-colors"
+        onclick={refreshAll}
+        disabled={refreshing || cloning || pulling || !configStore.activeConfig}
+        title="Refresh all git statuses"
+      >
+        <RefreshCw size={16} class={refreshing ? "animate-spin" : ""} />
+      </button>
+    </div>
   </div>
 
   <!-- Content -->

@@ -13,9 +13,11 @@ export const gitStatusStore: GitStatusState = $state({
 export async function loadGitStatuses(config: PaceConfig): Promise<void> {
   const projectsWithRepo = config.projects.filter(p => p.repo_url);
   
-  for (const project of projectsWithRepo) {
-    gitStatusStore.loading = new Set(gitStatusStore.loading).add(project.name);
-    
+  // Mark all projects as loading
+  gitStatusStore.loading = new Set(projectsWithRepo.map(p => p.name));
+  
+  // Run all checks in parallel
+  const promises = projectsWithRepo.map(async (project) => {
     try {
       const status = await checkProjectGitStatus(project, config.repodir);
       gitStatusStore.statuses = new Map(gitStatusStore.statuses).set(project.name, status);
@@ -26,7 +28,9 @@ export async function loadGitStatuses(config: PaceConfig): Promise<void> {
       next.delete(project.name);
       gitStatusStore.loading = next;
     }
-  }
+  });
+  
+  await Promise.allSettled(promises);
 }
 
 export function getGitStatus(project: PaceProject): ProjectGitStatus | undefined {
