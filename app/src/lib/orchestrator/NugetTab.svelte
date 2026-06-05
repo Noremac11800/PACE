@@ -14,6 +14,7 @@
     XCircle,
     AlertCircle,
     Loader,
+    Trash2,
   } from "@lucide/svelte";
   import { configStore, saveConfig } from "$lib/config-store.svelte";
 
@@ -41,6 +42,10 @@
   let customCachePackages = $state<CachedPackage[]>([]);
   let customCacheLoading = $state(false);
   let customCacheError = $state<string | null>(null);
+
+  // Cleaning state
+  let defaultCacheCleaning = $state(false);
+  let customCacheCleaning = $state(false);
 
   let nugetConfigDir = $state<string>("");
 
@@ -261,6 +266,34 @@
     }
   }
 
+  async function cleanDefaultCache() {
+    if (defaultCacheCleaning) return;
+    defaultCacheCleaning = true;
+    try {
+      const cmd = Command.create("pace", ["clean", "--cache"]);
+      await cmd.execute();
+      await loadDefaultCachePackages();
+    } catch (e) {
+      console.error("Failed to clean default cache:", e);
+    } finally {
+      defaultCacheCleaning = false;
+    }
+  }
+
+  async function cleanCustomCache() {
+    if (customCacheCleaning || !customCachePath) return;
+    customCacheCleaning = true;
+    try {
+      const cmd = Command.create("pace", ["clean", "--custom-cache"]);
+      await cmd.execute();
+      await loadCustomCachePackages();
+    } catch (e) {
+      console.error("Failed to clean custom cache:", e);
+    } finally {
+      customCacheCleaning = false;
+    }
+  }
+
   onMount(async () => {
     loadSources();
     loadDefaultCachePackages();
@@ -388,7 +421,7 @@
         <button
           class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
           onclick={loadDefaultCachePackages}
-          disabled={defaultCacheLoading}
+          disabled={defaultCacheLoading || defaultCacheCleaning}
           title="Refresh packages"
         >
           <RefreshCw
@@ -396,6 +429,20 @@
             class={defaultCacheLoading ? "animate-spin" : ""}
           />
           Refresh
+        </button>
+        <button
+          class="btn preset-filled-error-500 flex items-center gap-1.5 text-xs py-1 px-2"
+          onclick={cleanDefaultCache}
+          disabled={defaultCacheCleaning || defaultCacheLoading}
+          title="Clean default cache"
+        >
+          {#if defaultCacheCleaning}
+            <Loader size={14} class="animate-spin" />
+            Cleaning...
+          {:else}
+            <Trash2 size={14} />
+            Clean
+          {/if}
         </button>
       </div>
     </div>
@@ -490,7 +537,7 @@
           <button
             class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
             onclick={loadCustomCachePackages}
-            disabled={customCacheLoading}
+            disabled={customCacheLoading || customCacheCleaning}
             title="Refresh packages"
           >
             <RefreshCw
@@ -498,6 +545,22 @@
               class={customCacheLoading ? "animate-spin" : ""}
             />
             Refresh
+          </button>
+          <button
+            class="btn preset-filled-error-500 flex items-center gap-1.5 text-xs py-1 px-2"
+            onclick={cleanCustomCache}
+            disabled={customCacheCleaning ||
+              customCacheLoading ||
+              !customCachePath}
+            title="Clean custom cache"
+          >
+            {#if customCacheCleaning}
+              <Loader size={14} class="animate-spin" />
+              Cleaning...
+            {:else}
+              <Trash2 size={14} />
+              Clean
+            {/if}
           </button>
         {/if}
       </div>

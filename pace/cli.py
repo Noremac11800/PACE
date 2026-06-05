@@ -120,7 +120,34 @@ def main() -> int:
 
     subparsers = parser.add_subparsers(dest="command", metavar="command")
 
-    subparsers.add_parser("clean", help="Delete build artifacts and NuGet cache for all projects")
+    clean_parser = subparsers.add_parser(
+        "clean", help="Delete build artifacts and NuGet cache for all projects"
+    )
+    clean_parser.add_argument(
+        "--cache",
+        action="store_true",
+        help="Clean NuGet packages from ~/.nuget/packages",
+        default=False,
+    )
+    clean_parser.add_argument(
+        "--custom-cache",
+        action="store_true",
+        help="Clean NuGet packages from the custom cache path configured in nuget_cache_path",
+        default=False,
+    )
+    clean_parser.add_argument(
+        "--project",
+        action="store_true",
+        help="Clean project bin/ and obj/ directories",
+        default=False,
+    )
+    clean_parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        help="Show what would be deleted without actually deleting",
+        default=False,
+    )
     subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
     _git_parser = subparsers.add_parser("git", help="Execute git commands across all repositories")
 
@@ -246,7 +273,14 @@ def _run(
 
     match args.command:
         case "clean":
-            clean.run(console, config)
+            clean.run(
+                console,
+                config,
+                cache=args.cache,
+                custom_cache=args.custom_cache,
+                project=args.project,
+                dry_run=args.dry_run,
+            )
         case "dotnet":
             dotnet.run(console, config, unknownargs)
         case "git":
