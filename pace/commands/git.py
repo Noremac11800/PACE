@@ -39,13 +39,16 @@ class ReposGitStatus:
             return table
 
 
-def _pull_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None:
+def _pull_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> tuple[bool, str]:
     """Pull a single repo and update its status.
 
     Args:
         repo_url: URL of the repository to pull
         dest_dir: Directory to pull the repository into
         statuses: ReposGitStatus instance to update
+
+    Returns:
+        Tuple of (success: bool, error_message: str)
     """
     repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
     repo_path = dest_dir / repo_name
@@ -56,34 +59,41 @@ def _pull_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None:
         result = subprocess.run(
             ["git", "-C", str(repo_path), "pull"],
             capture_output=True,
-            text=True,
             timeout=300,
             check=False,
         )
         if result.returncode == 0:
             statuses.set(repo_name, Text("Done ✓", style="green"))
-        else:
-            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
+            return True, ""
+        # Decode with 'replace' to handle non-UTF-8 bytes from SSH/git
+        error_msg = result.stderr.decode("utf-8", errors="replace").strip()[:70]
+        statuses.set(repo_name, Text(f"Failed: {error_msg}", style="red"))
+        return False, error_msg
     except subprocess.TimeoutExpired:
         statuses.set(repo_name, Text("Timeout", style="red"))
+        return False, "Timeout"
     except OSError as e:
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
+        return False, str(e)
 
 
-def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None:
+def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> tuple[bool, str]:
     """Clone a single repo and update its status.
 
     Args:
         repo_url: URL of the repository to clone
         dest_dir: Directory to clone the repository into
         statuses: ReposGitStatus instance to update
+
+    Returns:
+        Tuple of (success: bool, error_message: str)
     """
     repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
     repo_path = dest_dir / repo_name
 
     if repo_path.exists():
         statuses.set(repo_name, Text("Skipped (already exists)", style="yellow"))
-        return
+        return True, ""
 
     statuses.set(repo_name, Spinner("dots", text="Cloning...", style="cyan"))
 
@@ -91,21 +101,27 @@ def _clone_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus) -> None
         result = subprocess.run(
             ["git", "clone", repo_url, str(repo_path)],
             capture_output=True,
-            text=True,
             timeout=300,
             check=False,
         )
         if result.returncode == 0:
             statuses.set(repo_name, Text("Done ✓", style="green"))
-        else:
-            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
+            return True, ""
+        # Decode with 'replace' to handle non-UTF-8 bytes from SSH/git
+        error_msg = result.stderr.decode("utf-8", errors="replace").strip()[:70]
+        statuses.set(repo_name, Text(f"Failed: {error_msg}", style="red"))
+        return False, error_msg
     except subprocess.TimeoutExpired:
         statuses.set(repo_name, Text("Timeout", style="red"))
+        return False, "Timeout"
     except OSError as e:
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
+        return False, str(e)
 
 
-def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, branch: str) -> None:
+def _checkout_repo(
+    repo_url: str, dest_dir: Path, statuses: ReposGitStatus, branch: str
+) -> tuple[bool, str]:
     """Checkout a specific branch in a single repo and update its status.
 
     Args:
@@ -113,13 +129,16 @@ def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, bran
         dest_dir: Directory containing the repository
         statuses: ReposGitStatus instance to update
         branch: Branch name to checkout
+
+    Returns:
+        Tuple of (success: bool, error_message: str)
     """
     repo_name = repo_url.rsplit("/", maxsplit=1)[-1].replace(".git", "")
     repo_path = dest_dir / repo_name
 
     if not repo_path.exists():
         statuses.set(repo_name, Text("Skipped (repo not found)", style="yellow"))
-        return
+        return True, ""
 
     statuses.set(repo_name, Spinner("dots", text=f"Checking out {branch}...", style="cyan"))
 
@@ -127,21 +146,25 @@ def _checkout_repo(repo_url: str, dest_dir: Path, statuses: ReposGitStatus, bran
         result = subprocess.run(
             ["git", "-C", str(repo_path), "checkout", branch],
             capture_output=True,
-            text=True,
             timeout=300,
             check=False,
         )
         if result.returncode == 0:
             statuses.set(repo_name, Text("Done ✓", style="green"))
-        else:
-            statuses.set(repo_name, Text(f"Failed: {result.stderr[:70]}", style="red"))
+            return True, ""
+        # Decode with 'replace' to handle non-UTF-8 bytes from SSH/git
+        error_msg = result.stderr.decode("utf-8", errors="replace").strip()[:70]
+        statuses.set(repo_name, Text(f"Failed: {error_msg}", style="red"))
+        return False, error_msg
     except subprocess.TimeoutExpired:
         statuses.set(repo_name, Text("Timeout", style="red"))
+        return False, "Timeout"
     except OSError as e:
         statuses.set(repo_name, Text(f"Error: {e}", style="red"))
+        return False, str(e)
 
 
-_SIMPLE_COMMANDS: dict[str, Callable[[str, Path, ReposGitStatus], None]] = {
+_SIMPLE_COMMANDS: dict[str, Callable[[str, Path, ReposGitStatus], tuple[bool, str]]] = {
     "pull": _pull_repo,
     "clone": _clone_repo,
 }
@@ -150,7 +173,7 @@ _SIMPLE_COMMANDS: dict[str, Callable[[str, Path, ReposGitStatus], None]] = {
 def _parse_args(
     console: Console,
     args: list[str],
-) -> tuple[Callable[[str, Path, ReposGitStatus], None] | None, str | None]:
+) -> tuple[Callable[[str, Path, ReposGitStatus], tuple[bool, str]] | None, str | None]:
     """Parse git subcommand arguments and return the command function and optional branch.
 
     Args:
@@ -179,21 +202,27 @@ def _parse_args(
     return None, None
 
 
-def run(console: Console, config: Config, args: list[str]) -> None:
+def run(console: Console, config: Config, args: list[str]) -> int:
     """Execute git commands across all repositories in parallel.
 
     Args:
         console: Rich console instance for output
         config: PACE configuration
         args: Additional arguments to pass to git
+
+    Returns:
+        Exit code (0 for success, non-zero for failure)
     """
     command, checkout_branch = _parse_args(console, args)
     if command is None and checkout_branch is None:
-        return
+        return 1  # Error: invalid command or arguments
 
     statuses = ReposGitStatus()
     for project in config.projects:
         statuses.set(project.name, Spinner("dots", text="Dispatching to thread...", style="dim"))
+
+    results: list[tuple[bool, str]] = []
+    failed_repos: list[tuple[str, str]] = []
 
     with (
         Live(statuses.get_table(), console=console, refresh_per_second=10) as live,
@@ -208,10 +237,29 @@ def run(console: Console, config: Config, args: list[str]) -> None:
                 if project.repo_url is not None
             }
         else:
+            assert command is not None
             futures = {
                 executor.submit(command, project.repo_url, config.repodir, statuses): project
                 for project in config.projects
                 if project.repo_url is not None
             }
-        for _ in as_completed(futures):
+        for future in as_completed(futures):
+            project = futures[future]
+            try:
+                success, error_msg = future.result()
+                results.append((success, error_msg))
+                if not success:
+                    failed_repos.append((project.name, error_msg))
+            except Exception as e:
+                results.append((False, str(e)))
+                failed_repos.append((project.name, str(e)))
             live.update(statuses.get_table())
+
+    # Report summary if there were failures
+    if failed_repos:
+        console.print(f"\n[red]Failed to process {len(failed_repos)} repository(s):[/red]")
+        for repo_name, error in failed_repos:
+            console.print(f"  [red]- {repo_name}: {error}[/red]")
+        return 1
+
+    return 0

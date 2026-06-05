@@ -29,6 +29,11 @@
   let pulling = $state(false);
   let expandedGroups = $state<Set<string>>(new Set());
   let hasLoaded = $state(false);
+  let lastOperationResult = $state<{
+    type: "clone" | "pull" | null;
+    success: boolean;
+    message: string;
+  }>({ type: null, success: true, message: "" });
 
   const GROUP_ORDER = ["Toolkits", "AppModules", "Apps"];
 
@@ -95,12 +100,33 @@
     if (!configStore.activeConfig || cloning || pulling) return;
     clearGitStatuses();
     cloning = true;
+    lastOperationResult = { type: null, success: true, message: "" };
     try {
       const allArgs = await paceArgs(["git", "clone"]);
       const cmd = Command.create("pace", allArgs);
-      await cmd.execute();
+      const result = await cmd.execute();
+      if (result.code === 0) {
+        lastOperationResult = {
+          type: "clone",
+          success: true,
+          message: "All repositories cloned successfully",
+        };
+      } else {
+        const errorOutput =
+          result.stderr || "One or more repositories failed to clone";
+        lastOperationResult = {
+          type: "clone",
+          success: false,
+          message: errorOutput,
+        };
+      }
     } catch (e) {
       console.error("Git clone failed:", e);
+      lastOperationResult = {
+        type: "clone",
+        success: false,
+        message: String(e),
+      };
     } finally {
       cloning = false;
       await loadGitStatuses(configStore.activeConfig);
@@ -111,12 +137,33 @@
     if (!configStore.activeConfig || cloning || pulling) return;
     clearGitStatuses();
     pulling = true;
+    lastOperationResult = { type: null, success: true, message: "" };
     try {
       const allArgs = await paceArgs(["git", "pull"]);
       const cmd = Command.create("pace", allArgs);
-      await cmd.execute();
+      const result = await cmd.execute();
+      if (result.code === 0) {
+        lastOperationResult = {
+          type: "pull",
+          success: true,
+          message: "All repositories pulled successfully",
+        };
+      } else {
+        const errorOutput =
+          result.stderr || "One or more repositories failed to pull";
+        lastOperationResult = {
+          type: "pull",
+          success: false,
+          message: errorOutput,
+        };
+      }
     } catch (e) {
       console.error("Git pull failed:", e);
+      lastOperationResult = {
+        type: "pull",
+        success: false,
+        message: String(e),
+      };
     } finally {
       pulling = false;
       await loadGitStatuses(configStore.activeConfig);
@@ -236,6 +283,35 @@
       </button>
     </div>
   </div>
+
+  <!-- Status Message Banner -->
+  {#if lastOperationResult.type && !cloning && !pulling}
+    <div
+      class="px-4 py-2 border-b {lastOperationResult.success
+        ? 'bg-success-500/10 border-success-500/20'
+        : 'bg-error-500/10 border-error-500/20'}"
+    >
+      <div class="flex items-center gap-2">
+        {#if lastOperationResult.success}
+          <span class="text-success-500 text-sm font-medium">
+            {lastOperationResult.message}
+          </span>
+        {:else}
+          <span class="text-error-500 text-sm font-medium">
+            {lastOperationResult.type === "clone" ? "Clone" : "Pull"} failed:
+            {lastOperationResult.message}
+          </span>
+        {/if}
+        <button
+          class="ml-auto text-xs text-surface-500-400 hover:text-surface-900-100"
+          onclick={() =>
+            (lastOperationResult = { type: null, success: true, message: "" })}
+        >
+          Dismiss
+        </button>
+      </div>
+    </div>
+  {/if}
 
   <!-- Content -->
   <div class="flex-1 overflow-auto p-4">

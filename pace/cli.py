@@ -1,11 +1,19 @@
 """CLI entry point for PACE."""
 
 import argparse
+import os
 import sys
 from argparse import Namespace
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
+
+# Force UTF-8 encoding for stdout/stderr to avoid encoding issues on Windows
+os.environ["PYTHONIOENCODING"] = "utf-8:replace"
+if sys.platform == "win32":
+    # Reconfigure stdout/stderr to use UTF-8 with replace error handling
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 
 import rich
 from rich.console import Console
@@ -292,7 +300,7 @@ def _run(
         case "dotnet":
             return dotnet.run(console, config, args.dotnet_args)
         case "git":
-            git.run(console, config, unknownargs)
+            return git.run(console, config, unknownargs)
         case "upload":
             # Handle build description from file if provided
             build_description = args.build_description
