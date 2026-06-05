@@ -177,7 +177,7 @@
     const parts: string[] = ["pace"];
     if (fromProject) parts.push("--from", fromProject);
     if (toProject) parts.push("--to", toProject);
-    parts.push("dotnet");
+    parts.push("dotnet", "build");
     parts.push("-c", buildConfig);
     if (selectedFramework) parts.push("-f", selectedFramework);
     if (noRestore) parts.push("--no-restore");
@@ -277,7 +277,7 @@
     progress = 0;
     progressLabel = "Starting...";
 
-    const dotnetPassthrough: string[] = ["-c", buildConfig];
+    const dotnetPassthrough: string[] = ["build", "-c", buildConfig];
     if (selectedFramework) dotnetPassthrough.push("-f", selectedFramework);
     if (noRestore) dotnetPassthrough.push("--no-restore");
     for (const prop of buildProps) {

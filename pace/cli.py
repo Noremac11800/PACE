@@ -148,7 +148,15 @@ def main() -> int:
         help="Show what would be deleted without actually deleting",
         default=False,
     )
-    subparsers.add_parser("dotnet", help="Execute dotnet commands across the project graph")
+    dotnet_parser = subparsers.add_parser(
+        "dotnet", help="Execute dotnet commands across the project graph"
+    )
+    dotnet_parser.add_argument(
+        "dotnet_args",
+        metavar="... <dotnet-args>",
+        nargs=argparse.REMAINDER,
+        help="Arguments to pass to dotnet (e.g., 'build -c Release')",
+    )
     _git_parser = subparsers.add_parser("git", help="Execute git commands across all repositories")
 
     # Upload command with arguments
@@ -282,7 +290,7 @@ def _run(
                 dry_run=args.dry_run,
             )
         case "dotnet":
-            dotnet.run(console, config, unknownargs)
+            return dotnet.run(console, config, args.dotnet_args)
         case "git":
             git.run(console, config, unknownargs)
         case "upload":
