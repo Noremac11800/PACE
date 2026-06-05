@@ -1,402 +1,159 @@
 <script lang="ts">
-  import { PanelRightClose, PanelRightOpen } from "@lucide/svelte";
+  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
+  import {
+    PanelRightClose,
+    PanelRightOpen,
+    Search,
+    Info,
+    Rocket,
+    Lightbulb,
+    Terminal,
+    LayoutGrid,
+    FileCog,
+    Workflow,
+    FolderTree,
+    LifeBuoy,
+    Link as LinkIcon,
+  } from "@lucide/svelte";
+  import HelpContent from "$lib/panels/help/HelpContent.svelte";
+  import {
+    helpToc,
+    helpSectionIds,
+    type TocEntry,
+  } from "$lib/panels/help/help-toc";
 
   const version = "v0.1.0-alpha";
 
-  interface TocEntry {
-    id: string;
-    label: string;
-    children?: TocEntry[];
-  }
-
-  const toc: TocEntry[] = [
-    { id: "about", label: "About PACE" },
-    {
-      id: "getting-started",
-      label: "Getting Started",
-      children: [
-        { id: "installation", label: "Installation" },
-        { id: "configuration", label: "Configuration" },
-      ],
-    },
-    {
-      id: "cli-usage",
-      label: "CLI Usage",
-      children: [
-        { id: "global-options", label: "Global Options" },
-        { id: "cmd-dotnet", label: "dotnet Command" },
-        { id: "cmd-git", label: "git Command" },
-        { id: "cmd-demo", label: "demo Command" },
-      ],
-    },
-    {
-      id: "gui-usage",
-      label: "GUI Usage",
-      children: [
-        { id: "gui-dependencies", label: "Dependencies Panel" },
-        { id: "gui-build-props", label: "Directory.Build.props Editor" },
-        { id: "gui-console", label: "Console Panel" },
-      ],
-    },
-    { id: "config-file", label: "Configuration File" },
-  ];
+  const sectionIcons: Record<string, typeof Info> = {
+    about: Info,
+    "quick-start": Rocket,
+    concepts: Lightbulb,
+    cli: Terminal,
+    gui: LayoutGrid,
+    config: FileCog,
+    workflows: Workflow,
+    locations: FolderTree,
+    troubleshooting: LifeBuoy,
+    resources: LinkIcon,
+  };
 
   let activeSection = $state("about");
   let tocOpen = $state(true);
+  let query = $state("");
+
+  const filteredToc = $derived.by<TocEntry[]>(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return helpToc;
+    const result: TocEntry[] = [];
+    for (const entry of helpToc) {
+      const selfMatch = entry.label.toLowerCase().includes(q);
+      const kids =
+        entry.children?.filter((c) => c.label.toLowerCase().includes(q)) ?? [];
+      if (selfMatch) result.push(entry);
+      else if (kids.length) result.push({ ...entry, children: kids });
+    }
+    return result;
+  });
 
   function scrollTo(id: string) {
     activeSection = id;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  onMount(() => {
+    const root = document.getElementById("docs-content");
+    if (!root) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) activeSection = e.target.id;
+        }
+      },
+      { root, rootMargin: "0px 0px -75% 0px", threshold: 0 },
+    );
+    for (const id of helpSectionIds) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+  });
 </script>
 
 <div
   class="h-full grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out"
-  style="grid-template-columns: 1fr {tocOpen ? '220px' : '48px'};"
+  style="grid-template-columns: 1fr {tocOpen ? '260px' : '48px'};"
 >
   <!-- Main Content -->
-  <div class="overflow-auto p-6 space-y-8" id="docs-content">
-    <!-- About -->
-    <section id="about">
-      <div class="flex items-center gap-4 mb-4">
-        <img src="/appicon.svg" alt="PACE" class="h-12 w-12" />
-        <div>
-          <h1 class="h2 text-primary-500">PACE</h1>
-          <p class="text-sm text-surface-700-300">Version {version}</p>
-        </div>
-      </div>
-      <p class="text-surface-700-300">
-        <strong>Project Automation and Configuration Engine</strong> — a tool for
-        managing multi-repository .NET projects. PACE provides both a CLI and a GUI
-        to orchestrate builds, manage git operations, and configure shared build
-        properties across your project graph.
-      </p>
-    </section>
-
-    <!-- Getting Started -->
-    <section id="getting-started">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        Getting Started
-      </h2>
-
-      <div id="installation" class="mb-6">
-        <h3 class="h4 mb-2">Installation</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          PACE requires <strong>Python 3.11+</strong>, <strong>Git</strong>, and
-          <strong>pipx</strong>. Install PACE from the repository root:
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pipx install --editable /path/to/PACE</pre>
-        <p class="text-xs text-surface-500 mt-2">
-          Use the <strong>Dependencies</strong> panel in the GUI to check and install
-          all prerequisites automatically.
-        </p>
-      </div>
-
-      <div id="configuration" class="mb-6">
-        <h3 class="h4 mb-2">Configuration</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          PACE uses a TOML configuration file to define the project graph. By
-          default it loads an internal <code class="text-primary-500"
-            >pace.toml</code
-          >, but you can specify a custom config:
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto">pace -C /path/to/config.toml [command]</pre>
-        <p class="text-sm text-surface-700-300 mt-2">
-          The <code class="text-primary-500">REPODIR</code> environment variable
-          can override the
-          <code class="text-primary-500">repodir</code> setting in the config file.
-        </p>
-      </div>
-    </section>
-
-    <!-- CLI Usage -->
-    <section id="cli-usage">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        CLI Usage
-      </h2>
-      <pre
-        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">usage: pace [-h] [-C &lt;path&gt;] [OPTIONS] command...</pre>
-
-      <div id="global-options" class="mb-6">
-        <h3 class="h4 mb-2">Global Options</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-surface-200-800">
-                <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                  >Option</th
-                >
-                <th class="text-left py-2 text-surface-500 font-medium"
-                  >Description</th
-                >
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500">-h, --help</td>
-                <td class="py-2 text-surface-700-300"
-                  >Show help message and exit</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >-v, --version</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Print the version and exit</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >-C, --config &lt;path&gt;</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Path to configuration file (defaults to internal pace.toml)</td
-                >
-              </tr>
-              <tr class="border-b border-surface-200-800">
-                <td class="py-2 pr-4 font-mono text-primary-500">--debug</td>
-                <td class="py-2 text-surface-700-300"
-                  >Enable debug mode with full tracebacks</td
-                >
-              </tr>
-              <tr>
-                <td class="py-2 pr-4 font-mono text-primary-500"
-                  >--print-config</td
-                >
-                <td class="py-2 text-surface-700-300"
-                  >Print the loaded configuration and exit</td
-                >
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="cmd-dotnet" class="mb-6">
-        <h3 class="h4 mb-2">dotnet Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Execute dotnet build commands across the project graph. PACE creates a
-          temporary solution file containing all configured projects and runs
-          <code class="text-primary-500">dotnet build</code> against it.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace dotnet [-- dotnet-args...]</pre>
-        <p class="text-sm text-surface-700-300 mb-2">
-          <strong>Framework filtering:</strong>
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2"># Build only iOS-compatible projects
-pace dotnet -- -f net8.0-ios</pre>
-        <p class="text-xs text-surface-500">
-          Supported framework filters: <code>ios</code>, <code>android</code>,
-          <code>windows</code>, <code>maccatalyst</code>
-        </p>
-      </div>
-
-      <div id="cmd-git" class="mb-6">
-        <h3 class="h4 mb-2">git Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Execute git operations across all repositories in parallel with live
-          status updates.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace git clone   # Clone all repositories
-pace git pull    # Pull latest for all repositories</pre>
-        <p class="text-xs text-surface-500">
-          Repositories are defined per-project in the config file via the
-          <code>repo_url</code> field.
-        </p>
-      </div>
-
-      <div id="cmd-demo" class="mb-6">
-        <h3 class="h4 mb-2">demo Command</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Run built-in Rich demos for development and testing purposes.
-        </p>
-        <pre
-          class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-2">pace demo columns
-pace demo progress_bar</pre>
-      </div>
-    </section>
-
-    <!-- GUI Usage -->
-    <section id="gui-usage">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        GUI Usage
-      </h2>
-      <p class="text-sm text-surface-700-300 mb-4">
-        The PACE GUI provides visual access to the same functionality as the
-        CLI, plus additional features. Navigate between panels using the
-        sidebar.
-      </p>
-
-      <div id="gui-dependencies" class="mb-6">
-        <h3 class="h4 mb-2">Dependencies Panel</h3>
-        <p class="text-sm text-surface-700-300">
-          Checks for required dependencies (Python, Git, pipx) and allows you to
-          install PACE directly from the GUI. If PACE is not installed, other
-          panels will be disabled and a warning badge will appear on this
-          button.
-        </p>
-      </div>
-
-      <div id="gui-build-props" class="mb-6">
-        <h3 class="h4 mb-2">Directory.Build.props Editor</h3>
-        <p class="text-sm text-surface-700-300 mb-2">
-          Create and manage MSBuild properties that apply to all .NET projects
-          in a directory tree.
-        </p>
-        <ul
-          class="text-sm text-surface-700-300 list-disc list-inside space-y-1"
-        >
-          <li>
-            <strong>Add/Edit/Delete</strong> properties with name-value pairs
-          </li>
-          <li><strong>Search</strong> to filter the property list</li>
-          <li>
-            <strong>Save</strong> writes a
-            <code class="text-primary-500">Directory.Build.props</code> file to the
-            target directory
-          </li>
-          <li>
-            <strong>Load</strong> reads an existing file from the target directory
-          </li>
-          <li>
-            <strong>Copy XML</strong> copies the generated XML to clipboard
-          </li>
-        </ul>
-      </div>
-
-      <div id="gui-console" class="mb-6">
-        <h3 class="h4 mb-2">Console Panel</h3>
-        <p class="text-sm text-surface-700-300">
-          Displays command output and logs from PACE operations. Use this to
-          monitor build progress, git operations, and other long-running tasks.
-        </p>
-      </div>
-    </section>
-
-    <!-- Configuration File -->
-    <section id="config-file">
-      <h2 class="h3 text-primary-500 mb-3 border-b border-surface-200-800 pb-2">
-        Configuration File
-      </h2>
-      <p class="text-sm text-surface-700-300 mb-3">
-        The PACE config file is written in TOML. It defines the repository root
-        directory and a list of projects with their paths and repository URLs.
-      </p>
-      <h3 class="h4 mb-2">Structure</h3>
-      <pre
-        class="bg-surface-800-200 text-surface-200-800 p-3 rounded text-sm font-mono overflow-x-auto mb-4">repodir = "/path/to/repos"
-
-[[projects]]
-name = "my-project"
-csproj_path = "src/MyProject/MyProject.csproj"
-repo_url = "git@github.com:org/my-project.git"</pre>
-
-      <h3 class="h4 mb-2">Fields</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-surface-200-800">
-              <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                >Field</th
-              >
-              <th class="text-left py-2 pr-4 text-surface-500 font-medium"
-                >Type</th
-              >
-              <th class="text-left py-2 text-surface-500 font-medium"
-                >Description</th
-              >
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500">repodir</td>
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Root directory where repositories are cloned</td
-              >
-            </tr>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].name</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Project identifier (also the subdirectory name)</td
-              >
-            </tr>
-            <tr class="border-b border-surface-200-800">
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].csproj_path</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string</td>
-              <td class="py-2 text-surface-700-300"
-                >Relative path to the .csproj file within the project</td
-              >
-            </tr>
-            <tr>
-              <td class="py-2 pr-4 font-mono text-primary-500"
-                >projects[].repo_url</td
-              >
-              <td class="py-2 pr-4 text-surface-700-300">string?</td>
-              <td class="py-2 text-surface-700-300"
-                >Git remote URL (optional, required for clone/pull)</td
-              >
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+  <div class="overflow-auto p-6 md:p-8" id="docs-content">
+    <div class="max-w-3xl mx-auto">
+      <HelpContent {version} />
+    </div>
   </div>
 
   <!-- Table of Contents Sidebar -->
   <nav
-    class="overflow-auto border-l border-surface-200-800 p-4 bg-surface-50-950 flex flex-col"
+    class="overflow-hidden border-l border-surface-200-800 bg-surface-50-950 flex flex-col"
   >
-    <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center justify-between gap-2 p-3 shrink-0">
       {#if tocOpen}
         <h4 class="text-xs font-bold uppercase tracking-wider text-surface-500">
-          Table of Contents
+          On this page
         </h4>
       {/if}
       <button
-        class="btn preset-tonal p-1"
+        class="btn preset-tonal p-1.5"
         onclick={() => (tocOpen = !tocOpen)}
-        title={tocOpen ? "Collapse TOC" : "Expand TOC"}
+        title={tocOpen ? "Collapse" : "Expand"}
       >
         {#if tocOpen}
-          <PanelRightClose size={14} />
+          <PanelRightClose size={16} />
         {:else}
-          <PanelRightOpen size={14} />
+          <PanelRightOpen size={16} />
         {/if}
       </button>
     </div>
+
     {#if tocOpen}
-      <ul class="space-y-1" transition:slide={{ duration: 200 }}>
-        {#each toc as entry}
+      <div class="px-3 pb-2 shrink-0" transition:slide={{ duration: 150 }}>
+        <div class="input-group grid grid-cols-[auto_1fr] items-center">
+          <div class="ig-cell px-2 text-surface-500"><Search size={14} /></div>
+          <input
+            class="ig-input text-sm py-1.5"
+            type="text"
+            placeholder="Search help..."
+            bind:value={query}
+          />
+        </div>
+      </div>
+
+      <ul
+        class="flex-1 overflow-auto px-2 pb-4 space-y-0.5"
+        transition:slide={{ duration: 150 }}
+      >
+        {#each filteredToc as entry (entry.id)}
+          {@const Icon = sectionIcons[entry.id] ?? Info}
           <li>
             <button
-              class="text-left text-sm w-full px-2 py-1 rounded hover:bg-surface-200-800 transition-colors
+              class="flex items-center gap-2 text-left text-sm w-full px-2 py-1.5 rounded transition-colors hover:bg-surface-200-800
               {activeSection === entry.id
-                ? 'text-primary-500 font-medium'
+                ? 'text-primary-500 font-medium bg-surface-200-800/60'
                 : 'text-surface-700-300'}"
               onclick={() => scrollTo(entry.id)}
             >
-              {entry.label}
+              <Icon size={15} class="shrink-0" />
+              <span class="truncate">{entry.label}</span>
             </button>
             {#if entry.children}
-              <ul class="ml-3 space-y-0.5">
-                {#each entry.children as child}
+              <ul
+                class="ml-4 border-l border-surface-200-800 pl-2 mt-0.5 space-y-0.5"
+              >
+                {#each entry.children as child (child.id)}
                   <li>
                     <button
-                      class="text-left text-xs w-full px-2 py-0.5 rounded hover:bg-surface-200-800 transition-colors
+                      class="text-left text-xs w-full px-2 py-1 rounded transition-colors hover:bg-surface-200-800
                       {activeSection === child.id
                         ? 'text-primary-500 font-medium'
                         : 'text-surface-500'}"
@@ -410,6 +167,9 @@ repo_url = "git@github.com:org/my-project.git"</pre>
             {/if}
           </li>
         {/each}
+        {#if filteredToc.length === 0}
+          <li class="px-2 py-3 text-xs text-surface-500">No matches.</li>
+        {/if}
       </ul>
     {/if}
   </nav>
