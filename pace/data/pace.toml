@@ -1,3 +1,8 @@
 repodir = "/tmp/PACE"
 
 nuget_cache_path = ""
+
+[[projects]]
+name = "MyLib"
+sln_group = "Classlibs"
+csproj_path = "MyLib.csproj"

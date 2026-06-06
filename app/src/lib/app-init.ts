@@ -15,7 +15,21 @@ import {
 } from "./settings.svelte";
 import { theme } from "./theme";
 
+// Promise that resolves when app initialization is complete
+let initPromise: Promise<void> | null = null;
+
+export function getInitializationPromise(): Promise<void> {
+  if (!initPromise) {
+    initPromise = initializeAppInternal();
+  }
+  return initPromise;
+}
+
 export async function initializeApp(): Promise<void> {
+  return getInitializationPromise();
+}
+
+async function initializeAppInternal(): Promise<void> {
   await ensurePaceDir();
   await loadSettings();
   applyTheme(settings.general.theme);

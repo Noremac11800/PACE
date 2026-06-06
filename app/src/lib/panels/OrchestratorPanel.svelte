@@ -20,6 +20,7 @@
     getActiveConfigPath,
   } from "$lib/config-store.svelte";
   import { settings } from "$lib/settings.svelte";
+  import { getInitializationPromise } from "$lib/app-init";
   import { commandStatus } from "$lib/orchestrator/command-status.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
   import BuildTab from "$lib/orchestrator/BuildTab.svelte";
@@ -76,6 +77,8 @@
   });
 
   onMount(async () => {
+    // Wait for app initialization to complete (includes syncPaceConfig)
+    await getInitializationPromise();
     await loadAvailableConfigs();
     if (
       configStore.availableConfigs.length > 0 &&
@@ -85,9 +88,17 @@
       const match = saved
         ? configStore.availableConfigs.find((c) => c.filename === saved)
         : null;
+
+      // If no saved config, prefer default.toml, otherwise first available
+      const defaultConfig = configStore.availableConfigs.find(
+        (c) => c.filename === "default.toml",
+      );
+
       const toLoad = match
         ? match.filename
-        : configStore.availableConfigs[0].filename;
+        : defaultConfig
+          ? defaultConfig.filename
+          : configStore.availableConfigs[0].filename;
       await loadConfig(toLoad);
     }
   });
