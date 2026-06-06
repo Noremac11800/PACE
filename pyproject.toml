@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pace"
+name = "pace-dotnet"
 version = "0.1.0"
 description = "Project Automation and Configuration Engine - A Python CLI tool for bulk management of C# .NET project ecosystems"
 readme = "README.md"

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "PACE",
-  "version": "0.1.0-alpha.1",
-  "identifier": "com.cam.pace",
+  "productName": "pace-dotnet",
+  "version": "0.1.0",
+  "identifier": "com.cam.pace-dotnet",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
