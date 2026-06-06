@@ -35,8 +35,6 @@
     message: string;
   }>({ type: null, success: true, message: "" });
 
-  const GROUP_ORDER = ["Toolkits", "AppModules", "Apps"];
-
   $effect(() => {
     if (configStore.activeConfig) {
       // Prevent infinite loops by using untrack
@@ -55,16 +53,10 @@
 
   function getOrderedGroups(): string[] {
     if (!configStore.activeConfig) return [];
-    const availableGroups = new Set(
-      configStore.activeConfig.projects
-        .map((p) => p.sln_group)
-        .filter(Boolean) as string[],
-    );
-    const ordered = GROUP_ORDER.filter((g) => availableGroups.has(g));
-    for (const g of availableGroups) {
-      if (!GROUP_ORDER.includes(g)) ordered.push(g);
-    }
-    return ordered;
+    const groups = configStore.activeConfig.projects
+      .map((p) => p.sln_group)
+      .filter(Boolean) as string[];
+    return [...new Set(groups)];
   }
 
   function getProjectsByGroup(group: string): PaceProject[] {

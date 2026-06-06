@@ -120,8 +120,8 @@
         A config describes your repository root and the projects in your graph.
         In the app, open the <strong>Orchestrator</strong> and use the config
         picker to create one — it is saved to
-        <code class="text-primary-500">~/.pace/configs/</code>. For the CLI, point
-        at any TOML file:
+        <code class="text-primary-500">~/.pace/configs/</code>. For the CLI,
+        point at any TOML file:
       </p>
       {@render CodeBlock(`pace -C ~/.pace/configs/myteam.toml --print-config`)}
     </div>
@@ -151,14 +151,16 @@ pace dotnet build -c Release`)}
       <p class="text-sm text-surface-700-300">
         Every project declares which other projects it
         <code class="text-primary-500">depends_on</code>. Together these form a
-        directed dependency graph that PACE uses to order operations and to scope
-        commands. Visualize it any time in the
+        directed dependency graph that PACE uses to order operations and to
+        scope commands. Visualize it any time in the
         <strong>Project Graph</strong> panel.
       </p>
     </div>
 
     <div id="concept-chains" class="mb-6">
-      <h3 class="h4 mb-2">Dependency chains — <code>--from</code> / <code>--to</code></h3>
+      <h3 class="h4 mb-2">
+        Dependency chains — <code>--from</code> / <code>--to</code>
+      </h3>
       <p class="text-sm text-surface-700-300 mb-2">
         Most commands accept <code class="text-primary-500">--from</code> and
         <code class="text-primary-500">--to</code> to operate on a slice of the graph
@@ -194,7 +196,7 @@ pace dotnet build -c Release`)}
         ],
       )}
       {@render CodeBlock(
-        "# Rebuild toolkit-core and everything that consumes it\npace --from toolkit-core dotnet build",
+        "# Rebuild common-lib and everything that consumes it\npace --from common-lib dotnet build",
       )}
     </div>
 
@@ -202,9 +204,9 @@ pace dotnet build -c Release`)}
       <h3 class="h4 mb-2">Solution groups</h3>
       <p class="text-sm text-surface-700-300">
         Each project may set a <code class="text-primary-500">sln_group</code>
-        (e.g. <em>Toolkits</em>, <em>AppModules</em>, <em>Apps</em>). Groups are purely
-        organizational — the Projects and Git tabs collapse projects by group so large
-        graphs stay readable.
+        (e.g. <em>Libraries</em>, <em>Modules</em>, <em>Apps</em>). Groups are
+        purely organizational — the Projects and Git tabs collapse projects by
+        group so large graphs stay readable.
       </p>
     </div>
 
@@ -212,11 +214,11 @@ pace dotnet build -c Release`)}
       <h3 class="h4 mb-2">Config profiles</h3>
       <p class="text-sm text-surface-700-300">
         You can keep multiple config files side-by-side (one per team, branch or
-        experiment) under <code class="text-primary-500">~/.pace/configs/</code>.
-        The app remembers your last active profile; the CLI selects one with
+        experiment) under <code class="text-primary-500">~/.pace/configs/</code
+        >. The app remembers your last active profile; the CLI selects one with
         <code class="text-primary-500">-C</code>. A built-in
-        <code class="text-primary-500">default.toml</code> profile is read-only, so its
-        Config Editor tab is hidden.
+        <code class="text-primary-500">default.toml</code> profile is read-only,
+        so its Config Editor tab is hidden.
       </p>
     </div>
   </section>
@@ -292,8 +294,9 @@ pace dotnet build -c Release`)}
       <h3 class="h4 mb-2"><code class="text-primary-500">pace clean</code></h3>
       <p class="text-sm text-surface-700-300 mb-2">
         Delete build artifacts and cached NuGet packages across the graph, in
-        parallel, with a live status table. With <strong>no flags it cleans
-          everything</strong>; pass flags to scope it.
+        parallel, with a live status table. With <strong
+          >no flags it cleans everything</strong
+        >; pass flags to scope it.
       </p>
       {@render RefTable(
         ["Flag", "Removes"],
@@ -313,13 +316,17 @@ pace dotnet build -c Release`)}
           {
             cells: [
               { text: "--custom-cache", mono: true, accent: true },
-              { text: "Matching packages from the configured nuget_cache_path." },
+              {
+                text: "Matching packages from the configured nuget_cache_path.",
+              },
             ],
           },
           {
             cells: [
               { text: "-n, --dry-run", mono: true, accent: true },
-              { text: "Show exactly what would be deleted without removing it." },
+              {
+                text: "Show exactly what would be deleted without removing it.",
+              },
             ],
           },
         ],
@@ -334,11 +341,12 @@ pace clean --project`)}
     <div id="cli-dotnet" class="mb-8">
       <h3 class="h4 mb-2"><code class="text-primary-500">pace dotnet</code></h3>
       <p class="text-sm text-surface-700-300 mb-2">
-        PACE generates/syncs a single solution file
-        (<code class="text-primary-500">PACE.slnx</code>) in the repo root that
-        contains every configured project, then runs your
-        <code>dotnet</code> subcommand against it. Anything after the subcommand is
-        forwarded verbatim to the .NET SDK.
+        PACE generates/syncs a single solution file (<code
+          class="text-primary-500">PACE.slnx</code
+        >) in the repo root that contains every configured project, then runs
+        your
+        <code>dotnet</code> subcommand against it. Anything after the subcommand
+        is forwarded verbatim to the .NET SDK.
       </p>
       {@render CodeBlock(`# Build the whole solution in Release
 pace dotnet build -c Release
@@ -352,7 +360,9 @@ pace dotnet restore`)}
         <code class="text-primary-500">~/.pace/cache/</code>) and includes only
         the projects that support that platform:
       </p>
-      {@render CodeBlock("# Build only iOS-capable projects\npace dotnet build -f net8.0-ios")}
+      {@render CodeBlock(
+        "# Build only iOS-capable projects\npace dotnet build -f net8.0-ios",
+      )}
       <p class="text-xs text-surface-500">
         Recognized platform keywords: <code>ios</code>, <code>android</code>,
         <code>windows</code>, <code>maccatalyst</code>.
@@ -454,7 +464,11 @@ pace git checkout develop`)}
           },
           {
             cells: [
-              { text: "-N, --build-description-from-file", mono: true, accent: true },
+              {
+                text: "-N, --build-description-from-file",
+                mono: true,
+                accent: true,
+              },
               { text: "no" },
               { text: "Read build notes from a file." },
             ],
@@ -470,7 +484,8 @@ pace git checkout develop`)}
         <p class="text-sm text-surface-700-300">
           The app scans your build output for packages, lets you pick several,
           and uploads them in parallel — building the same
-          <code>pace upload</code> command for you. The destination is set by the
+          <code>pace upload</code> command for you. The destination is set by
+          the
           <strong>Storage Endpoint URL</strong> in Settings.
         </p>
       </Callout>
@@ -499,9 +514,9 @@ pace demo progress_bar`)}
         <Package size={16} class="text-primary-500" /> Dependencies
       </h3>
       <p class="text-sm text-surface-700-300">
-        Detects Python, Git and pipx, shows each version, and installs/updates the
-        PACE CLI directly from the app. A red warning badge on the sidebar icon
-        means the CLI is not yet available.
+        Detects Python, Git and pipx, shows each version, and installs/updates
+        the PACE CLI directly from the app. A red warning badge on the sidebar
+        icon means the CLI is not yet available.
       </p>
     </div>
 
@@ -510,8 +525,8 @@ pace demo progress_bar`)}
         <Network size={16} class="text-primary-500" /> Project Graph
       </h3>
       <p class="text-sm text-surface-700-300">
-        An interactive node-link diagram of the active config's dependency graph,
-        laid out automatically. Use it to sanity-check
+        An interactive node-link diagram of the active config's dependency
+        graph, laid out automatically. Use it to sanity-check
         <code>depends_on</code> relationships before running chained commands.
       </p>
     </div>
@@ -529,7 +544,9 @@ pace demo progress_bar`)}
         <li><strong>Add / Edit / Delete</strong> name–value property pairs.</li>
         <li><strong>Search</strong> to filter long property lists.</li>
         <li><strong>Save / Load</strong> the file in the target directory.</li>
-        <li><strong>XML Preview</strong> with <strong>Copy XML</strong> to clipboard.</li>
+        <li>
+          <strong>XML Preview</strong> with <strong>Copy XML</strong> to clipboard.
+        </li>
       </ul>
     </div>
 
@@ -548,37 +565,49 @@ pace demo progress_bar`)}
           {
             cells: [
               { text: "Projects", accent: true },
-              { text: "Repo root, NuGet cache path and a grouped overview of every project; open any folder in your file manager." },
+              {
+                text: "Repo root, NuGet cache path and a grouped overview of every project; open any folder in your file manager.",
+              },
             ],
           },
           {
             cells: [
               { text: "NuGet", accent: true },
-              { text: "Inspect configured NuGet sources and browse packages in the global and custom caches." },
+              {
+                text: "Inspect configured NuGet sources and browse packages in the global and custom caches.",
+              },
             ],
           },
           {
             cells: [
               { text: "Git", accent: true },
-              { text: "Clone / Pull all repos, refresh statuses, and see per-repo branch, ahead/behind and uncommitted state by group." },
+              {
+                text: "Clone / Pull all repos, refresh statuses, and see per-repo branch, ahead/behind and uncommitted state by group.",
+              },
             ],
           },
           {
             cells: [
               { text: "Build", accent: true },
-              { text: "Run dotnet builds with config/framework/no-restore options, a live command preview, progress bar and output log." },
+              {
+                text: "Run dotnet builds with config/framework/no-restore options, a live command preview, progress bar and output log.",
+              },
             ],
           },
           {
             cells: [
               { text: "Deploy", accent: true },
-              { text: "Publishing, Upload and Code signing sub-sections (see below)." },
+              {
+                text: "Publishing, Upload and Code signing sub-sections (see below).",
+              },
             ],
           },
           {
             cells: [
               { text: "Config editor", accent: true },
-              { text: "Edit the active profile (repodir, NuGet cache, groups, projects and dependencies). Hidden for the read-only default profile." },
+              {
+                text: "Edit the active profile (repodir, NuGet cache, groups, projects and dependencies). Hidden for the read-only default profile.",
+              },
             ],
           },
         ],
@@ -592,19 +621,25 @@ pace demo progress_bar`)}
           {
             cells: [
               { text: "Publishing", accent: true },
-              { text: "Select a project + platforms (iOS/Android/Windows), build config and MSBuild props, then dotnet publish with the right runtime, framework and signing args. Live progress per platform." },
+              {
+                text: "Select a project + platforms (iOS/Android/Windows), build config and MSBuild props, then dotnet publish with the right runtime, framework and signing args. Live progress per platform.",
+              },
             ],
           },
           {
             cells: [
               { text: "Upload", accent: true },
-              { text: "Auto-scans build output for .ipa/.apk/.msix packages, then uploads selected ones in parallel via pace upload." },
+              {
+                text: "Auto-scans build output for .ipa/.apk/.msix packages, then uploads selected ones in parallel via pace upload.",
+              },
             ],
           },
           {
             cells: [
               { text: "Code signing", accent: true },
-              { text: "Manage signing identities per platform — iOS bundle IDs (key + provision), Windows cert thumbprints, Android keystores. Saved to ~/.pace/codesigning.json; import existing files." },
+              {
+                text: "Manage signing identities per platform — iOS bundle IDs (key + provision), Windows cert thumbprints, Android keystores. Saved to ~/.pace/codesigning.json; import existing files.",
+              },
             ],
           },
         ],
@@ -612,8 +647,8 @@ pace demo progress_bar`)}
       <Callout type="tip" message="Wildcard signing defaults">
         <p class="text-sm text-surface-700-300">
           In Code signing, the <code class="text-primary-500">*</code> entry is the
-          default applied to any bundle ID / certificate / keystore that has no
-          explicit match — set it once and only override the exceptions.
+          default applied to any bundle ID / certificate / keystore that has no explicit
+          match — set it once and only override the exceptions.
         </p>
       </Callout>
     </div>
@@ -623,11 +658,11 @@ pace demo progress_bar`)}
         <Terminal size={16} class="text-primary-500" /> Console
       </h3>
       <p class="text-sm text-surface-700-300">
-        An embedded terminal for ad-hoc commands with command history
-        (<kbd class="px-1 rounded bg-surface-200-800 text-xs">↑</kbd>/<kbd
-          class="px-1 rounded bg-surface-200-800 text-xs">↓</kbd
-        >), ANSI color rendering, optional timestamps, a configurable working
-        directory, and the ability to copy or export the log.
+        An embedded terminal for ad-hoc commands with command history (<kbd
+          class="px-1 rounded bg-surface-200-800 text-xs">↑</kbd
+        >/<kbd class="px-1 rounded bg-surface-200-800 text-xs">↓</kbd>), ANSI
+        color rendering, optional timestamps, a configurable working directory,
+        and the ability to copy or export the log.
       </p>
     </div>
 
@@ -636,9 +671,18 @@ pace demo progress_bar`)}
         <Settings size={16} class="text-primary-500" /> Settings
       </h3>
       <ul class="text-sm text-surface-700-300 list-disc list-inside space-y-1">
-        <li><strong>General</strong> — application language and auto-check-for-updates on startup.</li>
-        <li><strong>Appearance</strong> — Light / Dark / System theme and base font size.</li>
-        <li><strong>Storage</strong> — the Application Storage Endpoint URL used by uploads.</li>
+        <li>
+          <strong>General</strong> — application language and auto-check-for-updates
+          on startup.
+        </li>
+        <li>
+          <strong>Appearance</strong> — Light / Dark / System theme and base font
+          size.
+        </li>
+        <li>
+          <strong>Storage</strong> — the Application Storage Endpoint URL used by
+          uploads.
+        </li>
       </ul>
       <p class="text-xs text-surface-500 mt-2">
         Settings auto-save as you change them; <strong>Reset to default</strong>
@@ -651,9 +695,9 @@ pace demo progress_bar`)}
         <Download size={16} class="text-primary-500" /> Updates
       </h3>
       <p class="text-sm text-surface-700-300">
-        Shows the installed and latest versions of both the PACE CLI and the app,
-        and lets you update. The sidebar icon carries a green check when you're up
-        to date, or a warning badge when an update is available.
+        Shows the installed and latest versions of both the PACE CLI and the
+        app, and lets you update. The sidebar icon carries a green check when
+        you're up to date, or a warning badge when an update is available.
       </p>
     </div>
   </section>
@@ -668,8 +712,8 @@ pace demo progress_bar`)}
         Config files are TOML. The app stores profiles in
         <code class="text-primary-500">~/.pace/configs/*.toml</code> and you can
         create, duplicate, rename, import or delete them from the config picker.
-        The CLI uses <code class="text-primary-500">-C &lt;path&gt;</code>, falling
-        back to a bundled <code>pace.toml</code> when omitted.
+        The CLI uses <code class="text-primary-500">-C &lt;path&gt;</code>,
+        falling back to a bundled <code>pace.toml</code> when omitted.
       </p>
     </div>
 
@@ -679,19 +723,19 @@ pace demo progress_bar`)}
 nuget_cache_path = "/path/to/nuget-packages"   # optional
 
 [[projects]]
-name = "toolkit-core"
-csproj_path = "src/Toolkit.Core/Toolkit.Core.csproj"
-repo_url = "git@github.com:org/toolkit-core.git"  # optional
-sln_group = "Toolkits"                             # optional
+name = "common-lib"
+csproj_path = "src/CommonLib/CommonLib.csproj"
+repo_url = "git@github.com:org/common-lib.git"  # optional
+sln_group = "Libraries"                          # optional
 explicit_frameworks = []
-depends_on = ["toolkit-versioning"]
+depends_on = ["versioning-lib"]
 
 [[projects]]
 name = "my-app"
 csproj_path = "src/MyApp/MyApp.csproj"
 repo_url = "git@github.com:org/my-app.git"
 sln_group = "Apps"
-depends_on = ["toolkit-core"]
+depends_on = ["common-lib"]
 
 [[build-props]]
 name = "GeneratePackageOnBuild"
@@ -709,14 +753,18 @@ default = false`)}
             cells: [
               { text: "repodir", mono: true, accent: true },
               { text: "string" },
-              { text: "Root directory where repositories are cloned. Created if missing." },
+              {
+                text: "Root directory where repositories are cloned. Created if missing.",
+              },
             ],
           },
           {
             cells: [
               { text: "nuget_cache_path", mono: true, accent: true },
               { text: "path?" },
-              { text: "Custom NuGet cache, used by clean --custom-cache and the NuGet tab." },
+              {
+                text: "Custom NuGet cache, used by clean --custom-cache and the NuGet tab.",
+              },
             ],
           },
         ],
@@ -731,7 +779,9 @@ default = false`)}
             cells: [
               { text: "name", mono: true, accent: true },
               { text: "string" },
-              { text: "Project identifier; also the subdirectory under repodir." },
+              {
+                text: "Project identifier; also the subdirectory under repodir.",
+              },
             ],
           },
           {
@@ -759,14 +809,18 @@ default = false`)}
             cells: [
               { text: "explicit_frameworks", mono: true, accent: true },
               { text: "string[]" },
-              { text: "Force specific target frameworks (overrides detection)." },
+              {
+                text: "Force specific target frameworks (overrides detection).",
+              },
             ],
           },
           {
             cells: [
               { text: "depends_on", mono: true, accent: true },
               { text: "string[]" },
-              { text: "Names of projects this one depends on — defines the graph." },
+              {
+                text: "Names of projects this one depends on — defines the graph.",
+              },
             ],
           },
         ],
@@ -788,7 +842,9 @@ default = false`)}
             cells: [
               { text: "datatype", mono: true, accent: true },
               { text: "string" },
-              { text: '"boolean" · "string" · "path" — controls the input widget.' },
+              {
+                text: '"boolean" · "string" · "path" — controls the input widget.',
+              },
             ],
           },
           {
@@ -831,8 +887,8 @@ pace dotnet build -c Release`)}
     <p class="text-sm font-semibold text-surface-900-100 mb-1 mt-4">
       Rebuild only what changed in a library
     </p>
-    {@render CodeBlock(`pace clean --project --from toolkit-core
-pace --from toolkit-core dotnet build -c Release`)}
+    {@render CodeBlock(`pace clean --project --from common-lib
+pace --from common-lib dotnet build -c Release`)}
 
     <p class="text-sm font-semibold text-surface-900-100 mb-1 mt-4">
       Free up disk space
@@ -866,14 +922,20 @@ pace clean             # then remove artifacts + caches`)}
         },
         {
           cells: [
-            { text: "~/.pace/cache/dotnet_cache.json", mono: true, accent: true },
+            {
+              text: "~/.pace/cache/dotnet_cache.json",
+              mono: true,
+              accent: true,
+            },
             { text: "Cached TargetFrameworks for fast framework filtering." },
           ],
         },
         {
           cells: [
             { text: "<repodir>/PACE.slnx", mono: true, accent: true },
-            { text: "Auto-generated solution containing all configured projects." },
+            {
+              text: "Auto-generated solution containing all configured projects.",
+            },
           ],
         },
         {
@@ -902,8 +964,8 @@ pace clean             # then remove artifacts + caches`)}
       <Callout type="warning" message="git clone / pull fails">
         <p class="text-sm text-surface-700-300">
           Verify each <code>repo_url</code> and that your SSH keys or credentials
-          are configured. The failing repositories and their error messages are
-          listed at the end of the run.
+          are configured. The failing repositories and their error messages are listed
+          at the end of the run.
         </p>
       </Callout>
     </div>
@@ -911,8 +973,8 @@ pace clean             # then remove artifacts + caches`)}
     <div class="mt-3">
       <Callout type="warning" message="A build skips projects unexpectedly">
         <p class="text-sm text-surface-700-300">
-          Framework filtering relies on cached <code>TargetFrameworks</code>. If a
-          project's frameworks changed, the cache key (file mtime) refreshes
+          Framework filtering relies on cached <code>TargetFrameworks</code>. If
+          a project's frameworks changed, the cache key (file mtime) refreshes
           automatically — but you can delete
           <code class="text-primary-500">~/.pace/cache/dotnet_cache.json</code> to
           force a rebuild of the cache.
@@ -923,10 +985,12 @@ pace clean             # then remove artifacts + caches`)}
     <div class="mt-3">
       <Callout type="note" message="Get a full error trace">
         <p class="text-sm text-surface-700-300">
-          Re-run any CLI command with <code class="text-primary-500">--debug</code>
+          Re-run any CLI command with <code class="text-primary-500"
+            >--debug</code
+          >
           to see the complete Python traceback, and
-          <code class="text-primary-500">--print-config</code> to confirm which
-          projects PACE actually resolved.
+          <code class="text-primary-500">--print-config</code> to confirm which projects
+          PACE actually resolved.
         </p>
       </Callout>
     </div>

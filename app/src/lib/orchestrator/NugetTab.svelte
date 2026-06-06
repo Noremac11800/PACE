@@ -93,7 +93,7 @@
       // that looks like a semver start (digit)
       const stem = entry.name.slice(0, -".nupkg".length);
       // Split on dots, find the first segment starting with a digit —
-      // that marks the start of the version (e.g. "2" in "Esri.Toolkit.Maui.Core.2.1.0-alpha.15")
+      // that marks the start of the version (e.g. "2" in "Company.Toolkit.Lib.Core.2.1.0-alpha.15")
       const parts = stem.split(".");
       const versionIdx = parts.findIndex((p) => /^\d/.test(p));
       if (versionIdx <= 0) continue;

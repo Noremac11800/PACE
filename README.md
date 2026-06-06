@@ -104,21 +104,21 @@ PACE is driven by a `pace.toml` manifest at your workspace root:
 path = "C:\Applications\Melbourne"
 
 [[project]]
-name = "toolkit-maui-core"
-path = "./toolkit-maui-core/src/Toolkit.Maui.Core/Toolkit.Maui.Core.csproj"
+name = "common-lib"
+path = "./common-lib/src/CommonLib/CommonLib.csproj"
 type = "classlib"
 
 [[project]]
-name = "appmodule-core"
-path = "./appmodule-core/src/AppModule.Core/AppModule.Core.csproj"
+name = "feature-module"
+path = "./feature-module/src/FeatureModule/FeatureModule.csproj"
 type = "classlib"
-depends_on = ["toolkit-maui-core"]
+depends_on = ["common-lib"]
 
 [[project]]
-name = "Survey123-Mobile"
-path = "./Survey123-Mobile/src/Survey123.MobileApp/Survey123.MobileApp.csproj"
+name = "mobile-app"
+path = "./mobile-app/src/MobileApp/MobileApp.csproj"
 type = "maui"
-depends_on = ["appmodule-core"]
+depends_on = ["feature-module"]
 ```
 
 ---

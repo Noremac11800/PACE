@@ -41,6 +41,7 @@ def _build_curl_command(
     username: str,
     platform: str,
     build_description: str | None,
+    endpoint: str,
 ) -> list[str]:
     """Build the curl command arguments."""
     curl_args = [
@@ -49,7 +50,7 @@ def _build_curl_command(
         "-#",
         "-X",
         "POST",
-        "https://apptopia.esri.com/api/upload",
+        f"{endpoint}/api/upload",
         "-F",
         f"build=@{package_path}",
         "-F",
@@ -131,6 +132,7 @@ def run(
     platform: str,
     release_type: str,
     version: str,
+    endpoint: str,
     build_description: str | None = None,
 ) -> None:
     """Upload an app package to the deployment server.
@@ -143,6 +145,7 @@ def run(
         platform: Target platform (iOS, Android, Windows).
         release_type: Build configuration (Debug or Release).
         version: Version number or identifier.
+        endpoint: Base URL of the deployment server.
         build_description: Optional build notes/description.
     """
     _validate_inputs(package_path, platform, release_type, console)
@@ -157,6 +160,6 @@ def run(
         build_description,
     )
     curl_args = _build_curl_command(
-        package_path, app_name, version, username, platform, build_description
+        package_path, app_name, version, username, platform, build_description, endpoint
     )
     _execute_upload(console, curl_args, package_path)

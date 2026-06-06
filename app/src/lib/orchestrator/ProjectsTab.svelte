@@ -18,8 +18,6 @@
 
   let expandedGroups = $state<Set<string>>(new Set());
 
-  const GROUP_ORDER = ["Toolkits", "AppModules", "Apps"];
-
   $effect(() => {
     if (config) {
       // Collapse all groups by default in Projects tab
@@ -29,14 +27,10 @@
 
   function getOrderedGroups(): string[] {
     if (!config) return [];
-    const availableGroups = new Set(
-      config.projects.map((p) => p.sln_group).filter(Boolean) as string[],
-    );
-    const ordered = GROUP_ORDER.filter((g) => availableGroups.has(g));
-    for (const g of availableGroups) {
-      if (!GROUP_ORDER.includes(g)) ordered.push(g);
-    }
-    return ordered;
+    const groups = config.projects
+      .map((p) => p.sln_group)
+      .filter(Boolean) as string[];
+    return [...new Set(groups)];
   }
 
   function getProjectsByGroup(group: string): PaceProject[] {

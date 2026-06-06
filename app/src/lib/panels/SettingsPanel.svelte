@@ -212,7 +212,7 @@
                 id="storage-endpoint-url"
                 type="text"
                 class="ig-input"
-                placeholder="apptopia.esri.com"
+                placeholder="company.storage.com"
                 bind:value={settings.general.storageEndpointUrl}
               />
               <button

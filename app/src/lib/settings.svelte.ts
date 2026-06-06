@@ -87,7 +87,7 @@ export const DEFAULT_SETTINGS: Settings = {
     theme: "system",
     language: "en",
     autoCheckUpdates: true,
-    storageEndpointUrl: "apptopia.esri.com",
+    storageEndpointUrl: "",
   },
   cliPaths: {
     paceCliPath: "",

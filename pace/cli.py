@@ -210,6 +210,12 @@ def main() -> int:
         metavar="<version>",
     )
     upload_parser.add_argument(
+        "--endpoint",
+        required=True,
+        help="Base URL of the deployment server",
+        metavar="<url>",
+    )
+    upload_parser.add_argument(
         "-n",
         "--build-description",
         help="Build notes/description",
@@ -318,6 +324,7 @@ def _run(
                 args.platform,
                 args.release_type,
                 args.version,
+                args.endpoint,
                 build_description,
             )
         case "demo":
