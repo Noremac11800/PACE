@@ -110,7 +110,12 @@ def main() -> int:
         help="Print the path to the configuration file and exit",
         default=False,
     )
-    parser.add_argument(_Options.VERSION.long, action="version", version="pace 0.1.0")
+    parser.add_argument(
+        _Options.VERSION.long,
+        _Options.VERSION.short,
+        action="version",
+        version="pace 0.1.0",
+    )
     parser.add_argument(
         _Options.FROM_REPO.long,
         dest="from_repo",
