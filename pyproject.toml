@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pace-dotnet"
-version = "0.1.2"
+version = "0.1.4"
 description = "Project Automation and Configuration Engine - A Python CLI tool for bulk management of C# .NET project ecosystems"
-readme = "README.md"
+readme = "README_PYPI.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [

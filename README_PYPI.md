@@ -1,5 +1,3 @@
-![PACE Logo](./pace_logo.svg)
-
 # **P**roject **A**utomation and **C**onfiguration **E**ngine
 
 > A Python CLI tool for bulk management of C# .NET project ecosystems — from single class libraries to complex multi-project hierarchies with MAUI applications.
@@ -9,17 +7,11 @@
 [![MAUI](https://img.shields.io/badge/MAUI-supported-blueviolet?logo=dotnet)](https://dotnet.microsoft.com/apps/maui)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
----
-
 ## Overview
 
 PACE eliminates the repetitive, error-prone manual work of managing .NET project ecosystems at scale. Rather than shelling into each project directory to run `dotnet` commands, manage git state, or manually update build configurations, PACE provides a unified interface to interact with all of them at once.
 
 It understands your project topology — respecting dependency order, project hierarchy, and configuration context — so you can express intent once and apply it across your entire repository graph.
-
-PACE is built for .NET library authors, platform teams, and SDK maintainers who manage production-grade codebases consisting of multiple interconnected components and need reliable, scriptable tooling to keep them in sync.
-
----
 
 ## Target project types
 
@@ -30,25 +22,15 @@ PACE is built for .NET library authors, platform teams, and SDK maintainers who 
 | **Dependency trees** | Multi-library hierarchies with topological dependency ordering |
 | **Sample applications** | Reference and demo apps accompanying library suites |
 
----
-
-## Capabilities
-
-![PACE Features](./features.png)
-
----
-
 ## Design principles
 
-**Composability** — individual commands can be piped, scripted, and combined into workflows. PACE is a good Unix citizen.
+**Composability** — individual commands can be piped, scripted, and combined into workflows.
 
-**Topology-awareness** — multi-project operations always respect inter-project dependencies. `CoreLib` is built before `ExtensionLib` before `SampleApp`, automatically.
+**Topology-awareness** — multi-project operations always respect inter-project dependencies.
 
-**Transparency** — every operation emits clear, structured output suitable for both human review and CI log parsing. Nothing happens silently.
+**Transparency** — every operation emits clear, structured output suitable for both human review and CI log parsing.
 
-**Reproducibility** — configuration is declared in a manifest file that describes the project graph, repository layout, and per-project overrides. Behaviour is version-controllable alongside the code it manages.
-
----
+**Reproducibility** — configuration is declared in a manifest file that describes the project graph.
 
 ## Installation
 
@@ -99,30 +81,6 @@ pace test
 
 # Format and verify code style
 pace format --check
-```
-
----
-
-## Development
-
-```bash
-# Install in development mode
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Format code
-ruff format .
-
-# Check code style
-ruff check .
-
-# or for safe fixes
-ruff check --fix .
-
-# Type check
-pyright
 ```
 
 ## License
