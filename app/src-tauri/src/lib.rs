@@ -1,7 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 const GIT_BRANCH: &str = env!("GIT_BRANCH");
-const GIT_COMMIT: &str = env!("GIT_COMMIT");
+const GIT_COMMIT_COUNT: &str = env!("GIT_COMMIT_COUNT");
 
 #[tauri::command]
 fn get_app_version(app_handle: tauri::AppHandle) -> String {
@@ -12,7 +12,7 @@ fn get_app_version(app_handle: tauri::AppHandle) -> String {
         .map(|v| v.to_string())
         .unwrap_or_else(|| "0.1.0".to_string());
 
-    format!("{}-{}.{}", base_version, GIT_BRANCH, GIT_COMMIT)
+    format!("{}-{}.{}", base_version, GIT_BRANCH, GIT_COMMIT_COUNT)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
