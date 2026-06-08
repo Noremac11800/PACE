@@ -16,7 +16,7 @@
     Loader,
     Trash2,
   } from "@lucide/svelte";
-  import { configStore, saveConfig } from "$lib/config-store.svelte";
+  import { configStore, saveConfig, paceArgs } from "$lib/config-store.svelte";
 
   interface NugetSource {
     name: string;
@@ -269,11 +269,17 @@
   async function cleanDefaultCache() {
     if (defaultCacheCleaning) return;
     defaultCacheCleaning = true;
+    defaultCacheError = null;
     try {
-      const cmd = Command.create("pace", ["clean", "--cache"]);
-      await cmd.execute();
+      const args = await paceArgs(["clean", "--cache"]);
+      const cmd = Command.create("pace", args);
+      const result = await cmd.execute();
+      if (result.code !== 0) {
+        defaultCacheError = result.stderr || `Exit code ${result.code}`;
+      }
       await loadDefaultCachePackages();
     } catch (e) {
+      defaultCacheError = e instanceof Error ? e.message : String(e);
       console.error("Failed to clean default cache:", e);
     } finally {
       defaultCacheCleaning = false;
@@ -283,11 +289,17 @@
   async function cleanCustomCache() {
     if (customCacheCleaning || !customCachePath) return;
     customCacheCleaning = true;
+    customCacheError = null;
     try {
-      const cmd = Command.create("pace", ["clean", "--custom-cache"]);
-      await cmd.execute();
+      const args = await paceArgs(["clean", "--custom-cache"]);
+      const cmd = Command.create("pace", args);
+      const result = await cmd.execute();
+      if (result.code !== 0) {
+        customCacheError = result.stderr || `Exit code ${result.code}`;
+      }
       await loadCustomCachePackages();
     } catch (e) {
+      customCacheError = e instanceof Error ? e.message : String(e);
       console.error("Failed to clean custom cache:", e);
     } finally {
       customCacheCleaning = false;
