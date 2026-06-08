@@ -22,8 +22,9 @@
     helpSectionIds,
     type TocEntry,
   } from "$lib/panels/help/help-toc";
+  import { getFormattedVersion } from "$lib/app-version.svelte";
 
-  const version = "v0.1.0-alpha";
+  const version = getFormattedVersion();
 
   const sectionIcons: Record<string, typeof Info> = {
     about: Info,

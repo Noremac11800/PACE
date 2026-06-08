@@ -15,6 +15,7 @@
   import OrchestratorPanel from "$lib/panels/OrchestratorPanel.svelte";
   import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
   import { setAppUpdate, setCliUpdate } from "$lib/update-status.svelte";
+  import { getFormattedVersion } from "$lib/app-version.svelte";
   import { onMount } from "svelte";
 
   let activeView: View = $state(View.HOME);
@@ -122,7 +123,7 @@
       onclick={() => goto("/sandbox")}
       class="text-end text-xs text-surface-500-400"
     >
-      v0.1.0-alpha
+      {getFormattedVersion()}
     </button>
   </footer>
 </main>

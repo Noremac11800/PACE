@@ -1,4 +1,5 @@
 import { paceStatus } from "./pace-status.svelte";
+import { getAppVersion } from "./app-version.svelte";
 
 export interface VersionInfo {
   currentVersion: string;
@@ -28,8 +29,10 @@ export const updateStatus: {
     changelog: "",
   },
   app: {
-    currentVersion: "0.1.0-alpha",
-    latestVersion: "0.1.0-alpha",
+    get currentVersion() {
+      return getAppVersion() || "...";
+    },
+    latestVersion: "...",
     updateAvailable: false,
     changelog: "",
   },
