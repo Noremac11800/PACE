@@ -102,7 +102,7 @@
       <AboutPanel />
     </div>
     <div class="absolute inset-0" class:hidden={activeView !== View.UPDATES}>
-      <UpdatesPanel />
+      <UpdatesPanel onGoToPanel={(view) => (activeView = view)} />
     </div>
   </div>
 

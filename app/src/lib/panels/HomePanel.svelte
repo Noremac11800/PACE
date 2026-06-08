@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Download, ArrowRight } from "@lucide/svelte";
+  import { Download, ArrowRight, Package } from "@lucide/svelte";
   import AnimatedBackground from "$lib/panels/AnimatedBackground.svelte";
   import { updateStatus } from "$lib/update-status.svelte";
+  import { paceStatus } from "$lib/pace-status.svelte";
   import { View } from "$lib/panels/view-types";
 
   interface Props {
@@ -13,6 +14,7 @@
   let hasUpdates = $derived(
     updateStatus.cli.updateAvailable || updateStatus.app.updateAvailable,
   );
+  let paceInstalled = $derived(paceStatus.installed === true);
 </script>
 
 <div class="relative min-h-full flex items-center justify-center">
@@ -29,7 +31,18 @@
       Use the sidebar to navigate between views.
     </p>
 
-    {#if hasUpdates}
+    {#if !paceInstalled}
+      <button
+        class="mt-4 w-full flex items-center justify-between gap-2 rounded-lg bg-success-500/10 border border-success-500/30 px-4 py-3 text-sm text-success-500 hover:bg-success-500/20 transition-colors"
+        onclick={() => onGoToPanel?.(View.DEPENDENCIES)}
+      >
+        <span class="flex items-center gap-2">
+          <Package size={16} />
+          Install PACE to get started
+        </span>
+        <ArrowRight size={16} />
+      </button>
+    {:else if hasUpdates}
       <button
         class="mt-4 w-full flex items-center justify-between gap-2 rounded-lg bg-warning-500/10 border border-warning-500/30 px-4 py-3 text-sm text-warning-500 hover:bg-warning-500/20 transition-colors"
         onclick={() => onGoToPanel?.(View.UPDATES)}

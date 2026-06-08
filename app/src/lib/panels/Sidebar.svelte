@@ -148,13 +148,13 @@
     title="Updates"
   >
     <Download size={20} />
-    {#if hasUpdates}
+    {#if paceInstalledStatus !== false && hasUpdates}
       <span
         class="absolute -top-1.5 -right-1.5 bg-warning-500 text-surface-950 rounded-full p-0.5"
       >
         <TriangleAlert size={12} />
       </span>
-    {:else}
+    {:else if paceInstalledStatus !== false}
       <span
         class="absolute -top-1.5 -right-1.5 bg-success-500 text-surface-950 rounded-full p-0.5"
       >

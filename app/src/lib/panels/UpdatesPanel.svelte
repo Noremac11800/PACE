@@ -5,11 +5,52 @@
     ChevronDown,
     ChevronRight,
     RefreshCw,
+    Loader,
+    Package,
   } from "@lucide/svelte";
-  import { updateStatus } from "$lib/update-status.svelte";
+  import { Command } from "@tauri-apps/plugin-shell";
+  import {
+    updateStatus,
+    checkPypiForCliUpdate,
+  } from "$lib/update-status.svelte";
+  import { checkPaceInstalled, paceStatus } from "$lib/pace-status.svelte";
+  import { View } from "$lib/panels/view-types";
+
+  interface Props {
+    onGoToPanel?: (view: View) => void;
+  }
+
+  let { onGoToPanel }: Props = $props();
 
   let showCliChangelog = $state(false);
   let showAppChangelog = $state(false);
+  let isUpdatingCli = $state(false);
+  let cliUpdateResult = $state("");
+
+  async function updateCli() {
+    isUpdatingCli = true;
+    cliUpdateResult = "";
+    try {
+      const result = await Command.create("pipx", [
+        "upgrade",
+        "pace-dotnet",
+      ]).execute();
+
+      if (result.code === 0) {
+        cliUpdateResult = "CLI updated successfully!";
+        // Refresh the installed version status
+        await checkPaceInstalled();
+        // Re-check PyPI for latest (current should now match)
+        await checkPypiForCliUpdate();
+      } else {
+        cliUpdateResult = `Update failed: ${result.stderr}`;
+      }
+    } catch (error) {
+      cliUpdateResult = `Error: ${error}`;
+    } finally {
+      isUpdatingCli = false;
+    }
+  }
 </script>
 
 <div class="h-full flex flex-col overflow-hidden">
@@ -25,7 +66,13 @@
     <div class="card bg-surface-50-950 p-4 shadow-md">
       <div class="flex items-center justify-between mb-2">
         <h3 class="font-semibold text-surface-900-50">PACE CLI</h3>
-        {#if updateStatus.cli.updateAvailable}
+        {#if paceStatus.installed === false}
+          <span
+            class="text-xs font-medium px-2 py-0.5 rounded-full bg-error-500/20 text-error-500"
+          >
+            Not installed
+          </span>
+        {:else if updateStatus.cli.updateAvailable}
           <span
             class="text-xs font-medium px-2 py-0.5 rounded-full bg-warning-500/20 text-warning-500"
           >
@@ -40,48 +87,80 @@
         {/if}
       </div>
 
-      <div class="text-sm text-surface-600-300 mb-3">
-        <p>
-          Current: <span class="font-mono"
-            >{updateStatus.cli.currentVersion}</span
+      {#if paceStatus.installed === false}
+        <div class="text-sm text-surface-600-300 mb-3">
+          <p class="text-error-500">PACE CLI is not installed.</p>
+          <button
+            class="mt-4 w-full flex items-center justify-between gap-2 rounded-lg bg-success-500/10 border border-success-500/30 px-4 py-3 text-sm text-success-500 hover:bg-success-500/20 transition-colors"
+            onclick={() => onGoToPanel?.(View.DEPENDENCIES)}
           >
-        </p>
-        {#if updateStatus.cli.updateAvailable}
+            <span class="flex items-center gap-2">
+              <Package size={16} />
+              Go to Dependencies panel to install
+            </span>
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      {:else}
+        <div class="text-sm text-surface-600-300 mb-3">
           <p>
-            Latest: <span class="font-mono text-warning-500"
-              >{updateStatus.cli.latestVersion}</span
+            Current: <span class="font-mono"
+              >{updateStatus.cli.currentVersion}</span
             >
           </p>
-        {/if}
-      </div>
+          {#if updateStatus.cli.updateAvailable}
+            <p>
+              Latest: <span class="font-mono text-warning-500"
+                >{updateStatus.cli.latestVersion}</span
+              >
+            </p>
+          {/if}
+        </div>
 
-      {#if updateStatus.cli.updateAvailable}
-        {#if updateStatus.cli.changelog}
-          <button
-            class="text-xs text-primary-500 flex items-center gap-1 mb-2"
-            onclick={() => (showCliChangelog = !showCliChangelog)}
-          >
+        {#if updateStatus.cli.updateAvailable}
+          {#if updateStatus.cli.changelog}
+            <button
+              class="text-xs text-primary-500 flex items-center gap-1 mb-2"
+              onclick={() => (showCliChangelog = !showCliChangelog)}
+            >
+              {#if showCliChangelog}
+                <ChevronDown size={14} />
+              {:else}
+                <ChevronRight size={14} />
+              {/if}
+              Changelog
+            </button>
             {#if showCliChangelog}
-              <ChevronDown size={14} />
-            {:else}
-              <ChevronRight size={14} />
+              <pre
+                class="text-xs bg-surface-100-900 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
+                  .cli.changelog}</pre>
             {/if}
-            Changelog
+          {/if}
+
+          <button
+            onclick={updateCli}
+            disabled={isUpdatingCli}
+            class="btn preset-filled-primary-500 text-sm"
+          >
+            {#if isUpdatingCli}
+              <Loader size={14} class="animate-spin" />
+              Updating...
+            {:else}
+              <RefreshCw size={14} />
+              Update CLI
+            {/if}
           </button>
-          {#if showCliChangelog}
-            <pre
-              class="text-xs bg-surface-100-900 rounded p-3 mb-3 overflow-auto max-h-40 font-mono whitespace-pre-wrap">{updateStatus
-                .cli.changelog}</pre>
+
+          {#if cliUpdateResult}
+            <div
+              class="mt-2 text-xs"
+              class:text-success-500={cliUpdateResult.includes("success")}
+              class:text-error-500={!cliUpdateResult.includes("success")}
+            >
+              {cliUpdateResult}
+            </div>
           {/if}
         {/if}
-
-        <button
-          onclick={() => (updateStatus.cli.updateAvailable = false)}
-          class="btn preset-filled-primary-500 text-sm"
-        >
-          <RefreshCw size={14} />
-          Update CLI
-        </button>
       {/if}
     </div>
 

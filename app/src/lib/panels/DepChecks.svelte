@@ -13,6 +13,7 @@
     setPaceVersion,
     paceStatus,
   } from "$lib/pace-status.svelte";
+  import { checkPypiForCliUpdate } from "$lib/update-status.svelte";
   import { onMount } from "svelte";
   import {
     Check,
@@ -120,6 +121,9 @@
     paceInstallResult = await installPace();
     isInstalling = false;
     await checkPace();
+
+    // Re-check PyPI to properly set update status with the new installed version
+    await checkPypiForCliUpdate();
   }
 
   async function uninstallPACE() {
