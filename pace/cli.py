@@ -1,8 +1,11 @@
 """CLI entry point for PACE."""
 
 import argparse
+import json
 import os
+import subprocess
 import sys
+import urllib.request
 from argparse import Namespace
 from importlib.metadata import version as get_version
 from importlib.resources import files
@@ -15,6 +18,19 @@ try:
 except Exception:
     __version__ = "0.1.0"
 
+
+def get_latest_pypi_version() -> str | None:
+    """Fetch the latest version of pace-dotnet from PyPI."""
+    try:
+        with urllib.request.urlopen(
+            "https://pypi.org/pypi/pace-dotnet/json", timeout=5
+        ) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            return data.get("info", {}).get("version")
+    except Exception:
+        return None
+
+
 # Force UTF-8 encoding for stdout/stderr to avoid encoding issues on Windows
 os.environ["PYTHONIOENCODING"] = "utf-8:replace"
 if sys.platform == "win32":
@@ -25,6 +41,33 @@ if sys.platform == "win32":
 import rich
 from rich.console import Console
 from rich.traceback import install
+
+
+def print_version_check(console: Console) -> None:
+    """Print a message if a newer version is available on PyPI."""
+    latest = get_latest_pypi_version()
+    if latest:
+        # Compare versions (simple tuple comparison for semver)
+        try:
+            current_parts = tuple(int(x) for x in __version__.split("."))
+            latest_parts = tuple(int(x) for x in latest.split("."))
+            if latest_parts > current_parts:
+                console.print()
+                console.print(
+                    f"[yellow]A new version of pace-dotnet is available: {latest} (current: {__version__})[/yellow]"
+                )
+                console.print("[yellow]Run 'pace update' to upgrade.[/yellow]")
+                console.print()
+        except ValueError:
+            # Fallback to string comparison if parsing fails
+            if latest != __version__:
+                console.print()
+                console.print(
+                    f"[yellow]A new version of pace-dotnet is available: {latest} (current: {__version__})[/yellow]"
+                )
+                console.print("[yellow]Run 'pace update' to upgrade.[/yellow]")
+                console.print()
+
 
 from pace.commands import clean, dotnet, git, upload
 from pace.config import Config, load_config
@@ -120,8 +163,9 @@ def main() -> int:
     parser.add_argument(
         _Options.VERSION.long,
         _Options.VERSION.short,
-        action="version",
-        version=f"pace {__version__}",
+        action="store_true",
+        help="Print the version and exit",
+        default=False,
     )
     parser.add_argument(
         _Options.FROM_REPO.long,
@@ -251,6 +295,11 @@ def main() -> int:
         help=f"Demo to run. Choices: {', '.join(_DEMOS)}",
     )
 
+    # Update command to upgrade to latest version
+    _update_parser = subparsers.add_parser(
+        "update", help="Update pace-dotnet to the latest version"
+    )
+
     args: Namespace
     unknownargs: list[str]
     args, unknownargs = parser.parse_known_args()
@@ -259,11 +308,44 @@ def main() -> int:
         install(show_locals=True, suppress=[rich])
 
     try:
+        # Handle version flag manually to show update check
+        if getattr(args, "version", False):
+            console.print(f"pace {__version__}")
+            print_version_check(console)
+            return 0
+
+        # Handle update command before _run to avoid config loading
+        if args.command == "update":
+            return _update(console)
         return _run(console, args, unknownargs, parser)
     except Exception as e:
         if args.debug:
             raise
         console.print(f"[red]error:[/red] {e}")
+        return 1
+
+
+def _update(console: Console) -> int:
+    """Update pace-dotnet to the latest version using pipx."""
+    console.print("[blue]Updating pace-dotnet...[/blue]")
+    try:
+        subprocess.run(
+            ["pipx", "upgrade", "pace-dotnet"],
+            capture_output=True,
+            check=True,
+        )
+        # Get new version after update
+        new_version = get_latest_pypi_version()
+        if new_version:
+            console.print(f"[green]Successfully updated to pace {new_version}[/green]")
+        else:
+            console.print("[green]Successfully updated pace-dotnet[/green]")
+        return 0
+    except subprocess.CalledProcessError:
+        console.print("[red]Update failed[/red]")
+        return 1
+    except FileNotFoundError:
+        console.print("[red]pipx not found. Please install pipx first.[/red]")
         return 1
 
 
@@ -344,6 +426,12 @@ def _run(
         case _:
             if not was_option_given:
                 parser.print_help()
+                print_version_check(console)
+                return 0
+
+    # Show version check after any command completes (except update)
+    if args.command != "update":
+        print_version_check(console)
     return 0
 
 
