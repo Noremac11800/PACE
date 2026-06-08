@@ -16,10 +16,13 @@
     Copy,
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-shell";
+  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
 
   let { class: classname = "" } = $props();
 
-  const version = "v0.1.0-alpha";
+  let version = $derived(`v${appVersion.version}`);
+
+  fetchAppVersion();
 
   const techStack = [
     {
@@ -105,12 +108,12 @@
     },
   ];
 
-  const stats = [
+  const stats = $derived([
     { label: "Technologies", value: "6+", icon: Sparkles },
     { label: "Platforms", value: "3", icon: Globe },
     { label: "Open Source", value: "MIT", icon: Heart },
     { label: "Version", value: version, icon: Package },
-  ];
+  ]);
 
   async function openLink(url: string) {
     await open(url);

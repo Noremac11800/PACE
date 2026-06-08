@@ -3,13 +3,16 @@
   import { setContext } from "svelte";
   import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
+  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
   import type { LayoutProps } from "./+layout";
 
   const { children } = $props();
 
   let data = $state<LayoutProps>({ title: "Sandbox" });
+  let version = $derived(`v${appVersion.version}`);
 
   setContext("data", data);
+  fetchAppVersion();
 </script>
 
 <header
@@ -36,6 +39,6 @@
 >
   <p class="text-sm italic text-surface-700-300">
     <!-- &copy; {new Date().getFullYear()} VentureCodable - All rights reserved -->
-    v0.1.0-alpha
+    {version}
   </p>
 </footer>
