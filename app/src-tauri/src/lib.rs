@@ -12,7 +12,12 @@ fn get_app_version(app_handle: tauri::AppHandle) -> String {
         .map(|v| v.to_string())
         .unwrap_or_else(|| "0.1.0".to_string());
 
-    format!("{}-{}.{}", base_version, GIT_BRANCH, GIT_COMMIT_COUNT)
+    // Show clean semver for main/master branch
+    if GIT_BRANCH == "main" || GIT_BRANCH == "master" {
+        base_version
+    } else {
+        format!("{}-{}.{}", base_version, GIT_BRANCH, GIT_COMMIT_COUNT)
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
