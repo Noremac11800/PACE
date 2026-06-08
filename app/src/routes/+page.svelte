@@ -14,7 +14,6 @@
   import UpdatesPanel from "$lib/panels/UpdatesPanel.svelte";
   import OrchestratorPanel from "$lib/panels/OrchestratorPanel.svelte";
   import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
-  import { setAppUpdate, setCliUpdate } from "$lib/update-status.svelte";
   import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
   import { onMount } from "svelte";
 
@@ -50,15 +49,6 @@
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <button
-        class="btn preset-tonal text-xs"
-        onclick={() => {
-          setAppUpdate("0.2.0", "- Bug fixes\n- New feature");
-          setCliUpdate("0.2.0", "- Bug fixes\n- New feature");
-        }}
-      >
-        Simulate Updates
-      </button>
       <ThemeSwitch />
     </div>
   </header>
