@@ -1,3 +1,5 @@
+import { paceStatus } from "./pace-status.svelte";
+
 export interface VersionInfo {
   currentVersion: string;
   latestVersion: string;
@@ -5,12 +7,22 @@ export interface VersionInfo {
   changelog: string;
 }
 
+function getCliVersion(): string {
+  // Extract version number from paceStatus.version (e.g., "pace 0.1.5" -> "0.1.5")
+  const version = paceStatus.version;
+  if (!version) return "0.1.0";
+  const match = version.match(/(\d+\.\d+\.\d+)/);
+  return match ? match[1] : "0.1.0";
+}
+
 export const updateStatus: {
   cli: VersionInfo;
   app: VersionInfo;
 } = $state({
   cli: {
-    currentVersion: "0.1.0",
+    get currentVersion() {
+      return getCliVersion();
+    },
     latestVersion: "0.1.0",
     updateAvailable: false,
     changelog: "",

@@ -4,9 +4,16 @@ import argparse
 import os
 import sys
 from argparse import Namespace
+from importlib.metadata import version as get_version
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
+
+# Get version from package metadata
+try:
+    __version__ = get_version("pace-dotnet")
+except Exception:
+    __version__ = "0.1.0"
 
 # Force UTF-8 encoding for stdout/stderr to avoid encoding issues on Windows
 os.environ["PYTHONIOENCODING"] = "utf-8:replace"
@@ -114,7 +121,7 @@ def main() -> int:
         _Options.VERSION.long,
         _Options.VERSION.short,
         action="version",
-        version="pace 0.1.0",
+        version=f"pace {__version__}",
     )
     parser.add_argument(
         _Options.FROM_REPO.long,

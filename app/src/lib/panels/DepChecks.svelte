@@ -4,18 +4,21 @@
     getPythonVersion,
     isGitInstalled,
     isPipxInstalled,
+    installPipx,
     installPace,
   } from "$lib/dependency_utils";
   import { Command } from "@tauri-apps/plugin-shell";
-  import { setPaceInstalledStatus } from "$lib/pace-status.svelte";
-  import { open } from "@tauri-apps/plugin-dialog";
+  import {
+    setPaceInstalledStatus,
+    setPaceVersion,
+    paceStatus,
+  } from "$lib/pace-status.svelte";
   import { onMount } from "svelte";
   import {
     Check,
     X,
     Loader,
     RefreshCw,
-    Folder,
     Package,
     Github,
     Play,
@@ -34,7 +37,6 @@
   let gitFound: boolean | undefined = $state(undefined);
   let pipxFound: boolean | undefined = $state(undefined);
   let pipxVersion = $state("");
-  let paceRepoPath: string = $state("");
   let paceInstallResult: string = $state("");
   let paceHelpResult: string = $state("");
   let paceUninstallResult: string = $state("");
@@ -45,7 +47,6 @@
   let isCheckingPace = $state(false);
   let pipxInstallResult: string = $state("");
   let paceInstalled: boolean | undefined = $state(undefined);
-  let paceVersion = $state("");
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -80,30 +81,12 @@
     }
   }
 
-  async function installPipx() {
+  async function installPipxHandler() {
     isInstallingPipx = true;
     pipxInstallResult = "";
     await sleep(EXEC_DELAY);
     try {
-      let result = await Command.create("pip install pipx", [
-        "-m",
-        "pip",
-        "install",
-        "pipx",
-      ]).execute();
-      console.log(result);
-      if (result.code === 0) {
-        pipxInstallResult = "Pipx installed successfully. Ensuring PATH...";
-        let ensurePathResult = await Command.create("pipx", [
-          "ensurepath",
-        ]).execute();
-        pipxInstallResult =
-          ensurePathResult.code === 0
-            ? "Pipx installed and PATH updated."
-            : `Pipx installed but PATH update failed: ${ensurePathResult.stderr}`;
-      } else {
-        pipxInstallResult = result.stderr;
-      }
+      pipxInstallResult = await installPipx();
       await checkPipx();
     } catch (error) {
       pipxInstallResult = error as string;
@@ -115,13 +98,13 @@
 
   async function checkPace() {
     isCheckingPace = true;
-    paceVersion = "";
+    setPaceVersion("");
     await sleep(EXEC_DELAY);
     try {
       let result = await Command.create("pace", ["--version"]).execute();
       paceInstalled = result.code === 0;
       if (paceInstalled) {
-        paceVersion = result.stdout.trim();
+        setPaceVersion(result.stdout.trim());
       }
     } catch {
       paceInstalled = false;
@@ -132,16 +115,9 @@
   }
 
   async function installPACE() {
-    // Validate that a repository path is provided
-    if (!paceRepoPath || paceRepoPath.trim() === "") {
-      paceInstallResult =
-        "Please select a PACE repository path before installing.";
-      return;
-    }
-
     isInstalling = true;
     await sleep(EXEC_DELAY);
-    paceInstallResult = await installPace(paceRepoPath);
+    paceInstallResult = await installPace();
     isInstalling = false;
     await checkPace();
   }
@@ -153,7 +129,7 @@
     try {
       let result = await Command.create("pipx", [
         "uninstall",
-        "pace",
+        "pace-dotnet",
       ]).execute();
       paceUninstallResult =
         result.code === 0 ? "PACE uninstalled successfully" : result.stderr;
@@ -185,7 +161,7 @@
     pipxFound = undefined;
     pipxVersion = "";
     paceInstalled = undefined;
-    paceVersion = "";
+    setPaceVersion("");
     paceHelpResult = "";
     paceInstallResult = "";
     paceUninstallResult = "";
@@ -333,7 +309,7 @@
             {#if pythonFound}
               <button
                 class="btn preset-filled-secondary-500 text-xs flex items-center gap-1 px-2 py-1"
-                onclick={installPipx}
+                onclick={installPipxHandler}
                 disabled={isInstallingPipx}
               >
                 {#if isInstallingPipx}
@@ -366,10 +342,11 @@
             <img src="/appicon.svg" alt="PACE" class="h-5 w-5" />
             PACE Installation
           </h4>
-          {#if paceInstalled && paceVersion}
+          {#if paceInstalled && paceStatus.version}
             <p class="text-xs text-surface-700-300 flex items-center gap-1">
               <Tag size={12} />
-              v{paceVersion.replace(/^pace\s*/, "")}
+              v{paceStatus.version.match(/\d+\.\d+\.\d+/)?.[0] ||
+                paceStatus.version.replace(/^pace\s*/, "")}
             </p>
           {/if}
         </div>
@@ -390,35 +367,6 @@
         {:else if isCheckingPace}
           <Loader size={18} class="animate-spin text-surface-500" />
         {/if}
-      </div>
-
-      <!-- Repository Path Input -->
-      <label
-        for="pace-repo-path"
-        class="block text-sm text-surface-700-300 mb-1"
-      >
-        Path to PACE repository root
-      </label>
-      <div class="input-group grid grid-cols-[auto_1fr] mb-4">
-        <button
-          class="ig-cell preset-tonal cursor-pointer"
-          onclick={async () => {
-            const selected = await open({ directory: true });
-            if (selected) {
-              paceRepoPath = selected as string;
-            }
-          }}
-          title="Select directory"
-        >
-          <Folder size={18} />
-        </button>
-        <input
-          id="pace-repo-path"
-          class="ig-input"
-          type="text"
-          placeholder="PACE repository path"
-          bind:value={paceRepoPath}
-        />
       </div>
 
       <!-- Action Buttons -->

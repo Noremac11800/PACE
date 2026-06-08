@@ -59,32 +59,58 @@ export async function isPipxInstalled(): Promise<boolean> {
 
 export async function installPipx(): Promise<string> {
   try {
-    // First check if pipx is installed, if not install it
-    if (!(await isPipxInstalled())) {
-      const pipxInstallResult = await Command.create("python", [
+    // Install pipx using pip with --user and --break-system-packages if needed
+    const installResult = await Command.create("python", [
+      "-m",
+      "pip",
+      "install",
+      "--user",
+      "pipx",
+    ]).execute();
+
+    if (installResult.code !== 0) {
+      // Try with --break-system-packages flag (for PEP 668 systems)
+      const retryResult = await Command.create("python", [
         "-m",
         "pip",
         "install",
+        "--user",
+        "--break-system-packages",
         "pipx",
       ]).execute();
-      if (pipxInstallResult.code !== 0) {
-        return `Failed to install pipx: ${pipxInstallResult.stderr}`;
+      if (retryResult.code !== 0) {
+        return `Failed to install pipx: ${retryResult.stderr}`;
       }
     }
+
+    // Ensure pipx is on PATH
+    await Command.create("python", ["-m", "pipx", "ensurepath"]).execute();
+
+    return "Pipx installed successfully";
   } catch (error) {
     return `Error installing pipx: ${error instanceof Error ? error.message : String(error)}`;
   }
-  return "Unable to install pipx: Reason unknown";
 }
 
-export async function installPace(repodir: string): Promise<string> {
+export async function installPace(): Promise<string> {
   try {
-    // Install pace using pipx from the specified repository directory
-    console.log(repodir);
+    // First try to upgrade if already installed
+    const upgradeResult = await Command.create("pipx", [
+      "upgrade",
+      "pace-dotnet",
+    ]).execute();
+
+    if (upgradeResult.code === 0) {
+      // Ensure PATH is set up
+      await Command.create("pipx", ["ensurepath"]).execute();
+      return "PACE upgraded successfully";
+    }
+
+    // If upgrade failed (not installed), try fresh install with force
     const installResult = await Command.create("pipx", [
       "install",
-      "--editable",
-      repodir,
+      "--force",
+      "pace-dotnet",
     ]).execute();
 
     if (installResult.code !== 0) {
@@ -92,7 +118,10 @@ export async function installPace(repodir: string): Promise<string> {
       return `Failed to install pace: ${installResult.stderr}`;
     }
 
-    return "PACE installed successfully";
+    // Ensure PATH is set up
+    await Command.create("pipx", ["ensurepath"]).execute();
+
+    return "PACE installed successfully. You may need to restart your terminal for 'pace' to be available on PATH.";
   } catch (error) {
     return `Error installing PACE: ${error instanceof Error ? error.message : String(error)}`;
   }

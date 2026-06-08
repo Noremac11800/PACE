@@ -167,6 +167,9 @@
         },
         {
           "path": "**/*.toml"
+        },
+        {
+          "path": "$HOME/.local/share/pipx/venvs/**"
         }
       ]
     },
@@ -181,6 +184,9 @@
         },
         {
           "path": "$HOME/.pace/configs/**"
+        },
+        {
+          "path": "$HOME/.local/share/pipx/venvs/**"
         }
       ]
     },

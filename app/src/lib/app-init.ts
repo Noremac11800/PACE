@@ -89,6 +89,21 @@ export function applyFontSize(fontSize: "small" | "medium" | "large"): void {
 
 async function syncPaceConfig(): Promise<void> {
   try {
+    // Check if pace is installed before attempting to sync
+    const versionCheck = await Command.create("pace", ["--version"]).execute();
+    if (versionCheck.code !== 0) {
+      console.log("PACE is not installed, skipping config sync");
+      return;
+    }
+  } catch (error) {
+    console.error(
+      "Could not sync pace config file. PACE is not installed",
+      error,
+    );
+    return;
+  }
+
+  try {
     // Get the config file path from the pace CLI
     const result = await Command.create("pace", [
       "--print-config-path",

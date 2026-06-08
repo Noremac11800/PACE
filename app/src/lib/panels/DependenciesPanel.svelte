@@ -2,6 +2,6 @@
   import DepChecks from "./DepChecks.svelte";
 </script>
 
-<div class="min-h-full flex items-center justify-center">
+<div class="h-full overflow-auto flex items-start justify-center p-4">
   <DepChecks class="min-w-[300px] max-w-[500px] w-full" />
 </div>
