@@ -19,9 +19,8 @@
   import { openUrl } from "@tauri-apps/plugin-opener";
   import Callout from "$lib/components/Callout.svelte";
   import { CodeBlock, RefTable } from "$lib/snippets/HelpSnippets.svelte";
-  import { getFormattedVersion } from "$lib/app-version.svelte";
 
-  let { version = getFormattedVersion() }: { version?: string } = $props();
+  let { version = "v0.1.0-alpha" }: { version?: string } = $props();
 
   const REPO_URL = "https://github.com/Noremac11800/PACE";
 

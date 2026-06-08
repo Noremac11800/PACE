@@ -4,7 +4,6 @@
   import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
   import type { LayoutProps } from "./+layout";
-  import { getFormattedVersion } from "$lib/app-version.svelte";
 
   const { children } = $props();
 
@@ -37,6 +36,6 @@
 >
   <p class="text-sm italic text-surface-700-300">
     <!-- &copy; {new Date().getFullYear()} VentureCodable - All rights reserved -->
-    {getFormattedVersion()}
+    v0.1.0-alpha
   </p>
 </footer>

@@ -16,11 +16,10 @@
     Copy,
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-shell";
-  import { getFormattedVersion } from "$lib/app-version.svelte";
 
   let { class: classname = "" } = $props();
 
-  const version = getFormattedVersion();
+  const version = "v0.1.0-alpha";
 
   const techStack = [
     {
