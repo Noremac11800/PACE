@@ -1,6 +1,10 @@
 use std::process::Command;
 
 fn main() {
+    // Rerun build script when git state changes
+    println!("cargo:rerun-if-changed=.git/HEAD");
+    println!("cargo:rerun-if-changed=.git/refs/heads/");
+
     // Get git branch
     let branch = Command::new("git")
         .args(["rev-parse", "--abbrev-ref", "HEAD"])
