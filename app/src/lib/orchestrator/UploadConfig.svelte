@@ -19,6 +19,8 @@
     RotateCw,
     FolderOpen,
     ExternalLink,
+    Settings,
+    AlertTriangle,
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
   import { openPath, openUrl } from "@tauri-apps/plugin-opener";
@@ -32,6 +34,12 @@
   import { configStore } from "$lib/config-store.svelte";
   import { setUploadingStatus } from "./command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
+
+  interface Props {
+    onGoToSettings?: () => void;
+  }
+
+  let { onGoToSettings }: Props = $props();
 
   async function openStorageEndpoint() {
     let url = settings.general.storageEndpointUrl;
@@ -67,6 +75,10 @@
   let buildNotes = $state(settings.uploadTab.buildNotes);
 
   let settingsInitialized = $state(false);
+
+  // Endpoint configuration
+  const endpointUrl = $derived(settings.general.storageEndpointUrl);
+  const isEndpointConfigured = $derived(!!endpointUrl);
 
   // Derived projects list from active config
   const projects = $derived(configStore.activeConfig?.projects ?? []);
@@ -285,7 +297,8 @@
       selectedPackages.length === 0 ||
       !username ||
       !appName ||
-      !version
+      !version ||
+      !isEndpointConfigured
     )
       return;
 
@@ -341,6 +354,8 @@
       pkg.buildConfig,
       "--version",
       version,
+      "--endpoint",
+      endpointUrl,
     ];
 
     if (buildNotes) {
@@ -393,7 +408,7 @@
         if (!pkg) return null;
 
         const apiPlatform = getApiPlatform(pkg.platform);
-        let cmd = `pace upload "${pkg.path}" --username "${username}" --app-name "${appName}" --platform ${apiPlatform} --release-type ${pkg.buildConfig} --version "${version}"`;
+        let cmd = `pace upload "${pkg.path}" --username "${username}" --app-name "${appName}" --platform ${apiPlatform} --release-type ${pkg.buildConfig} --version "${version}" --endpoint "${endpointUrl}"`;
         if (buildNotes) {
           cmd += ` --build-description "${buildNotes}"`;
         }
@@ -411,6 +426,32 @@
 
 <div class="h-full flex flex-col">
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    <!-- Storage Endpoint Configuration Warning -->
+    {#if !isEndpointConfigured}
+      <div
+        class="card bg-warning-500/10 border border-warning-500 p-4 flex flex-col gap-3"
+      >
+        <div class="flex items-center gap-2">
+          <AlertTriangle size={18} class="text-warning-500" />
+          <span class="font-semibold text-warning-600-400"
+            >Storage Endpoint Not Configured</span
+          >
+        </div>
+        <p class="text-sm text-surface-700-300">
+          You need to configure a storage endpoint before uploading packages.
+        </p>
+        {#if onGoToSettings}
+          <button
+            class="btn preset-tonal flex items-center gap-2 self-start text-sm"
+            onclick={onGoToSettings}
+          >
+            <Settings size={14} />
+            Configure in Settings
+          </button>
+        {/if}
+      </div>
+    {/if}
+
     <!-- Storage Endpoint Link -->
     <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
       <div class="flex items-center justify-between">
@@ -802,7 +843,8 @@
         disabled={selectedPackages.length === 0 ||
           !username ||
           !appName ||
-          !version}
+          !version ||
+          !isEndpointConfigured}
       >
         <Upload size={16} />
         Upload {selectedPackages.length > 0

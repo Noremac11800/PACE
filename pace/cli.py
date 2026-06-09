@@ -309,7 +309,8 @@ def main() -> int:
 
     try:
         # Handle version flag manually to show update check
-        if getattr(args, "version", False):
+        # Only print version if --version is passed without a subcommand
+        if getattr(args, "version", False) and args.command is None:
             console.print(f"pace {__version__}")
             print_version_check(console)
             return 0

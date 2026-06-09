@@ -81,7 +81,7 @@
       class="absolute inset-0"
       class:hidden={activeView !== View.ORCHESTRATOR}
     >
-      <OrchestratorPanel />
+      <OrchestratorPanel onGoToPanel={(view) => (activeView = view)} />
     </div>
     <div class="absolute inset-0" class:hidden={activeView !== View.CONSOLE}>
       <ConsolePanel />

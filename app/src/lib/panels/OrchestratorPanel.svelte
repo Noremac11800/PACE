@@ -29,6 +29,13 @@
   import ConfigEditorTab from "$lib/orchestrator/ConfigEditorTab.svelte";
   import NugetTab from "$lib/orchestrator/NugetTab.svelte";
   import ConfigSelector from "$lib/panels/ConfigSelector.svelte";
+  import { View } from "$lib/panels/view-types";
+
+  interface Props {
+    onGoToPanel?: (view: View) => void;
+  }
+
+  let { onGoToPanel }: Props = $props();
 
   let refreshing = $state(false);
 
@@ -220,7 +227,7 @@
           class="flex-1 overflow-auto p-4"
           class:hidden={activeTab !== "deploy"}
         >
-          <DeployTab />
+          <DeployTab onGoToSettings={() => onGoToPanel?.(View.SETTINGS)} />
         </div>
         <div
           class="flex-1 overflow-auto p-4"

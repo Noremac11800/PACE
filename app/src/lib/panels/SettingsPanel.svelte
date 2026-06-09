@@ -8,6 +8,8 @@
     Database,
     ExternalLink,
     RotateCcw,
+    AlertTriangle,
+    Check,
   } from "@lucide/svelte";
   import { openUrl } from "@tauri-apps/plugin-opener";
   import { settings, resetSettings } from "$lib/settings.svelte";
@@ -34,6 +36,14 @@
   let tocOpen = $state(true);
   let initialized = $state(false);
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Derived state for endpoint URL validation
+  const endpointUrl = $derived(settings.general.storageEndpointUrl);
+  const endpointUrlValid = $derived(
+    !endpointUrl ||
+      endpointUrl.startsWith("http://") ||
+      endpointUrl.startsWith("https://"),
+  );
 
   // Explicitly track all settings values for reactivity
   $effect(() => {
@@ -202,7 +212,7 @@
           >
             <label
               class="block text-sm font-semibold text-surface-900-50 mb-2"
-              for="storage-endpoint-url">Application Storage Endpoint URL</label
+              for="storage-endpoint-url">Application storage endpoint URL</label
             >
             <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
               Configure the endpoint URL for application storage uploads
@@ -211,8 +221,10 @@
               <input
                 id="storage-endpoint-url"
                 type="text"
-                class="ig-input"
-                placeholder="company.storage.com"
+                class="ig-input {endpointUrl && !endpointUrlValid
+                  ? 'border-warning-500 focus:border-warning-500'
+                  : ''}"
+                placeholder="https://company.storage.com"
                 bind:value={settings.general.storageEndpointUrl}
               />
               <button
@@ -238,6 +250,21 @@
                 <ExternalLink size={16} />
               </button>
             </div>
+            {#if endpointUrl && !endpointUrlValid}
+              <div
+                class="flex items-center gap-1.5 mt-2 text-xs text-warning-600-400"
+              >
+                <AlertTriangle size={12} />
+                <span>URL must start with http:// or https://</span>
+              </div>
+            {:else if endpointUrl && endpointUrlValid}
+              <div
+                class="flex items-center gap-1.5 mt-2 text-xs text-success-600-400"
+              >
+                <Check size={12} />
+                <span>Valid URL format</span>
+              </div>
+            {/if}
           </div>
         </div>
       </section>

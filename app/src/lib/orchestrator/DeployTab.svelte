@@ -4,6 +4,12 @@
   import PublishingConfig from "./PublishingConfig.svelte";
   import UploadConfig from "./UploadConfig.svelte";
 
+  interface Props {
+    onGoToSettings?: () => void;
+  }
+
+  let { onGoToSettings }: Props = $props();
+
   let activeSection = $state<"codesigning" | "publishing" | "upload">(
     "publishing",
   );
@@ -52,7 +58,7 @@
       <PublishingConfig />
     </div>
     <div class="absolute inset-0" class:hidden={activeSection !== "upload"}>
-      <UploadConfig />
+      <UploadConfig {onGoToSettings} />
     </div>
   </div>
 </div>
