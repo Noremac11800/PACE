@@ -67,7 +67,7 @@ def _collect_paths_to_delete(
         repodir: Root directory where repositories are cloned.
         do_cache: Whether to include standard NuGet cache paths.
         do_custom_cache: Whether to include custom NuGet cache paths.
-        do_project: Whether to include project bin/obj directories.
+        do_project: Whether to include project bin/obj/AppPackages directories.
         nuget_cache_path: Custom NuGet cache path from config (if any).
 
     Returns:
@@ -79,9 +79,9 @@ def _collect_paths_to_delete(
     project_dir = csproj_full_path.parent
     package_name = csproj_full_path.stem
 
-    # --- bin/ and obj/ directories ---
+    # --- bin/, obj/, and AppPackages/ directories ---
     if do_project:
-        for artifact_dir_name in ("bin", "obj"):
+        for artifact_dir_name in ("bin", "obj", "AppPackages"):
             artifact_dir = project_dir / artifact_dir_name
             if artifact_dir.exists():
                 result.project.append(artifact_dir)
@@ -163,7 +163,7 @@ def _clean_project(
         statuses: ProjectCleanStatus instance to update.
         do_cache: Whether to clean standard NuGet cache.
         do_custom_cache: Whether to clean custom NuGet cache.
-        do_project: Whether to clean project directories.
+        do_project: Whether to clean project bin/obj/AppPackages directories.
         dry_run: If True, only show what would be deleted.
         nuget_cache_path: Custom NuGet cache path from config.
     """
@@ -303,7 +303,7 @@ def run(
         config: PACE configuration.
         cache: Clean standard NuGet cache (~/.nuget/packages).
         custom_cache: Clean custom NuGet cache (from nuget_cache_path config).
-        project: Clean project bin/ and obj/ directories.
+        project: Clean project bin/, obj/, and AppPackages/ directories.
         dry_run: Show what would be deleted without actually deleting.
     """
     # If no options specified, do all

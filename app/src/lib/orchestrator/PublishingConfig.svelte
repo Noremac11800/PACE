@@ -25,7 +25,7 @@
     type PublishTabSettings,
   } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
-  import { configStore } from "$lib/config-store.svelte";
+  import { configStore, paceArgs } from "$lib/config-store.svelte";
   import {
     type CodesigningData,
     type AndroidCodesignInfo,
@@ -59,6 +59,7 @@
   let windowsKey = $state(settings.publishTab.windowsKey);
   let androidKey = $state(settings.publishTab.androidKey);
   let noRestore = $state(settings.publishTab.noRestore ?? false);
+  let cleanBeforeBuild = $state(settings.publishTab.cleanBeforeBuild ?? false);
 
   let msbuildProps = $state<Record<string, string>>({
     ...settings.publishTab.msbuildProps,
@@ -113,6 +114,7 @@
       windowsKey,
       androidKey,
       noRestore,
+      cleanBeforeBuild,
       msbuildProps: { ...msbuildProps },
     };
     untrack(() => {
@@ -140,6 +142,7 @@
     windowsKey = d.windowsKey;
     androidKey = d.androidKey;
     noRestore = d.noRestore ?? false;
+    cleanBeforeBuild = d.cleanBeforeBuild ?? false;
     msbuildProps = {};
   }
 
@@ -321,6 +324,41 @@
     });
   }
 
+  async function runClean(): Promise<boolean> {
+    progressLabel = "Cleaning bin/ and obj/ directories...";
+    addLine(
+      "\n========== Cleaning bin/ and obj/ directories ==========\n",
+      "out",
+    );
+
+    const cleanArgs = await paceArgs([
+      "--to",
+      selectedProject,
+      "clean",
+      "--projects",
+    ]);
+
+    return new Promise((resolve) => {
+      try {
+        const cmd = Command.create("pace", cleanArgs);
+
+        cmd.stdout.on("data", (data: string) => addLine(data, "out"));
+        cmd.stderr.on("data", (data: string) => addLine(data, "err"));
+
+        cmd.on("close", (payload: { code: number | null }) => {
+          resolve(payload.code === 0);
+        });
+
+        cmd.spawn().then((child) => {
+          currentProcess = child;
+        });
+      } catch (e) {
+        addLine(`Error: ${e instanceof Error ? e.message : String(e)}`, "err");
+        resolve(false);
+      }
+    });
+  }
+
   async function runPublish() {
     if (isRunning || !selectedProject || selectedPlatforms.length === 0) return;
 
@@ -338,6 +376,18 @@
     }
 
     try {
+      if (cleanBeforeBuild) {
+        const cleanSuccess = await runClean();
+        currentProcess = null;
+        if (!cleanSuccess) {
+          addLine("\n========== Clean failed ==========\n", "err");
+          progressLabel = "Clean failed";
+          progress = 100;
+          return;
+        }
+        addLine("\n========== Clean completed ==========\n", "out");
+      }
+
       for (let i = 0; i < orderedSelectedPlatforms.length; i++) {
         currentPlatformIndex = i;
         const platform = orderedSelectedPlatforms[i];
@@ -399,6 +449,13 @@
     setPublishingStatus(false);
     currentProcess = null;
   }
+
+  const cleanCommandPreview = $derived.by(() => {
+    const parts: string[] = ["pace"];
+    if (selectedProject) parts.push("--to", selectedProject);
+    parts.push("clean", "--projects");
+    return parts.join(" ");
+  });
 
   // Command previews as async state+effect to support path expansion
   let commandPreviews = $state<{ platform: Platform; command: string }[]>([]);
@@ -524,46 +581,68 @@
     </div>
 
     <!-- Build Configuration -->
-    <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <Hammer size={16} class="text-primary-500" />
-          <span class="font-semibold text-surface-900-100 text-sm">Build</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="flex gap-2">
-            {#each ["Debug", "Release"] as const as cfg}
-              <button
-                type="button"
-                onclick={() => (buildConfig = cfg)}
-                class="px-3 py-2 rounded text-sm font-medium border transition-colors {buildConfig ===
-                cfg
-                  ? 'bg-primary-500 border-primary-500 text-white'
-                  : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
-              >
-                {cfg}
-              </button>
-            {/each}
+    <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <Hammer size={16} class="text-primary-500" />
+        <span class="font-semibold text-surface-900-100 text-sm">Build</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {#each ["Debug", "Release"] as const as cfg}
+          <button
+            type="button"
+            onclick={() => (buildConfig = cfg)}
+            class="px-3 py-2 rounded text-sm font-medium border transition-colors {buildConfig ===
+            cfg
+              ? 'bg-primary-500 border-primary-500 text-white'
+              : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
+          >
+            {cfg}
+          </button>
+        {/each}
+      </div>
+
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <label class="flex items-center gap-2 cursor-pointer group">
+          <div class="relative inline-flex items-center">
+            <input
+              type="checkbox"
+              bind:checked={noRestore}
+              class="peer sr-only"
+            />
+            <div
+              class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
+            ></div>
           </div>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <span class="text-xs font-medium text-surface-600-400"
-              >--no-restore</span
-            >
-            <div class="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                bind:checked={noRestore}
-                class="peer sr-only"
-              />
-              <div
-                class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
-              ></div>
-              <div
-                class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
-              ></div>
-            </div>
-          </label>
-        </div>
+          <span
+            class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+          >
+            Skip restore (--no-restore)
+          </span>
+        </label>
+
+        <label class="flex items-center gap-2 cursor-pointer group">
+          <div class="relative inline-flex items-center">
+            <input
+              type="checkbox"
+              bind:checked={cleanBeforeBuild}
+              class="peer sr-only"
+            />
+            <div
+              class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
+            ></div>
+          </div>
+          <span
+            class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+          >
+            Clean bin/ and obj/ dirs before build
+          </span>
+        </label>
       </div>
     </div>
 
@@ -847,6 +926,21 @@
           </div>
         {:else}
           <div class="flex flex-col gap-3">
+            {#if cleanBeforeBuild}
+              <div class="flex flex-col gap-1">
+                <div
+                  class="text-xs font-medium text-surface-600-400 flex items-center justify-between"
+                >
+                  <span>Clean (runs first)</span>
+                  <CopyButton text={cleanCommandPreview} />
+                </div>
+                <code
+                  class="text-xs font-mono bg-surface-200-800 px-3 py-2 rounded whitespace-pre-wrap break-all text-surface-900-100"
+                >
+                  {cleanCommandPreview}
+                </code>
+              </div>
+            {/if}
             {#each commandPreviews as { platform, command }}
               {@const PLATFORMS_ = PLATFORMS}
               {@const platformConfig = PLATFORMS_.find(

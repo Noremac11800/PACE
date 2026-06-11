@@ -5,6 +5,7 @@ export interface BuildTabSettings {
   selectedFrameworks: string[];
   msbuildProps: Record<string, string>;
   noRestore: boolean;
+  cleanBeforeBuild: boolean;
 }
 
 export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
@@ -14,6 +15,7 @@ export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
   selectedFrameworks: [],
   msbuildProps: {},
   noRestore: false,
+  cleanBeforeBuild: false,
 };
 
 export interface PublishTabSettings {
@@ -24,6 +26,7 @@ export interface PublishTabSettings {
   windowsKey: string;
   androidKey: string;
   noRestore: boolean;
+  cleanBeforeBuild: boolean;
   msbuildProps: Record<string, string>;
 }
 
@@ -35,6 +38,7 @@ export const DEFAULT_PUBLISH_TAB_SETTINGS: PublishTabSettings = {
   windowsKey: "*",
   androidKey: "*",
   noRestore: false,
+  cleanBeforeBuild: false,
   msbuildProps: {},
 };
 

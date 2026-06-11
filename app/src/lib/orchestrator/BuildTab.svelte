@@ -32,6 +32,9 @@
     (settings.buildTab.selectedFrameworks[0] as Framework) ?? "",
   );
   let noRestore = $state<boolean>(settings.buildTab.noRestore);
+  let cleanBeforeBuild = $state<boolean>(
+    settings.buildTab.cleanBeforeBuild ?? false,
+  );
 
   let msbuildProps = $state<Record<string, string>>({
     ...settings.buildTab.msbuildProps,
@@ -54,6 +57,7 @@
       selectedFrameworks: selectedFramework ? [selectedFramework] : [],
       msbuildProps: { ...msbuildProps },
       noRestore,
+      cleanBeforeBuild,
     };
     untrack(() => {
       settings.buildTab = snapshot;
@@ -71,6 +75,7 @@
     selectedFramework = "";
     msbuildProps = {};
     noRestore = d.noRestore;
+    cleanBeforeBuild = d.cleanBeforeBuild;
   }
 
   async function pickPath(propName: string) {
@@ -173,6 +178,14 @@
     return projects.filter((p) => included.has(p.name));
   });
 
+  const cleanCommandPreview = $derived.by(() => {
+    const parts: string[] = ["pace"];
+    if (fromProject) parts.push("--from", fromProject);
+    if (toProject) parts.push("--to", toProject);
+    parts.push("clean", "--projects");
+    return parts.join(" ");
+  });
+
   const commandPreview = $derived.by(() => {
     const parts: string[] = ["pace"];
     if (fromProject) parts.push("--from", fromProject);
@@ -187,7 +200,10 @@
       if (effective !== "" && effective !== String(prop.default))
         parts.push(`-p:${prop.name}=${effective}`);
     }
-    return parts.join(" ");
+    const buildCommand = parts.join(" ");
+    return cleanBeforeBuild
+      ? `${cleanCommandPreview}\n${buildCommand}`
+      : buildCommand;
   });
 
   function addLine(text: string, type: "out" | "err") {
@@ -298,6 +314,33 @@
     ]);
 
     try {
+      if (cleanBeforeBuild) {
+        progressLabel = "Cleaning bin/ and obj/ directories...";
+        const cleanArgs = await paceArgs([
+          ...extraPaceArgs,
+          "clean",
+          "--projects",
+        ]);
+        const cleanCmd = Command.create("pace", cleanArgs);
+        cleanCmd.stdout.on("data", (data: string) => addLine(data, "out"));
+        cleanCmd.stderr.on("data", (data: string) => addLine(data, "err"));
+        const cleanChild = await cleanCmd.spawn();
+        currentProcess = cleanChild;
+        const cleanCode = await new Promise<number | null>((resolve) => {
+          cleanCmd.on("close", (payload: { code: number | null }) =>
+            resolve(payload.code),
+          );
+        });
+        currentProcess = null;
+        if (cleanCode !== 0) {
+          addLine(`Clean failed with exit code ${cleanCode}.`, "err");
+          progressLabel = "Clean failed";
+          progress = 100;
+          return;
+        }
+        if (!isRunning) return; // cancelled during clean
+      }
+
       const cmd = Command.create("pace", allArgs);
       const child = await cmd.spawn();
       currentProcess = child;
@@ -487,6 +530,32 @@
           Skip restore (--no-restore)
         </span>
       </label>
+
+      <!-- Clean before build toggle -->
+      <label class="flex items-center gap-3 cursor-pointer group">
+        <div
+          role="checkbox"
+          aria-checked={cleanBeforeBuild}
+          tabindex="0"
+          class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {cleanBeforeBuild
+            ? 'bg-primary-500'
+            : 'bg-surface-300-700'}"
+          onclick={() => (cleanBeforeBuild = !cleanBeforeBuild)}
+          onkeydown={(e) =>
+            e.key === " " && (cleanBeforeBuild = !cleanBeforeBuild)}
+        >
+          <div
+            class="w-4 h-4 rounded-full bg-white shadow transition-transform {cleanBeforeBuild
+              ? 'translate-x-4'
+              : 'translate-x-0'}"
+          ></div>
+        </div>
+        <span
+          class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+        >
+          Clean bin/ and obj/ dirs before build
+        </span>
+      </label>
     </div>
 
     <!-- MSBuild Properties -->
@@ -613,7 +682,7 @@
         <CopyButton text={commandPreview} />
       </div>
       <code
-        class="block text-sm font-mono bg-surface-200-800 px-3 py-2 rounded break-all text-surface-900-100"
+        class="block text-sm font-mono bg-surface-200-800 px-3 py-2 rounded break-all whitespace-pre-wrap text-surface-900-100"
       >
         {commandPreview}
       </code>

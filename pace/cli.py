@@ -202,7 +202,7 @@ def main() -> int:
     clean_parser.add_argument(
         "--project",
         action="store_true",
-        help="Clean project bin/ and obj/ directories",
+        help="Clean project bin/, obj/, and AppPackages/ directories",
         default=False,
     )
     clean_parser.add_argument(
