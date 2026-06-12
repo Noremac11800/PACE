@@ -15,6 +15,7 @@ import {
 } from "./settings.svelte";
 import { theme } from "./theme";
 import { checkPypiForCliUpdate } from "./update-status.svelte";
+import { checkPaceInstalled } from "./pace-status.svelte";
 
 // Promise that resolves when app initialization is complete
 let initPromise: Promise<void> | null = null;
@@ -36,6 +37,7 @@ async function initializeAppInternal(): Promise<void> {
   applyTheme(settings.general.theme);
   applyFontSize(settings.appearance.fontSize);
   await syncPaceConfig();
+  await checkPaceInstalled();
   await checkPypiForCliUpdate();
 }
 

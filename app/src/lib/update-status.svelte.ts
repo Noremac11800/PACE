@@ -38,16 +38,29 @@ export const updateStatus: {
   },
 });
 
+function isVersionGreaterThan(latest: string, current: string): boolean {
+  // Compare semver versions (e.g., "0.1.5" vs "0.1.4")
+  const latestParts = latest.split(".").map(Number);
+  const currentParts = current.split(".").map(Number);
+  for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+    const latestPart = latestParts[i] || 0;
+    const currentPart = currentParts[i] || 0;
+    if (latestPart > currentPart) return true;
+    if (latestPart < currentPart) return false;
+  }
+  return false; // versions are equal
+}
+
 export function setCliUpdate(latest: string, changelog: string) {
   updateStatus.cli.latestVersion = latest;
   updateStatus.cli.changelog = changelog;
-  updateStatus.cli.updateAvailable = latest !== updateStatus.cli.currentVersion;
+  updateStatus.cli.updateAvailable = isVersionGreaterThan(latest, updateStatus.cli.currentVersion);
 }
 
 export function setAppUpdate(latest: string, changelog: string) {
   updateStatus.app.latestVersion = latest;
   updateStatus.app.changelog = changelog;
-  updateStatus.app.updateAvailable = latest !== updateStatus.app.currentVersion;
+  updateStatus.app.updateAvailable = isVersionGreaterThan(latest, updateStatus.app.currentVersion);
 }
 
 export function hasAnyUpdate(): boolean {
