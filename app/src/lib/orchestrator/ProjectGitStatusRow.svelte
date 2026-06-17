@@ -14,7 +14,9 @@
 
 {#if compact}
   <!-- Compact row for Git tab -->
-  <div class="flex items-center gap-3 py-2 px-3 border-b border-surface-100-900/50 hover:bg-surface-100-900/30">
+  <div
+    class="flex items-center gap-3 py-2 px-3 border-b border-surface-100-900/50 hover:bg-surface-100-900/30"
+  >
     <div class="flex-1 min-w-0">
       <div class="font-medium text-surface-900-100 text-sm truncate">
         {project.name}
@@ -23,17 +25,23 @@
         {project.csproj_path}
       </div>
     </div>
-    
+
     <!-- Status badges -->
     <div class="flex items-center gap-2 shrink-0">
       {#if loading}
-        <span class="inline-flex items-center gap-1 text-xs text-surface-500-400">
+        <span
+          class="inline-flex items-center gap-1 text-xs text-surface-500-400"
+        >
           <Loader size={12} class="animate-spin" />
           Checking...
         </span>
       {:else if gitStatus}
         <!-- Cloned status -->
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium {gitStatus.cloned ? 'bg-success-500/10 text-success-500' : 'bg-error-500/10 text-error-500'}">
+        <span
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium {gitStatus.cloned
+            ? 'bg-success-500/10 text-success-500'
+            : 'bg-error-500/10 text-error-500'}"
+        >
           {#if gitStatus.cloned}
             <Check size={10} />
             Cloned
@@ -42,23 +50,34 @@
             Missing
           {/if}
         </span>
-        
+
         <!-- Up to date status -->
         {#if gitStatus.cloned}
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium {gitStatus.upToDate ? 'bg-success-500/10 text-success-500' : 'bg-warning-500/10 text-warning-500'}">
+          <span
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium {gitStatus.upToDate
+              ? 'bg-success-500/10 text-success-500'
+              : gitStatus.behindRemote
+                ? 'bg-tertiary-500/10 text-tertiary-500'
+                : 'bg-warning-500/10 text-warning-500'}"
+          >
             {#if gitStatus.upToDate}
               <Check size={10} />
               Up to date
+            {:else if gitStatus.behindRemote}
+              <X size={10} />
+              {gitStatus.aheadBehind || "Behind remote"}
             {:else}
               <X size={10} />
               {gitStatus.aheadBehind || "Changes"}
             {/if}
           </span>
         {/if}
-        
+
         <!-- Branch -->
         {#if gitStatus.cloned}
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary-500/10 text-primary-500">
+          <span
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary-500/10 text-primary-500"
+          >
             <GitBranch size={10} />
             {gitStatus.branch}
           </span>
@@ -101,10 +120,25 @@
             <Check size={14} />
             <span class="text-xs">Yes</span>
           </span>
-        {:else}
-          <span class="inline-flex items-center gap-1 text-warning-500" title={gitStatus.aheadBehind}>
+        {:else if gitStatus.behindRemote}
+          <span
+            class="inline-flex items-center gap-1 text-tertiary-500"
+            title={gitStatus.aheadBehind}
+          >
             <X size={14} />
-            <span class="text-xs break-all">{gitStatus.aheadBehind || "No"}</span>
+            <span class="text-xs break-all"
+              >{gitStatus.aheadBehind || "Behind remote"}</span
+            >
+          </span>
+        {:else}
+          <span
+            class="inline-flex items-center gap-1 text-warning-500"
+            title={gitStatus.aheadBehind}
+          >
+            <X size={14} />
+            <span class="text-xs break-all"
+              >{gitStatus.aheadBehind || "No"}</span
+            >
           </span>
         {/if}
       {:else}

@@ -27,6 +27,7 @@ export interface ProjectGitStatus {
   upToDate: boolean;
   branch: string;
   aheadBehind?: string;
+  behindRemote?: boolean;
 }
 
 export async function checkProjectGitStatus(
@@ -60,6 +61,15 @@ export async function checkProjectGitStatus(
       };
     }
 
+    // Fetch latest remote refs without pulling
+    const fetchCmd = Command.create("git", [
+      "-C",
+      projectPath,
+      "fetch",
+      "--quiet",
+    ]);
+    await fetchCmd.execute();
+
     // Get current branch
     const branchCmd = Command.create("git", [
       "-C",
@@ -85,10 +95,14 @@ export async function checkProjectGitStatus(
     let aheadBehind = "";
     let upToDate = true;
 
+    let behindRemote = false;
     const aheadBehindMatch = statusOutput.match(/\[([^\]]+)\]/);
     if (aheadBehindMatch) {
       aheadBehind = aheadBehindMatch[1];
       upToDate = false;
+      if (/behind/.test(aheadBehind)) {
+        behindRemote = true;
+      }
     }
 
     // Check for uncommitted changes
@@ -106,6 +120,7 @@ export async function checkProjectGitStatus(
       upToDate,
       branch,
       aheadBehind: aheadBehind || undefined,
+      behindRemote: behindRemote || undefined,
     };
   } catch (error) {
     console.error(`Failed to check git status for ${project.name}:`, error);
