@@ -73,7 +73,7 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 8 — `$effect` Refactor: Dependency Tracking
 
-- [ ] **8.1** `SettingsPanel.svelte:49-94` — Extract the dependency tracking reads into a `$derived` snapshot object, then use a single `$effect(() => { snapshot; saveSettings(); })` on that derived value instead of the current verbose per-field reads
+- [x] **8.1** `SettingsPanel.svelte:49-94` — Extract the dependency tracking reads into a `$derived` snapshot object, then use a single `$effect(() => { snapshot; saveSettings(); })` on that derived value instead of the current verbose per-field reads
 
 ---
 
