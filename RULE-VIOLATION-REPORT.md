@@ -100,8 +100,8 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 12 — Script Block Order
 
-- [ ] **12.1** `AboutPanel.svelte:25` — Move the top-level `fetchAppVersion()` call into `onMount`
-- [ ] **12.2** `HelpPanel.svelte:29` — Move the top-level `fetchAppVersion()` call into `onMount`
+- [x] **12.1** `AboutPanel.svelte:25` — Move the top-level `fetchAppVersion()` call into `onMount`
+- [x] **12.2** `HelpPanel.svelte:29` — Move the top-level `fetchAppVersion()` call into `onMount`
 
 ---
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import {
     Github,
     ExternalLink,
@@ -19,7 +20,9 @@
 
   let version = $derived(`v${appVersion.version}`);
 
-  fetchAppVersion();
+  onMount(() => {
+    fetchAppVersion();
+  });
 
   const techStack = [
     {

@@ -26,7 +26,9 @@
 
   let version = $derived(`v${appVersion.version}`);
 
-  fetchAppVersion();
+  onMount(() => {
+    fetchAppVersion();
+  });
 
   const sectionIcons: Record<string, typeof Info> = {
     about: Info,
