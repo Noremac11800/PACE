@@ -30,6 +30,8 @@ trigger: always_on
 - Use <script lang="ts"> always — avoid plain JS components in a TypeScript project.
 - Order the <script> block content consistently: imports → props → state → derived → effects → functions → exports.
 - Keep the template logic minimal — complex conditionals or transforms belong in $derived or helper functions, not inline in the markup.
+- Use `class:` modifiers for conditional classes instead of ternary expressions in the template.
+- Common linting rules like "don't use self-closing tags" and a11y requirements should be enforced.
 
 ## Snippets and slots
 - Prefer {#snippet} over slots for reusable template fragments within a file or passed as props. Snippets are more composable and type-safe.

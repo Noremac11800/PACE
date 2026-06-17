@@ -32,7 +32,7 @@
   } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { configStore } from "$lib/config-store.svelte";
-  import { setUploadingStatus } from "./command-status.svelte";
+  import { setUploadingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
 
   interface Props {

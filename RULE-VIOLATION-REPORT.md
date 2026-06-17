@@ -16,10 +16,10 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 2 — Import Consistency (mechanical find-and-replace)
 
-- [ ] **2.1** `BuildTab.svelte:16` — Change `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
-- [ ] **2.2** `PublishingConfig.svelte:38-39` — Change `from "./publishing.svelte"` → `from "$lib/orchestrator/publishing.svelte"` and `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
-- [ ] **2.3** `CodesigningConfig.svelte` — Replace all `./` relative imports with `$lib/orchestrator/` equivalents
-- [ ] **2.4** `UploadConfig.svelte:35` — Change `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
+- [x] **2.1** `BuildTab.svelte:16` — Change `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
+- [x] **2.2** `PublishingConfig.svelte:38-39` — Change `from "./publishing.svelte"` → `from "$lib/orchestrator/publishing.svelte"` and `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
+- [x] **2.3** `CodesigningConfig.svelte` — N/A: file has no `./` sibling imports
+- [x] **2.4** `UploadConfig.svelte:35` — Change `from "./command-status.svelte"` → `from "$lib/orchestrator/command-status.svelte"`
 
 ---
 
@@ -39,10 +39,11 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ---
 
-## Phase 4 — Tailwind Color Syntax (replace `dark:` variants)
+## Phase 4 — Tailwind Color Syntax (replace `dark:` variants) + Lucide deprecated icons
 
 - [ ] **4.1** `AboutPanel.svelte:201` — Replace `from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900` → `from-surface-50-950 to-surface-100-900`
 - [ ] **4.2** `AboutPanel.svelte:247` — Replace `from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700` → `from-surface-100-900 to-surface-200-800`
+- [ ] **4.3** Replace all deprecated Lucide icons with their non-deprecated equivalents in all files that use Lucide icons
 
 ---
 

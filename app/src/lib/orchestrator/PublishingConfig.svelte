@@ -35,8 +35,8 @@
     getCodesigningParams,
     parseAndroidCodesignInfo,
     buildCommandPreview,
-  } from "./publishing.svelte";
-  import { setPublishingStatus } from "./command-status.svelte";
+  } from "$lib/orchestrator/publishing.svelte";
+  import { setPublishingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
 
   const PLATFORMS = [
