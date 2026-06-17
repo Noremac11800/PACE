@@ -118,6 +118,18 @@
   async function openLink(url: string) {
     await open(url);
   }
+
+  const techGradients: Record<string, string> = {
+    "text-orange-500": "from-orange-400 to-orange-600",
+    "text-blue-500": "from-blue-400 to-blue-600",
+    "text-cyan-500": "from-cyan-400 to-cyan-600",
+    "text-purple-500": "from-purple-400 to-purple-600",
+    "text-green-500": "from-green-400 to-green-600",
+  };
+
+  function techGradient(color: string): string {
+    return techGradients[color] ?? "from-orange-500 to-orange-600";
+  }
 </script>
 
 <div class="overflow-auto h-full bg-surface-50-950 {classname}">
@@ -203,18 +215,9 @@
               <!-- Icon with enhanced background -->
               <div class="relative mb-6 md:mb-8">
                 <div
-                  class="absolute inset-0 bg-gradient-to-br {tech.color ===
-                  'text-orange-500'
-                    ? 'from-orange-400 to-orange-600'
-                    : tech.color === 'text-blue-500'
-                      ? 'from-blue-400 to-blue-600'
-                      : tech.color === 'text-cyan-500'
-                        ? 'from-cyan-400 to-cyan-600'
-                        : tech.color === 'text-purple-500'
-                          ? 'from-purple-400 to-purple-600'
-                          : tech.color === 'text-green-500'
-                            ? 'from-green-400 to-green-600'
-                            : 'from-orange-500 to-orange-600'} opacity-15 rounded-3xl blur-2xl group-hover:opacity-25 transition-all duration-500"
+                  class="absolute inset-0 bg-gradient-to-br {techGradient(
+                    tech.color,
+                  )} opacity-15 rounded-3xl blur-2xl group-hover:opacity-25 transition-all duration-500"
                 ></div>
                 <div
                   class="relative bg-white border border-surface-200-800 shadow-lg rounded-3xl p-4 md:p-6 group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300 flex items-center justify-center"

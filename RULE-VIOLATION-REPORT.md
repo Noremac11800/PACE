@@ -107,8 +107,8 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 13 — Complex Template Logic Extraction
 
-- [ ] **13.1** `AboutPanel.svelte:206-217` — Extract the nested ternary gradient-colour class logic into a `$derived` map or helper function, then use it in the template
-- [ ] **13.2** `DirectoryBuildPropsPanel.svelte:289-305` — Extract `saveResult.startsWith('Error')` and the load-result error checks into named `$derived` booleans (e.g. `let saveIsError = $derived(...)`)
+- [x] **13.1** `AboutPanel.svelte:206-217` — Extract the nested ternary gradient-colour class logic into a `$derived` map or helper function, then use it in the template
+- [x] **13.2** `DirectoryBuildPropsPanel.svelte:289-305` — Extract `saveResult.startsWith('Error')` and the load-result error checks into named `$derived` booleans (e.g. `let saveIsError = $derived(...)`)
 
 ---
 

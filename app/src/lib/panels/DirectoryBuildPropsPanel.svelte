@@ -44,6 +44,13 @@
   let saveResult = $state("");
   let loadResult = $state("");
 
+  let saveIsError = $derived(saveResult.startsWith("Error"));
+  let loadIsError = $derived(
+    loadResult.startsWith("Error") ||
+      loadResult.startsWith("File not") ||
+      loadResult.startsWith("Invalid"),
+  );
+
   function generateId(): string {
     return crypto.randomUUID();
   }
@@ -286,7 +293,7 @@
         </button>
         {#if saveResult}
           <span
-            class="text-xs {saveResult.startsWith('Error')
+            class="text-xs {saveIsError
               ? 'text-error-500'
               : 'text-success-500'}"
           >
@@ -295,9 +302,7 @@
         {/if}
         {#if loadResult}
           <span
-            class="text-xs {loadResult.startsWith('Error') ||
-            loadResult.startsWith('File not') ||
-            loadResult.startsWith('Invalid')
+            class="text-xs {loadIsError
               ? 'text-error-500'
               : 'text-success-500'}"
           >
