@@ -14,7 +14,6 @@
   import { configStore } from "$lib/config-store.svelte";
   import {
     loadGitStatuses,
-    gitStatusStore,
     getGitStatus,
     isLoadingGit,
     clearGitStatuses,

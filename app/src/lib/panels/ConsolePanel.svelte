@@ -20,7 +20,9 @@
   let commandHistory = $state<string[]>([]);
   let historyIndex = $state(-1);
   let isRunning = $state(false);
-  let currentProcess: any = null;
+  let currentProcess: Awaited<
+    ReturnType<ReturnType<typeof Command.create>["spawn"]>
+  > | null = null;
   let consoleRef: HTMLDivElement;
   let inputRef: HTMLInputElement;
   let autoScroll = $state(true);

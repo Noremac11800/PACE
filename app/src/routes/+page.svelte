@@ -18,7 +18,6 @@
   import { onMount } from "svelte";
 
   let activeView: View = $state(View.HOME);
-  let previousView: View | null = $state(null);
 
   let version = $derived(`v${appVersion.version}`);
 

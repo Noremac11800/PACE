@@ -49,9 +49,9 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 5 — TypeScript Strictness
 
-- [ ] **5.1** `ConsolePanel.svelte:23` — Replace `let currentProcess: any = null` with the proper typed union from `@tauri-apps/plugin-shell` (e.g. `Child | null`)
-- [ ] **5.2** `DepChecks.svelte:93,155` — Replace `error as string` casts with `String(error)` or `error instanceof Error ? error.message : String(error)`
-- [ ] **5.3** Remove all unused imports and variables in all files
+- [x] **5.1** `ConsolePanel.svelte:23` — Replace `let currentProcess: any = null` with the proper typed union from `@tauri-apps/plugin-shell` (e.g. `Child | null`)
+- [x] **5.2** `DepChecks.svelte:93,155` — Replace `error as string` casts with `String(error)` or `error instanceof Error ? error.message : String(error)`
+- [x] **5.3** Remove all unused imports and variables in all files
 
 ---
 

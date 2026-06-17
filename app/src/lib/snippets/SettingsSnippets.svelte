@@ -1,7 +1,6 @@
 <script module lang="ts">
   import { open } from "@tauri-apps/plugin-dialog";
-  import { openPath, openUrl } from "@tauri-apps/plugin-opener";
-  import { FolderOpen, FileText, ExternalLink } from "@lucide/svelte";
+  import { FolderOpen, FileText } from "@lucide/svelte";
 
   export {
     SettingSwitch,

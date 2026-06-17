@@ -63,6 +63,7 @@ let { onCustomEvent }: { onCustomEvent: (payload: string) => void } = $props();
 - Use `ComponentProps<typeof MyComponent>` to extract prop types when building wrapper components.
 - Avoid `any` — use `unknown` and narrow it, or define proper types.
 - Use `satisfies` where you want to validate a value against a type without widening it.
+- Interfaces should go in `*.svelte.ts` or `*.ts` files depending on whether the interface is only relevant to a single component or general purpose. Interfaces should never exist in component `*.svelte` files.
 
 ## Performance
 - Avoid creating new objects/arrays inside $derived on every tick unless necessary — this breaks referential equality and causes unnecessary downstream updates.

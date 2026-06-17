@@ -3,8 +3,6 @@
     Github,
     ExternalLink,
     Code,
-    Palette,
-    Cpu,
     Package,
     Globe,
     Zap,
@@ -13,7 +11,6 @@
     Sparkles,
     Rocket,
     Heart,
-    Copy,
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-shell";
   import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";

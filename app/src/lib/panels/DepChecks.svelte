@@ -90,7 +90,8 @@
       pipxInstallResult = await installPipx();
       await checkPipx();
     } catch (error) {
-      pipxInstallResult = error as string;
+      pipxInstallResult =
+        error instanceof Error ? error.message : String(error);
     } finally {
       isInstallingPipx = false;
       await checkAll();
@@ -139,7 +140,8 @@
         result.code === 0 ? "PACE uninstalled successfully" : result.stderr;
       await checkPace();
     } catch (error) {
-      paceUninstallResult = error as string;
+      paceUninstallResult =
+        error instanceof Error ? error.message : String(error);
     } finally {
       isUninstalling = false;
     }
@@ -152,7 +154,7 @@
       let helpResult = await Command.create("pace", ["--help"]).execute();
       paceHelpResult = helpResult.stdout;
     } catch (error) {
-      paceHelpResult = error as string;
+      paceHelpResult = error instanceof Error ? error.message : String(error);
     } finally {
       isRunningHelp = false;
     }

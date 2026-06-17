@@ -13,10 +13,7 @@
   import { configStore, paceArgs } from "$lib/config-store.svelte";
   import { settings, DEFAULT_BUILD_TAB_SETTINGS } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
-  import {
-    commandStatus,
-    setBuildingStatus,
-  } from "$lib/orchestrator/command-status.svelte";
+  import { setBuildingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
 
   const FRAMEWORKS = [

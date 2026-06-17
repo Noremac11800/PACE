@@ -16,10 +16,7 @@
   import { View } from "$lib/panels/view-types";
   import { updateStatus } from "$lib/update-status.svelte";
   import { theme } from "$lib/theme";
-  import {
-    commandStatus,
-    isAnyCommandRunning,
-  } from "$lib/orchestrator/command-status.svelte";
+  import { isAnyCommandRunning } from "$lib/orchestrator/command-status.svelte";
 
   interface Props {
     activeView: View;
