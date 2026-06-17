@@ -18,13 +18,6 @@
 
   let expandedGroups = $state<Set<string>>(new Set());
 
-  $effect(() => {
-    if (config) {
-      // Collapse all groups by default in Projects tab
-      expandedGroups = new Set();
-    }
-  });
-
   function getOrderedGroups(): string[] {
     if (!config) return [];
     const groups = config.projects

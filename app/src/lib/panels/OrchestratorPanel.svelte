@@ -56,7 +56,7 @@
     }
   }
 
-  let activeTab = $state<
+  let selectedTab = $state<
     "projects" | "build" | "deploy" | "git" | "editor" | "nuget"
   >("projects");
 
@@ -77,11 +77,9 @@
     allTabs.filter((tab) => tab.id !== "editor" || !isDefaultConfig),
   );
 
-  $effect(() => {
-    if (isDefaultConfig && activeTab === "editor") {
-      activeTab = "projects";
-    }
-  });
+  const activeTab = $derived(
+    isDefaultConfig && selectedTab === "editor" ? "projects" : selectedTab,
+  );
 
   onMount(async () => {
     // Wait for app initialization to complete (includes syncPaceConfig)
@@ -157,7 +155,7 @@
         tab.id
           ? 'text-primary-500 border-b-2 border-primary-500 bg-surface-100-900/50'
           : 'text-surface-600-400 hover:text-surface-900-100 hover:bg-surface-100-900/30'}"
-        onclick={() => (activeTab = tab.id)}
+        onclick={() => (selectedTab = tab.id)}
       >
         {#if isBuildRunning || isDeployRunning}
           <Loader size={16} class="animate-spin text-primary-500" />
@@ -209,7 +207,9 @@
           class="flex-1 overflow-auto p-4"
           class:hidden={activeTab !== "projects"}
         >
-          <ProjectsTab config={configStore.activeConfig} />
+          {#key configStore.activeConfig}
+            <ProjectsTab config={configStore.activeConfig} />
+          {/key}
         </div>
         <div
           class="flex-1 overflow-auto p-4"

@@ -57,9 +57,9 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 6 — `$effect` Misuse: State Derivation → `$derived`
 
-- [ ] **6.1** `ThemeSwitch.svelte:11-13` — Replace `$effect(() => { checked = $theme === "dark"; })` with `let checked = $derived($theme === "dark")`
-- [ ] **6.2** `ProjectsTab.svelte:21-26` — Replace `$effect(() => { if (config) { expandedGroups = new Set(); } })` with a `$derived` or a reset triggered by a key change
-- [ ] **6.3** `OrchestratorPanel.svelte:80-84` — Replace the `$effect` that reads and writes `activeTab` with a `$derived` for `activeTab` that clamps to `"projects"` when `isDefaultConfig` is true
+- [x] **6.1** `ThemeSwitch.svelte:11-13` — Replace `$effect(() => { checked = $theme === "dark"; })` with `let checked = $derived($theme === "dark")`
+- [x] **6.2** `ProjectsTab.svelte:21-26` — Replace `$effect(() => { if (config) { expandedGroups = new Set(); } })` with a `$derived` or a reset triggered by a key change
+- [x] **6.3** `OrchestratorPanel.svelte:80-84` — Replace the `$effect` that reads and writes `activeTab` with a `$derived` for `activeTab` that clamps to `"projects"` when `isDefaultConfig` is true
 
 ---
 

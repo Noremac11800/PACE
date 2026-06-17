@@ -6,11 +6,7 @@
 
   let { class: classname }: { class?: string } = $props();
 
-  let checked = $state(false);
-
-  $effect(() => {
-    checked = $theme === "dark";
-  });
+  let checked = $derived($theme === "dark");
 
   const onCheckedChange = (event: { checked: boolean }) => {
     const mode = event.checked ? "dark" : "light";
