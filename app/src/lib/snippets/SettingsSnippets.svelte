@@ -202,7 +202,7 @@
       {value}
       onchange={(e) => onChange(e.currentTarget.value)}
     >
-      {#each options as option}
+      {#each options as option (option.value)}
         <option value={option.value}>{option.label}</option>
       {/each}
     </select>
@@ -226,7 +226,7 @@
       </p>
     {/if}
     <div class="space-y-3">
-      {#each options as option}
+      {#each options as option (option.value)}
         <label class="flex items-center gap-3 cursor-pointer group">
           <div class="relative">
             <input

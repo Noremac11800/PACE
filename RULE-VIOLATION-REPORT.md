@@ -25,17 +25,17 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 3 — `{#each}` Keys (add keys across all files)
 
-- [ ] **3.1** `AboutPanel.svelte:161` — `{#each stats as stat}` → `{#each stats as stat (stat.label)}`
-- [ ] **3.2** `AboutPanel.svelte:197` — `{#each techStack as tech, index}` → `{#each techStack as tech (tech.name)}`
-- [ ] **3.3** `AboutPanel.svelte:245` — `{#each tech.features as feature}` → `{#each tech.features as feature (feature)}`
-- [ ] **3.4** `AboutPanel.svelte:290` — `{#each features as feature}` → `{#each features as feature (feature.title)}`
-- [ ] **3.5** `SettingsPanel.svelte:290` — `{#each toc as entry}` → `{#each toc as entry (entry.id)}`
-- [ ] **3.6** `LanguageSwitcher.svelte:104` — `{#each supportedLocales as code}` → `{#each supportedLocales as code (code)}`
-- [ ] **3.7** `SettingsSnippets.svelte:205` — `{#each options as option}` (SettingSelect) → `{#each options as option (option.value)}`
-- [ ] **3.8** `SettingsSnippets.svelte:229` — `{#each options as option}` (SettingRadioGroup) → `{#each options as option (option.value)}`
-- [ ] **3.9** `AnimatedBackground.svelte:71,72,92` — Add index-based keys to all three `{#each nodes ...}` loops, e.g. `{#each nodes as node, i (i)}`
-- [ ] **3.10** `ProjectGraphPanel.svelte:231` — `{#each groupLegend as entry}` → `{#each groupLegend as entry (entry.label)}`
-- [ ] **3.11** `DeployTab.svelte:35` — `{#each Object.entries(sections) as [sectionId, ...]}` → add `(sectionId)` as key
+- [x] **3.1** `AboutPanel.svelte:161` — `{#each stats as stat}` → `{#each stats as stat (stat.label)}`
+- [x] **3.2** `AboutPanel.svelte:197` — `{#each techStack as tech, index}` → `{#each techStack as tech (tech.name)}`
+- [x] **3.3** `AboutPanel.svelte:245` — `{#each tech.features as feature}` → `{#each tech.features as feature (feature)}`
+- [x] **3.4** `AboutPanel.svelte:290` — `{#each features as feature}` → `{#each features as feature (feature.title)}`
+- [x] **3.5** `SettingsPanel.svelte:290` — `{#each toc as entry}` → `{#each toc as entry (entry.id)}`
+- [x] **3.6** `LanguageSwitcher.svelte:104` — `{#each supportedLocales as code}` → `{#each supportedLocales as code (code)}`
+- [x] **3.7** `SettingsSnippets.svelte:205` — `{#each options as option}` (SettingSelect) → `{#each options as option (option.value)}`
+- [x] **3.8** `SettingsSnippets.svelte:229` — `{#each options as option}` (SettingRadioGroup) → `{#each options as option (option.value)}`
+- [x] **3.9** `AnimatedBackground.svelte:71,72,92` — Add index-based keys to all three `{#each nodes ...}` loops, e.g. `{#each nodes as node, i (i)}`
+- [x] **3.10** `ProjectGraphPanel.svelte:231` — `{#each groupLegend as entry}` → `{#each groupLegend as entry (entry.label)}`
+- [x] **3.11** `DeployTab.svelte:35` — `{#each Object.entries(sections) as [sectionId, ...]}` → add `(sectionId)` as key
 
 ---
 

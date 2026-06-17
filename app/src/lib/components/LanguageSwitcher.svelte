@@ -101,7 +101,7 @@
       Reset to default ({defaultLocale})
     </button>
 
-    {#each supportedLocales as code}
+    {#each supportedLocales as code (code)}
       <button
         class="btn justify-start {code === $locale
           ? 'preset-filled-primary-500'

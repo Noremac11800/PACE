@@ -158,7 +158,7 @@
       </p>
 
       <div class="flex flex-wrap justify-center gap-2 mb-3">
-        {#each stats as stat}
+        {#each stats as stat (stat.label)}
           <div
             class="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20"
           >
@@ -194,7 +194,7 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
       >
-        {#each techStack as tech, index}
+        {#each techStack as tech (tech.name)}
           <div class="group relative">
             <!-- Card -->
             <div
@@ -242,7 +242,7 @@
 
                 <!-- Features -->
                 <div class="flex flex-wrap gap-2">
-                  {#each tech.features as feature}
+                  {#each tech.features as feature (feature)}
                     <span
                       class="text-xs px-3 py-1.5 bg-gradient-to-r from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700 text-surface-700-300 rounded-full border border-surface-200-800 font-medium"
                     >
@@ -287,7 +287,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {#each features as feature}
+        {#each features as feature (feature.title)}
           <div class="text-center">
             <div class="relative mb-6">
               <div

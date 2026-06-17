@@ -32,7 +32,7 @@
 
   <!-- Section Tabs -->
   <div class="flex border-b border-surface-200-800 bg-surface-50-950 shrink-0">
-    {#each Object.entries(sections) as [sectionId, { icon: Icon, label }]}
+    {#each Object.entries(sections) as [sectionId, { icon: Icon, label }] (sectionId)}
       <button
         class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap {activeSection ===
         sectionId

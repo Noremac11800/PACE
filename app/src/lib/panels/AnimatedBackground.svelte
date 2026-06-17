@@ -68,8 +68,8 @@
 
   <!-- SVG for connections -->
   <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-    {#each nodes as node, i}
-      {#each nodes.slice(i + 1) as otherNode}
+    {#each nodes as node, i (i)}
+      {#each nodes.slice(i + 1) as otherNode, j (j)}
         {@const distance = getDistance(node, otherNode)}
         {#if distance < connectionDistance / 5}
           {@const opacity = getOpacity(distance)}
@@ -89,7 +89,7 @@
   </svg>
 
   <!-- Nodes -->
-  {#each nodes as node}
+  {#each nodes as node, i (i)}
     <div
       class="absolute rounded-full bg-primary-500/40 backdrop-blur-sm shadow-[0_0_10px_currentColor]"
       style="

@@ -287,7 +287,7 @@
       </button>
 
       <nav class="flex-1 overflow-auto p-2 space-y-1">
-        {#each toc as entry}
+        {#each toc as entry (entry.id)}
           {@const Icon = entry.icon}
           <button
             class="w-full text-left {tocOpen

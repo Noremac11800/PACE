@@ -228,7 +228,7 @@
     </div>
     {#if groupLegend.length > 0}
       <div class="flex items-center gap-4 flex-wrap">
-        {#each groupLegend as entry}
+        {#each groupLegend as entry (entry.label)}
           <span class="flex items-center gap-1">
             <span
               class="inline-block w-3 h-3 rounded-full"
