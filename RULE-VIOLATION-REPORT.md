@@ -6,11 +6,11 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 1 — Trivial One-Liners (no logic changes)
 
-- [ ] **1.1** `Toasts.svelte:1` — Add `lang="ts"` to `<script module>` → `<script module lang="ts">`
-- [ ] **1.2** `UpdatesPanel.svelte:251-255` — Replace raw `<svg>` GitHub mark with `<Github size={16} />` from `@lucide/svelte`
-- [ ] **1.3** `DependenciesPanel.svelte:2` — Change `import DepChecks from "./DepChecks.svelte"` → `import DepChecks from "$lib/panels/DepChecks.svelte"`
-- [ ] **1.4** `ConfigSelector.svelte:191` — Replace `style="right: 1rem; top: 4.5rem;"` with Tailwind classes `right-4 top-[4.5rem]`
-- [ ] **1.5** `AnimatedBackground.svelte:95-103` — Add `shadow-[0_0_10px_currentColor]` Tailwind class to node `<div>` and remove the static `box-shadow` from the inline `style`
+- [x] **1.1** `Toasts.svelte:1` — Add `lang="ts"` to `<script module>` → `<script module lang="ts">`
+- [x] **1.2** `UpdatesPanel.svelte:251-255` — Replace raw `<svg>` GitHub mark with `<Github size={16} />` from `@lucide/svelte`
+- [x] **1.3** `DependenciesPanel.svelte:2` — Change `import DepChecks from "./DepChecks.svelte"` → `import DepChecks from "$lib/panels/DepChecks.svelte"`
+- [x] **1.4** `ConfigSelector.svelte:191` — Replace `style="right: 1rem; top: 4.5rem;"` with Tailwind classes `right-4 top-[4.5rem]`
+- [x] **1.5** `AnimatedBackground.svelte:95-103` — Add `shadow-[0_0_10px_currentColor]` Tailwind class to node `<div>` and remove the static `box-shadow` from the inline `style`
 
 ---
 

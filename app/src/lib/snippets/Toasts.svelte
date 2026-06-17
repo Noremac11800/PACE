@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
   import { Wifi, WifiOff } from "@lucide/svelte";
   export { toastIconWifi, toastIconWifiOff };
 </script>

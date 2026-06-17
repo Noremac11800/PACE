@@ -91,14 +91,13 @@
   <!-- Nodes -->
   {#each nodes as node}
     <div
-      class="absolute rounded-full bg-primary-500/40 backdrop-blur-sm"
+      class="absolute rounded-full bg-primary-500/40 backdrop-blur-sm shadow-[0_0_10px_currentColor]"
       style="
         left: {node.x}%;
         top: {node.y}%;
         width: {node.size}px;
         height: {node.size}px;
         transform: translate(-50%, -50%);
-        box-shadow: 0 0 10px currentColor;
       "
     ></div>
   {/each}

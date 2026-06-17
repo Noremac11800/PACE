@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DepChecks from "./DepChecks.svelte";
+  import DepChecks from "$lib/panels/DepChecks.svelte";
 </script>
 
 <div class="h-full overflow-auto flex items-start justify-center p-4">

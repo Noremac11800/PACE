@@ -187,8 +187,7 @@
       }}
     ></button>
     <div
-      class="fixed z-20 w-auto min-w-64 max-w-none rounded-lg border border-surface-200-800 bg-surface-50-950 shadow-xl"
-      style="right: 1rem; top: 4.5rem;"
+      class="fixed z-20 right-4 top-18 w-auto min-w-64 max-w-none rounded-lg border border-surface-200-800 bg-surface-50-950 shadow-xl"
     >
       {#if configStore.availableConfigs.length > 0}
         <div
