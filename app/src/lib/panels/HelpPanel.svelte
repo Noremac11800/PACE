@@ -88,8 +88,8 @@
 </script>
 
 <div
-  class="h-full grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out"
-  style="grid-template-columns: 1fr {tocOpen ? '260px' : '48px'};"
+  class="h-full grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out grid-cols-[1fr_var(--toc-width)]"
+  style="--toc-width: {tocOpen ? '260px' : '48px'};"
 >
   <!-- Main Content -->
   <div class="overflow-auto p-6 md:p-8" id="docs-content">

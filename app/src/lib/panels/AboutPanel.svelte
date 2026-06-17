@@ -142,8 +142,7 @@
     <!-- Pattern overlay -->
     <div class="absolute inset-0 opacity-10">
       <div
-        class="absolute inset-0"
-        style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 60px 60px;"
+        class="absolute inset-0 bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-size-[60px_60px]"
       ></div>
     </div>
 

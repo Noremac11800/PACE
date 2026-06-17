@@ -114,9 +114,9 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 14 — Remaining Inline Styles → Tailwind
 
-- [ ] **14.1** `AboutPanel.svelte:134` — Replace `style="background-image: radial-gradient(...)"` with a Tailwind arbitrary value or CSS custom property in `app.css`
-- [ ] **14.2** `HelpPanel.svelte:90` — Replace `style="grid-template-columns: 1fr {tocOpen ? '260px' : '48px'};"` with a CSS custom property driven by a reactive variable and a Tailwind arbitrary class
-- [ ] **14.3** `SettingsPanel.svelte:131` — Same pattern as 14.2: replace dynamic `grid-template-columns` inline style with a CSS custom property
+- [x] **14.1** `AboutPanel.svelte:134` — Replace `style="background-image: radial-gradient(...)"` with a Tailwind arbitrary value or CSS custom property in `app.css`
+- [x] **14.2** `HelpPanel.svelte:90` — Replace `style="grid-template-columns: 1fr {tocOpen ? '260px' : '48px'};"` with a CSS custom property driven by a reactive variable and a Tailwind arbitrary class
+- [x] **14.3** `SettingsPanel.svelte:131` — Same pattern as 14.2: replace dynamic `grid-template-columns` inline style with a CSS custom property
 
 ---
 

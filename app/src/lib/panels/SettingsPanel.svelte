@@ -118,8 +118,8 @@
 
   <!-- Content Grid -->
   <div
-    class="flex-1 grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out"
-    style="grid-template-columns: 1fr {tocOpen ? '220px' : '56px'};"
+    class="flex-1 grid overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out grid-cols-[1fr_var(--toc-width)]"
+    style="--toc-width: {tocOpen ? '220px' : '56px'};"
   >
     <!-- Main Content -->
     <div class="overflow-auto p-6 space-y-8" id="settings-content">
