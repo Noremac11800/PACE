@@ -10,9 +10,9 @@
     RefreshCw,
     FolderOpen,
     Server,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
+    CircleCheckBig,
+    CircleX,
+    CircleAlert,
     Loader,
     Trash2,
   } from "@lucide/svelte";
@@ -371,7 +371,7 @@
       <div
         class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
       >
-        <AlertCircle size={16} class="shrink-0" />
+        <CircleAlert size={16} class="shrink-0" />
         <span class="break-all">{sourcesError}</span>
       </div>
     {:else if sources.length === 0}
@@ -382,12 +382,12 @@
           <div class="flex flex-col bg-surface-100-900/50 rounded">
             <div class="flex items-start gap-3 p-3">
               {#if source.enabled}
-                <CheckCircle
+                <CircleCheckBig
                   size={16}
                   class="text-success-500 mt-0.5 shrink-0"
                 />
               {:else}
-                <XCircle size={16} class="text-error-500 mt-0.5 shrink-0" />
+                <CircleX size={16} class="text-error-500 mt-0.5 shrink-0" />
               {/if}
               <div class="flex flex-col gap-0.5 min-w-0 flex-1">
                 <span class="text-sm font-medium text-surface-900-100"
@@ -481,7 +481,7 @@
       <div
         class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
       >
-        <AlertCircle size={16} class="shrink-0" />
+        <CircleAlert size={16} class="shrink-0" />
         <span class="break-all">{defaultCacheError}</span>
       </div>
     {:else if defaultCachePackages.length > 0}
@@ -494,7 +494,7 @@
         <div
           class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
         >
-          <AlertCircle size={16} class="shrink-0" />
+          <CircleAlert size={16} class="shrink-0" />
           No packages matched the projects in the active config.
         </div>
       {:else}
@@ -523,7 +523,7 @@
       <div
         class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
       >
-        <AlertCircle size={16} class="shrink-0" />
+        <CircleAlert size={16} class="shrink-0" />
         No packages found in the default cache directory.
       </div>
     {/if}
@@ -608,7 +608,7 @@
       <div
         class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
       >
-        <AlertCircle size={16} class="shrink-0" />
+        <CircleAlert size={16} class="shrink-0" />
         <span class="break-all">{customCacheError}</span>
       </div>
     {:else if customCachePackages.length > 0}
@@ -621,7 +621,7 @@
         <div
           class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
         >
-          <AlertCircle size={16} class="shrink-0" />
+          <CircleAlert size={16} class="shrink-0" />
           No packages matched the projects in the active config.
         </div>
       {:else}
@@ -650,7 +650,7 @@
       <div
         class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
       >
-        <AlertCircle size={16} class="shrink-0" />
+        <CircleAlert size={16} class="shrink-0" />
         No .nupkg files found in this directory.
       </div>
     {:else if !customCachePath}

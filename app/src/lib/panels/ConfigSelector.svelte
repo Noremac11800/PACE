@@ -5,7 +5,7 @@
     ChevronDown,
     Check,
     Copy,
-    Edit2,
+    Pen,
     Trash2,
     Upload,
     FilePlus,
@@ -211,7 +211,7 @@
               onclick={() => startRename(entry.filename)}
               title="Rename config"
             >
-              <Edit2 size={14} />
+              <Pen size={14} />
             </button>
             <button
               class="p-2 text-surface-400-600 hover:text-primary-500 hover:bg-surface-100-900 transition-colors"

@@ -41,9 +41,9 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 4 — Tailwind Color Syntax (replace `dark:` variants) + Lucide deprecated icons
 
-- [ ] **4.1** `AboutPanel.svelte:201` — Replace `from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900` → `from-surface-50-950 to-surface-100-900`
-- [ ] **4.2** `AboutPanel.svelte:247` — Replace `from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700` → `from-surface-100-900 to-surface-200-800`
-- [ ] **4.3** Replace all deprecated Lucide icons with their non-deprecated equivalents in all files that use Lucide icons
+- [x] **4.1** `AboutPanel.svelte:201` — Replace `from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900` → `from-surface-50-950 to-surface-100-900`
+- [x] **4.2** `AboutPanel.svelte:247` — Replace `from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700` → `from-surface-100-900 to-surface-200-800`
+- [x] **4.3** Replace all deprecated Lucide icons with their non-deprecated equivalents in all files that use Lucide icons
 
 ---
 
@@ -51,6 +51,7 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 - [ ] **5.1** `ConsolePanel.svelte:23` — Replace `let currentProcess: any = null` with the proper typed union from `@tauri-apps/plugin-shell` (e.g. `Child | null`)
 - [ ] **5.2** `DepChecks.svelte:93,155` — Replace `error as string` casts with `String(error)` or `error instanceof Error ? error.message : String(error)`
+- [ ] **5.3** Remove all unused imports and variables in all files
 
 ---
 

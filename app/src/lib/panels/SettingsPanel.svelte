@@ -8,7 +8,7 @@
     Database,
     ExternalLink,
     RotateCcw,
-    AlertTriangle,
+    TriangleAlert,
     Check,
   } from "@lucide/svelte";
   import { openUrl } from "@tauri-apps/plugin-opener";
@@ -254,7 +254,7 @@
               <div
                 class="flex items-center gap-1.5 mt-2 text-xs text-warning-600-400"
               >
-                <AlertTriangle size={12} />
+                <TriangleAlert size={12} />
                 <span>URL must start with http:// or https://</span>
               </div>
             {:else if endpointUrl && endpointUrlValid}

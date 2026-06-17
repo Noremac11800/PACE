@@ -8,11 +8,11 @@
     Smartphone,
     FolderOpen,
     Check,
-    AlertCircle,
+    CircleAlert,
     Eye,
     EyeOff,
     Upload,
-    FileSignature,
+    FilePenLine,
   } from "@lucide/svelte";
   import {
     BaseDirectory,
@@ -379,7 +379,7 @@
 
 <div class="h-full flex flex-col p-4">
   <div class="flex items-center gap-2 mb-4">
-    <FileSignature size={18} class="text-primary-500" />
+    <FilePenLine size={18} class="text-primary-500" />
     <span class="font-semibold text-surface-900-100"
       >Code Signing Configuration</span
     >
@@ -401,7 +401,7 @@
         {:else if importStatus === "success"}
           <Check size={14} /> Imported
         {:else if importStatus === "error"}
-          <AlertCircle size={14} /> Import failed
+          <CircleAlert size={14} /> Import failed
         {:else}
           <Upload size={14} /> Import
         {/if}
@@ -418,7 +418,7 @@
     {#if importStatus === "error" && importError}
       <div class="px-4 py-2 bg-error-500/10 border border-error-500/20 rounded">
         <div class="flex items-center gap-2 text-sm text-error-500">
-          <AlertCircle size={16} />
+          <CircleAlert size={16} />
           <span>{importError}</span>
         </div>
       </div>

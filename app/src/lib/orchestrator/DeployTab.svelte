@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Rocket, FileSignature, Globe, CloudUpload } from "@lucide/svelte";
+  import { Rocket, FilePenLine, Globe, CloudUpload } from "@lucide/svelte";
   import CodesigningConfig from "./CodesigningConfig.svelte";
   import PublishingConfig from "./PublishingConfig.svelte";
   import UploadConfig from "./UploadConfig.svelte";
@@ -17,7 +17,7 @@
   const sections = {
     publishing: { icon: Globe, label: "Publishing" },
     upload: { icon: CloudUpload, label: "Upload" },
-    codesigning: { icon: FileSignature, label: "Code signing" },
+    codesigning: { icon: FilePenLine, label: "Code signing" },
   };
 </script>
 

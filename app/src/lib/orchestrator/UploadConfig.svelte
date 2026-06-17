@@ -20,7 +20,7 @@
     FolderOpen,
     ExternalLink,
     Settings,
-    AlertTriangle,
+    TriangleAlert,
   } from "@lucide/svelte";
   import { readDir } from "@tauri-apps/plugin-fs";
   import { openPath, openUrl } from "@tauri-apps/plugin-opener";
@@ -432,7 +432,7 @@
         class="card bg-warning-500/10 border border-warning-500 p-4 flex flex-col gap-3"
       >
         <div class="flex items-center gap-2">
-          <AlertTriangle size={18} class="text-warning-500" />
+          <TriangleAlert size={18} class="text-warning-500" />
           <span class="font-semibold text-warning-600-400"
             >Storage Endpoint Not Configured</span
           >

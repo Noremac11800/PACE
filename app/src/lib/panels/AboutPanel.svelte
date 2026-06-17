@@ -198,7 +198,7 @@
           <div class="group relative">
             <!-- Card -->
             <div
-              class="card bg-gradient-to-br from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900 border border-surface-200-800 p-6 md:p-10 hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] group-hover:border-primary-300-700"
+              class="card bg-linear-to-br from-surface-50-950 to-surface-100-900 border border-surface-200-800 p-6 md:p-10 hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] group-hover:border-primary-300-700"
             >
               <!-- Icon with enhanced background -->
               <div class="relative mb-6 md:mb-8">
@@ -244,7 +244,7 @@
                 <div class="flex flex-wrap gap-2">
                   {#each tech.features as feature (feature)}
                     <span
-                      class="text-xs px-3 py-1.5 bg-gradient-to-r from-surface-100 to-surface-200 dark:from-surface-800 dark:to-surface-700 text-surface-700-300 rounded-full border border-surface-200-800 font-medium"
+                      class="text-xs px-3 py-1.5 bg-linear-to-r from-surface-100-800 to-surface-200-700 text-surface-700-300 rounded-full border border-surface-200-800 font-medium"
                     >
                       {feature}
                     </span>
