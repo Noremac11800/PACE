@@ -524,6 +524,8 @@
                     else next.add(index);
                     dependsOnDropdownOpen = next;
                   }}
+                  onUpdate={(patch) =>
+                    Object.assign(draft.projects[index], patch)}
                 />
               {/each}
               {#if groupProjects.length === 0}

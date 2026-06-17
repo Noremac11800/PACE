@@ -79,8 +79,8 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 9 — `export function` & Props Mutation (Svelte 4 patterns)
 
-- [ ] **9.1** `Callout.svelte:32-35` — Remove `export function toggle()`. Replace with a callback prop `ontoggle?: () => void` in `$props()`, or expose toggle state via `$bindable` only and let the parent control it
-- [ ] **9.2** `ProjectCard.svelte:25-46` — Either declare `project` as `$bindable()` in props, or emit mutation events via callback props (`onUpdate: (patch: Partial<PaceProject>) => void`) instead of mutating the prop object directly
+- [x] **9.1** `Callout.svelte:32-35` — Remove `export function toggle()`. Replace with a callback prop `ontoggle?: () => void` in `$props()`, or expose toggle state via `$bindable` only and let the parent control it
+- [x] **9.2** `ProjectCard.svelte:25-46` — Either declare `project` as `$bindable()` in props, or emit mutation events via callback props (`onUpdate: (patch: Partial<PaceProject>) => void`) instead of mutating the prop object directly
 
 ---
 

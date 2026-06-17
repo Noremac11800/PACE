@@ -11,6 +11,7 @@
     onToggle,
     onRemove,
     onToggleDropdown,
+    onUpdate,
   }: {
     project: PaceProject;
     groups: string[];
@@ -20,13 +21,16 @@
     onToggle: () => void;
     onRemove: () => void;
     onToggleDropdown: () => void;
+    onUpdate: (patch: Partial<PaceProject>) => void;
   } = $props();
 
   function updateExplicitFrameworks(value: string): void {
-    project.explicit_frameworks = value
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    onUpdate({
+      explicit_frameworks: value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
   }
 
   function getAvailableProjects(): string[] {
@@ -36,13 +40,12 @@
   }
 
   function toggleDependency(depName: string): void {
-    if (!project.depends_on) project.depends_on = [];
-    const idx = project.depends_on.indexOf(depName);
-    if (idx >= 0) {
-      project.depends_on = project.depends_on.filter((_, i) => i !== idx);
-    } else {
-      project.depends_on = [...project.depends_on, depName];
-    }
+    const current = project.depends_on ?? [];
+    const idx = current.indexOf(depName);
+    onUpdate({
+      depends_on:
+        idx >= 0 ? current.filter((_, i) => i !== idx) : [...current, depName],
+    });
   }
 </script>
 
@@ -81,28 +84,26 @@
     <div class="p-4 grid grid-cols-2 gap-4 border-t border-surface-200-800">
       <!-- Name -->
       <div class="col-span-2 sm:col-span-1">
-        <label
-          class="block text-xs font-semibold text-surface-700-300 mb-1"
-        >
+        <label class="block text-xs font-semibold text-surface-700-300 mb-1">
           Name <span class="text-error-500">*</span>
           <input
             class="mt-1 w-full px-3 py-2 rounded-lg bg-surface-100-900 border border-surface-300-700 text-sm text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal"
             type="text"
             placeholder="my-project"
-            bind:value={project.name}
+            value={project.name}
+            oninput={(e) => onUpdate({ name: e.currentTarget.value })}
           />
         </label>
       </div>
 
       <!-- SLN Group -->
       <div class="col-span-2 sm:col-span-1">
-        <label
-          class="block text-xs font-semibold text-surface-700-300 mb-1"
-        >
+        <label class="block text-xs font-semibold text-surface-700-300 mb-1">
           Solution group <span class="text-error-500">*</span>
           <select
             class="mt-1 w-full px-3 py-2 rounded-lg bg-surface-100-900 border border-surface-300-700 text-sm text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal"
-            bind:value={project.sln_group}
+            value={project.sln_group}
+            onchange={(e) => onUpdate({ sln_group: e.currentTarget.value })}
           >
             {#each groups as g}
               <option value={g}>{g}</option>
@@ -113,30 +114,28 @@
 
       <!-- csproj_path -->
       <div class="col-span-2">
-        <label
-          class="block text-xs font-semibold text-surface-700-300 mb-1"
-        >
+        <label class="block text-xs font-semibold text-surface-700-300 mb-1">
           .csproj Path <span class="text-error-500">*</span>
           <input
             class="mt-1 w-full px-3 py-2 rounded-lg bg-surface-100-900 border border-surface-300-700 text-sm font-mono text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal"
             type="text"
             placeholder="src/My.Project/My.Project.csproj"
-            bind:value={project.csproj_path}
+            value={project.csproj_path}
+            oninput={(e) => onUpdate({ csproj_path: e.currentTarget.value })}
           />
         </label>
       </div>
 
       <!-- Repo URL -->
       <div class="col-span-2">
-        <label
-          class="block text-xs font-semibold text-surface-700-300 mb-1"
-        >
+        <label class="block text-xs font-semibold text-surface-700-300 mb-1">
           Repo URL
           <input
             class="mt-1 w-full px-3 py-2 rounded-lg bg-surface-100-900 border border-surface-300-700 text-sm font-mono text-surface-900-50 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal"
             type="text"
             placeholder="git@github.com:org/repo.git"
-            bind:value={project.repo_url}
+            value={project.repo_url}
+            oninput={(e) => onUpdate({ repo_url: e.currentTarget.value })}
           />
         </label>
       </div>
@@ -193,9 +192,7 @@
 
       <!-- Explicit Frameworks -->
       <div class="col-span-2 sm:col-span-1">
-        <label
-          class="block text-xs font-semibold text-surface-700-300 mb-1"
-        >
+        <label class="block text-xs font-semibold text-surface-700-300 mb-1">
           Explicit Frameworks
           <p class="text-xs text-surface-500-400 mt-0.5 mb-1.5 font-normal">
             Comma-separated framework monikers
@@ -217,10 +214,12 @@
                 {fw}
                 <button
                   class="hover:text-secondary-200"
-                  onclick={() => {
-                    project.explicit_frameworks =
-                      project.explicit_frameworks.filter((f) => f !== fw);
-                  }}
+                  onclick={() =>
+                    onUpdate({
+                      explicit_frameworks: project.explicit_frameworks.filter(
+                        (f) => f !== fw,
+                      ),
+                    })}
                 >
                   <X size={10} />
                 </button>

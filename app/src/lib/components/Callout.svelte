@@ -29,7 +29,7 @@
 
   const calloutBaseClass = "flex flex-col border-l-2 p-4 rounded-r-md";
 
-  export function toggle() {
+  function toggle() {
     if (!isCollapsible) return;
     isOpen = !isOpen;
   }
