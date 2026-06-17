@@ -93,8 +93,8 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 11 — Skeleton UI: Replace Custom Implementations
 
-- [ ] **11.1** `SettingsSnippets.svelte:36-52` — Replace the hand-rolled `SettingSwitch` toggle button with Skeleton's `<Switch>` component
-- [ ] **11.2** `SettingsSnippets.svelte:199-210` — Replace the raw `<select>` in `SettingSelect` with Skeleton's `Select` component
+- [x] **11.1** `SettingsSnippets.svelte:36-52` — Replace the hand-rolled `SettingSwitch` toggle button with Skeleton's `<Switch>` component
+- [x] **11.2** `SettingsSnippets.svelte:199-210` — Replace the raw `<select>` in `SettingSelect` with Skeleton's `Select` component
 
 ---
 

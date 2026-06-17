@@ -1,4 +1,5 @@
 <script module lang="ts">
+  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { FolderOpen, FileText } from "@lucide/svelte";
 
@@ -32,22 +33,16 @@
         </p>
       {/if}
     </div>
-    <button
-      id="setting-switch-{label}"
-      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50-950 {value
-        ? 'bg-primary-500'
-        : 'bg-surface-300-700 hover:bg-surface-400-600'}"
-      onclick={() => onChange(!value)}
-      type="button"
-      aria-label={label}
-      aria-pressed={value}
+    <Switch
+      checked={value}
+      name="setting-switch-{label}"
+      onCheckedChange={(details) => onChange(details.checked)}
     >
-      <span
-        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition-all duration-200 ease-in-out {value
-          ? 'translate-x-5'
-          : 'translate-x-0'}"
-      ></span>
-    </button>
+      <Switch.Control>
+        <Switch.Thumb />
+      </Switch.Control>
+      <Switch.HiddenInput />
+    </Switch>
   </div>
 {/snippet}
 
@@ -197,7 +192,7 @@
     {/if}
     <select
       id="setting-select-{label}"
-      class="w-full px-4 py-2.5 rounded-lg bg-surface-100-900 border border-surface-300-700 text-surface-900-50 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200 cursor-pointer"
+      class="select"
       {value}
       onchange={(e) => onChange(e.currentTarget.value)}
     >

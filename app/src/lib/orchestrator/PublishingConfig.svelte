@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick, onMount, untrack } from "svelte";
+  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { Command } from "@tauri-apps/plugin-shell";
   import {
     Globe,
@@ -602,47 +603,31 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
-        <label class="flex items-center gap-2 cursor-pointer group">
-          <div class="relative inline-flex items-center">
-            <input
-              type="checkbox"
-              bind:checked={noRestore}
-              class="peer sr-only"
-            />
-            <div
-              class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
-            ></div>
-            <div
-              class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
-            ></div>
-          </div>
-          <span
-            class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+        <div class="flex items-center gap-3">
+          <Switch
+            checked={noRestore}
+            onCheckedChange={(details) => (noRestore = details.checked)}
           >
-            Skip restore (--no-restore)
-          </span>
-        </label>
+            <Switch.Control><Switch.Thumb /></Switch.Control>
+            <Switch.HiddenInput />
+          </Switch>
+          <span class="text-sm text-surface-900-100"
+            >Skip restore (--no-restore)</span
+          >
+        </div>
 
-        <label class="flex items-center gap-2 cursor-pointer group">
-          <div class="relative inline-flex items-center">
-            <input
-              type="checkbox"
-              bind:checked={cleanBeforeBuild}
-              class="peer sr-only"
-            />
-            <div
-              class="w-9 h-5 bg-surface-300-700 rounded-full peer-checked:bg-primary-500 transition-colors"
-            ></div>
-            <div
-              class="absolute left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
-            ></div>
-          </div>
-          <span
-            class="text-sm text-surface-900-100 group-hover:text-primary-500 transition-colors"
+        <div class="flex items-center gap-3">
+          <Switch
+            checked={cleanBeforeBuild}
+            onCheckedChange={(details) => (cleanBeforeBuild = details.checked)}
           >
-            Clean bin/ and obj/ dirs before build
-          </span>
-        </label>
+            <Switch.Control><Switch.Thumb /></Switch.Control>
+            <Switch.HiddenInput />
+          </Switch>
+          <span class="text-sm text-surface-900-100"
+            >Clean bin/ and obj/ dirs before build</span
+          >
+        </div>
       </div>
     </div>
 
@@ -659,46 +644,32 @@
               msbuildProps[prop.name] !== undefined
                 ? msbuildProps[prop.name] === "true"
                 : prop.default === true || prop.default === "true"}
-            <label
-              class="flex items-center gap-3 cursor-pointer group"
-              for="msbuild-{prop.name}"
-            >
-              <div
-                role="checkbox"
-                aria-checked={val}
-                tabindex="0"
-                id="msbuild-{prop.name}"
-                class="w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 {val
-                  ? 'bg-primary-500'
-                  : 'bg-surface-300-700'}"
-                onclick={() =>
+            <div class="flex items-center gap-3">
+              <Switch
+                checked={val}
+                name="msbuild-{prop.name}"
+                onCheckedChange={(details) =>
                   (msbuildProps = {
                     ...msbuildProps,
-                    [prop.name]: val ? "false" : "true",
-                  })}
-                onkeydown={(e) =>
-                  e.key === " " &&
-                  (msbuildProps = {
-                    ...msbuildProps,
-                    [prop.name]: val ? "false" : "true",
+                    [prop.name]: details.checked ? "true" : "false",
                   })}
               >
-                <div
-                  class="w-4 h-4 rounded-full bg-white shadow transition-transform {val
-                    ? 'translate-x-4'
-                    : 'translate-x-0'}"
-                ></div>
-              </div>
-              <span
-                class="text-sm font-mono text-surface-900-100 group-hover:text-primary-500 transition-colors"
+                <Switch.Control>
+                  <Switch.Thumb />
+                </Switch.Control>
+                <Switch.HiddenInput />
+              </Switch>
+              <span class="text-sm font-mono text-surface-900-100"
                 >{prop.name}</span
               >
               <span
                 class="text-xs ml-auto {val
                   ? 'text-primary-400'
-                  : 'text-surface-500-400'}">{val ? "true" : "false"}</span
+                  : 'text-surface-500-400'}"
               >
-            </label>
+                {val ? "true" : "false"}
+              </span>
+            </div>
           {:else if prop.datatype === "path"}
             <div class="flex flex-col gap-1">
               <label
