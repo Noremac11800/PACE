@@ -65,9 +65,9 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 7 — `$effect` Missing Cleanup / Teardown
 
-- [ ] **7.1** `+layout.svelte:37-39` — Add `return () => { html.removeAttribute('lang'); html.removeAttribute('dir'); }` cleanup to the locale `$effect`
-- [ ] **7.2** `SettingsPanel.svelte:49-94` — Add `return () => { if (saveTimeout) clearTimeout(saveTimeout); }` at the end of the settings `$effect`
-- [ ] **7.3** `BuildTab.svelte:51-68` — Add a cleanup return to the settings-save `$effect` (cancel any pending async work if needed)
+- [x] **7.1** `+layout.svelte:37-39` — Add `return () => { html.removeAttribute('lang'); html.removeAttribute('dir'); }` cleanup to the locale `$effect`
+- [x] **7.2** `SettingsPanel.svelte:49-94` — Add `return () => { if (saveTimeout) clearTimeout(saveTimeout); }` at the end of the settings `$effect`
+- [x] **7.3** `BuildTab.svelte:51-68` — Add a cleanup return to the settings-save `$effect` (cancel any pending async work if needed)
 
 ---
 

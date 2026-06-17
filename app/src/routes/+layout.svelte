@@ -32,6 +32,10 @@
     const currentLocale = $locale ?? "en";
     html.lang = currentLocale;
     html.dir = isRtlLocale(currentLocale) ? "rtl" : "ltr";
+    return () => {
+      html.removeAttribute("lang");
+      html.removeAttribute("dir");
+    };
   });
 
   $effect(() => {

@@ -59,12 +59,16 @@
       noRestore,
       cleanBeforeBuild,
     };
+    let cancelled = false;
     untrack(() => {
       settings.buildTab = snapshot;
-      saveSettings().catch((e) =>
-        console.error("Failed to save build settings:", e),
-      );
+      saveSettings().catch((e) => {
+        if (!cancelled) console.error("Failed to save build settings:", e);
+      });
     });
+    return () => {
+      cancelled = true;
+    };
   });
 
   function resetToDefaults() {

@@ -91,6 +91,10 @@
         console.error("[SettingsPanel] Failed to save settings:", err);
       });
     }, 300);
+
+    return () => {
+      if (saveTimeout) clearTimeout(saveTimeout);
+    };
   });
 
   function scrollTo(id: string) {
