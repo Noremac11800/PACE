@@ -15,7 +15,7 @@
   } from "@lucide/svelte";
   import { View } from "$lib/panels/view-types";
   import { updateStatus } from "$lib/update-status.svelte";
-  import { theme } from "$lib/theme";
+  import { theme } from "$lib/theme.svelte";
   import { isAnyCommandRunning } from "$lib/orchestrator/command-status.svelte";
 
   interface Props {
@@ -131,7 +131,7 @@
   >
     {#if activeView === View.ABOUT}
       <img src="/appglyph.svg" alt="PACE Logo" class="w-5 h-5" />
-    {:else if $theme === "dark"}
+    {:else if theme.current === "dark"}
       <img src="/appglyph.svg" alt="PACE Logo" class="w-5 h-5" />
     {:else}
       <img src="/appglyph-dark.svg" alt="PACE Logo" class="w-5 h-5" />

@@ -13,7 +13,7 @@ import {
   getSettingsJSON,
   settings,
 } from "./settings.svelte";
-import { theme } from "./theme";
+import { theme } from "./theme.svelte";
 import { checkPypiForCliUpdate } from "./update-status.svelte";
 import { checkPaceInstalled } from "./pace-status.svelte";
 

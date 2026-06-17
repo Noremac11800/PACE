@@ -86,8 +86,8 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 10 — Svelte Store → Rune Module
 
-- [ ] **10.1** `network-status.ts` — Convert from `readable` store to a `.svelte.ts` module using `$state` and `$effect` for the `online`/`offline` event listeners. Update all consumers to drop the `$` store auto-subscribe syntax
-- [ ] **10.2** `theme.ts` — Confirm it is a Svelte store, then convert to a `.svelte.ts` rune module. Update `ThemeSwitch.svelte` and `Sidebar.svelte` to use the rune directly (no `$` sigil)
+- [x] **10.1** `network-status.ts` — Convert from `readable` store to a `.svelte.ts` module using `$state` and `$effect` for the `online`/`offline` event listeners. Update all consumers to drop the `$` store auto-subscribe syntax
+- [x] **10.2** `theme.ts` — Confirm it is a Svelte store, then convert to a `.svelte.ts` rune module. Update `ThemeSwitch.svelte` and `Sidebar.svelte` to use the rune directly (no `$` sigil)
 
 ---
 

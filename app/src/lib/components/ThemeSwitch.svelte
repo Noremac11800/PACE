@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Switch } from "@skeletonlabs/skeleton-svelte";
-  import { theme } from "$lib/theme";
+  import { theme } from "$lib/theme.svelte";
   import { settings } from "$lib/settings.svelte";
   import { Sun, Moon } from "@lucide/svelte";
 
   let { class: classname }: { class?: string } = $props();
 
-  let checked = $derived($theme === "dark");
+  let checked = $derived(theme.current === "dark");
 
   const onCheckedChange = (event: { checked: boolean }) => {
     const mode = event.checked ? "dark" : "light";
@@ -25,7 +25,7 @@
 </svelte:head>
 
 <div class="flex items-center gap-2 {classname}">
-  {#if $theme === "light"}
+  {#if theme.current === "light"}
     <Sun class="w-5 h-5" />
   {:else}
     <Moon class="w-5 h-5" />

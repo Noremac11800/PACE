@@ -1,8 +1,15 @@
-import { readable } from "svelte/store";
 import { toaster } from "$lib/toaster";
 import { toastIconWifi, toastIconWifiOff } from "$lib/snippets/Toasts.svelte";
 
-export const isWifiConnected = readable(navigator.onLine, (set) => {
+let online = $state(navigator.onLine);
+
+export const networkStatus = {
+  get online() {
+    return online;
+  },
+};
+
+$effect.root(() => {
   let prevConnected = navigator.onLine;
 
   const update = () => {
@@ -11,26 +18,18 @@ export const isWifiConnected = readable(navigator.onLine, (set) => {
       if (current) {
         toaster?.info({
           title: "Wi-Fi connected",
-          meta: {
-            icon: toastIconWifi,
-          },
+          meta: { icon: toastIconWifi },
         });
       } else {
         toaster?.info({
           title: "Wi-Fi disconnected",
-          meta: {
-            icon: toastIconWifiOff,
-          },
+          meta: { icon: toastIconWifiOff },
         });
       }
     }
-
-    // Using navigator.onLine as a proxy for Wi-Fi connection status
-    set(current);
+    online = current;
     prevConnected = current;
   };
-
-  update();
 
   window.addEventListener("online", update);
   window.addEventListener("offline", update);
