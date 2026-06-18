@@ -13,8 +13,11 @@
   import SettingsPanel from "$lib/panels/SettingsPanel.svelte";
   import UpdatesPanel from "$lib/panels/UpdatesPanel.svelte";
   import OrchestratorPanel from "$lib/panels/OrchestratorPanel.svelte";
-  import { paceStatus, checkPaceInstalled } from "$lib/pace-status.svelte";
-  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
+  import {
+    paceStatus,
+    checkPaceInstalled,
+  } from "$lib/state/pace-status.svelte";
+  import { fetchAppVersion, appVersion } from "$lib/state/app-version.svelte";
   import { onMount } from "svelte";
 
   let activeView: View = $state(View.HOME);

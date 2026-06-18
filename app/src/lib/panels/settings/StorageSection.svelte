@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Database, ExternalLink, TriangleAlert, Check } from "@lucide/svelte";
   import { openUrl } from "@tauri-apps/plugin-opener";
-  import { settings } from "$lib/settings.svelte";
+  import { settings } from "$lib/state/settings.svelte";
 
   const endpointUrl = $derived(settings.general.storageEndpointUrl);
   const endpointUrlValid = $derived(

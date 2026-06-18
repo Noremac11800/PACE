@@ -7,11 +7,10 @@ import {
   remove,
 } from "@tauri-apps/plugin-fs";
 import { homeDir } from "@tauri-apps/api/path";
-import { open } from "@tauri-apps/plugin-dialog";
 import * as TOML from "js-toml";
-import type { PaceConfig, PaceProject } from "./pace-config";
-import { settings } from "./settings.svelte";
-import { saveSettings } from "./app-init";
+import type { PaceConfig, PaceProject } from "$lib/types/pace-config";
+import { settings } from "$lib/state/settings.svelte";
+import { saveSettings } from "$lib/utils/app-init";
 
 export interface ConfigEntry {
   filename: string;

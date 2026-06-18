@@ -1,6 +1,6 @@
 <script lang="ts">
   import { GitBranch, Check, X, Loader } from "@lucide/svelte";
-  import type { PaceProject, ProjectGitStatus } from "$lib/pace-config";
+  import type { PaceProject, ProjectGitStatus } from "$lib/types/pace-config";
 
   interface Props {
     project: PaceProject;

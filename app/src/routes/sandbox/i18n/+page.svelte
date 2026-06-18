@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
   import type { LayoutProps } from "../+layout.svelte";
-  import { loadLocaleResource, locale } from "$lib/i18n";
+  import { loadLocaleResource, locale } from "$lib/utils/i18n";
 
   const data = getContext<LayoutProps>("data");
 

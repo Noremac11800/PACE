@@ -13,12 +13,12 @@
     configStore,
     saveConfig,
     emptyProject,
-  } from "$lib/config-store.svelte";
+  } from "$lib/state/config-store.svelte";
   import type {
     PaceConfig,
     PaceProject,
     PaceBuildProp,
-  } from "$lib/pace-config";
+  } from "$lib/types/pace-config";
   import ProjectCard from "$lib/orchestrator/ProjectCard.svelte";
 
   type PropType = "string" | "boolean" | "path";

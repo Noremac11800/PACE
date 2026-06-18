@@ -12,10 +12,10 @@ import {
   setSettingsFromJSON,
   getSettingsJSON,
   settings,
-} from "./settings.svelte";
-import { theme } from "./theme.svelte";
-import { checkPypiForCliUpdate } from "./update-status.svelte";
-import { checkPaceInstalled } from "./pace-status.svelte";
+} from "$lib/state/settings.svelte";
+import { theme } from "$lib/state/theme.svelte";
+import { checkPypiForCliUpdate } from "$lib/state/update-status.svelte";
+import { checkPaceInstalled } from "$lib/state/pace-status.svelte";
 
 // Promise that resolves when app initialization is complete
 let initPromise: Promise<void> | null = null;

@@ -13,7 +13,7 @@
     Heart,
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-shell";
-  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
+  import { fetchAppVersion, appVersion } from "$lib/state/app-version.svelte";
   import TechStackCard from "$lib/panels/about/TechStackCard.svelte";
   import FeatureCard from "$lib/panels/about/FeatureCard.svelte";
   import type { TechItem, FeatureItem } from "$lib/panels/about/types.ts";
@@ -127,7 +127,7 @@
   <div class="relative overflow-hidden">
     <!-- Background gradient -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700"
+      class="absolute inset-0 bg-linear-to-br from-primary-500 via-primary-600 to-primary-700"
     ></div>
     <!-- Pattern overlay -->
     <div class="absolute inset-0 opacity-10">
@@ -146,7 +146,7 @@
             <img src="/appglyph.svg" alt="PACE" class="h-12 w-12" />
           </div>
           <div
-            class="absolute -bottom-1 -right-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full p-1"
+            class="absolute -bottom-1 -right-1 bg-linear-to-r from-orange-500 to-pink-500 rounded-full p-1"
           >
             <Sparkles size={12} class="text-white" />
           </div>
@@ -227,11 +227,11 @@
     <section class="relative">
       <!-- Background decoration -->
       <div
-        class="absolute inset-0 bg-gradient-to-r from-surface-100-900 via-surface-50-950 to-surface-100-900"
+        class="absolute inset-0 bg-linear-to-r from-surface-100-900 via-surface-50-950 to-surface-100-900"
       ></div>
 
       <div
-        class="relative z-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-3xl p-12 text-center border border-primary-400-600"
+        class="relative z-10 bg-linear-to-r from-primary-500 to-primary-600 rounded-3xl p-12 text-center border border-primary-400-600"
       >
         <div class="max-w-4xl mx-auto">
           <div

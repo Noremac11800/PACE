@@ -6,7 +6,7 @@
     loadLocaleResource,
     locale,
     supportedLocales,
-  } from "$lib/i18n";
+  } from "$lib/utils/i18n";
 
   type LocaleMeta = {
     locale?: string;

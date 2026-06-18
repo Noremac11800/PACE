@@ -14,8 +14,8 @@
     Loader,
   } from "@lucide/svelte";
   import { View } from "$lib/panels/view-types";
-  import { updateStatus } from "$lib/update-status.svelte";
-  import { theme } from "$lib/theme.svelte";
+  import { updateStatus } from "$lib/state/update-status.svelte";
+  import { theme } from "$lib/state/theme.svelte";
   import { isAnyCommandRunning } from "$lib/orchestrator/command-status.svelte";
 
   interface Props {

@@ -1,4 +1,4 @@
-import { toaster } from "$lib/toaster";
+import { toaster } from "$lib/utils/toaster";
 import { toastIconWifi, toastIconWifiOff } from "$lib/snippets/Toasts.svelte";
 
 let online = $state(navigator.onLine);

@@ -22,7 +22,7 @@
     helpSectionIds,
     type TocEntry,
   } from "$lib/panels/help/help-toc";
-  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
+  import { fetchAppVersion, appVersion } from "$lib/state/app-version.svelte";
 
   let version = $derived(`v${appVersion.version}`);
 

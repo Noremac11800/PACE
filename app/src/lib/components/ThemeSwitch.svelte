@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Switch } from "@skeletonlabs/skeleton-svelte";
-  import { theme } from "$lib/theme.svelte";
-  import { settings } from "$lib/settings.svelte";
+  import { theme } from "$lib/state/theme.svelte";
+  import { settings } from "$lib/state/settings.svelte";
   import { Sun, Moon } from "@lucide/svelte";
 
   let { class: classname }: { class?: string } = $props();

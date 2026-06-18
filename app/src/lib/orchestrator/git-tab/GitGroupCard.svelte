@@ -1,8 +1,8 @@
 <script lang="ts">
   import { ChevronDown, ChevronRight, FolderOpen } from "@lucide/svelte";
-  import { getGitStatus, isLoadingGit } from "$lib/git-status.svelte";
+  import { getGitStatus, isLoadingGit } from "$lib/state/git-status.svelte";
   import ProjectGitStatusRow from "$lib/orchestrator/ProjectGitStatusRow.svelte";
-  import type { PaceProject } from "$lib/pace-config";
+  import type { PaceProject } from "$lib/types/pace-config";
 
   let {
     group,

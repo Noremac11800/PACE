@@ -18,9 +18,9 @@
     loadAvailableConfigs,
     loadConfig,
     getActiveConfigPath,
-  } from "$lib/config-store.svelte";
-  import { settings } from "$lib/settings.svelte";
-  import { getInitializationPromise } from "$lib/app-init";
+  } from "$lib/state/config-store.svelte";
+  import { settings } from "$lib/state/settings.svelte";
+  import { getInitializationPromise } from "$lib/utils/app-init";
   import { commandStatus } from "$lib/orchestrator/command-status.svelte";
   import ProjectsTab from "$lib/orchestrator/ProjectsTab.svelte";
   import BuildTab from "$lib/orchestrator/BuildTab.svelte";

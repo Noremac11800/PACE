@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Download, ArrowRight, Package } from "@lucide/svelte";
   import AnimatedBackground from "$lib/panels/AnimatedBackground.svelte";
-  import { updateStatus } from "$lib/update-status.svelte";
-  import { paceStatus } from "$lib/pace-status.svelte";
+  import { updateStatus } from "$lib/state/update-status.svelte";
+  import { paceStatus } from "$lib/state/pace-status.svelte";
   import { View } from "$lib/panels/view-types";
 
   interface Props {

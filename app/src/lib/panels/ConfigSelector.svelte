@@ -19,7 +19,7 @@
     renameConfig,
     deleteConfig,
     importConfig,
-  } from "$lib/config-store.svelte";
+  } from "$lib/state/config-store.svelte";
   import ConfigNameForm from "$lib/panels/config-selector/ConfigNameForm.svelte";
 
   let configPickerOpen = $state(false);

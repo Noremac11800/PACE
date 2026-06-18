@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Monitor } from "@lucide/svelte";
-  import { settings } from "$lib/settings.svelte";
+  import { settings } from "$lib/state/settings.svelte";
   import {
     SettingSwitch,
     SettingSelect,

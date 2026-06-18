@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ChevronDown, ChevronUp, Trash2, X } from "@lucide/svelte";
-  import type { PaceProject } from "$lib/pace-config";
+  import type { PaceProject } from "$lib/types/pace-config";
 
   let {
     project,

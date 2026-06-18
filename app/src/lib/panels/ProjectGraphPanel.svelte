@@ -3,8 +3,8 @@
   import { onMount } from "svelte";
   import cytoscape from "cytoscape";
   import cytoscapeDagre from "cytoscape-dagre";
-  import { configStore } from "$lib/config-store.svelte";
-  import type { PaceProject } from "$lib/pace-config";
+  import { configStore } from "$lib/state/config-store.svelte";
+  import type { PaceProject } from "$lib/types/pace-config";
 
   cytoscape.use(cytoscapeDagre);
 

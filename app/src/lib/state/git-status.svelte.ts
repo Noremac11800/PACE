@@ -1,4 +1,4 @@
-import { checkProjectGitStatus, type PaceConfig, type PaceProject, type ProjectGitStatus } from "./pace-config";
+import { checkProjectGitStatus, type PaceConfig, type PaceProject, type ProjectGitStatus } from "$lib/types/pace-config";
 
 export interface GitStatusState {
   statuses: Map<string, ProjectGitStatus>;

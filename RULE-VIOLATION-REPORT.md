@@ -141,7 +141,7 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 > ⚠️ High-impact refactor — do last as it requires updating every import across the codebase.
 
-- [ ] **16.1** Create `src/lib/state/` and move rune-based state modules into it: `app-version.svelte.ts`, `config-store.svelte.ts`, `git-status.svelte.ts`, `pace-status.svelte.ts`, `settings.svelte.ts`, `update-status.svelte.ts`
-- [ ] **16.2** Create `src/lib/utils/` and move utility files into it: `dependency_utils.ts`, `app-init.ts`, `i18n.ts`, `toaster.ts`
-- [ ] **16.3** Create `src/lib/types/` and move type-only files into it: `pace-config.ts`
-- [ ] **16.4** Update all import paths across the codebase after the moves above
+- [x] **16.1** Create `src/lib/state/` and move rune-based state modules into it: `app-version.svelte.ts`, `config-store.svelte.ts`, `git-status.svelte.ts`, `pace-status.svelte.ts`, `settings.svelte.ts`, `update-status.svelte.ts`
+- [x] **16.2** Create `src/lib/utils/` and move utility files into it: `dependency_utils.ts`, `app-init.ts`, `i18n.ts`, `toaster.ts`
+- [x] **16.3** Create `src/lib/types/` and move type-only files into it: `pace-config.ts`
+- [x] **16.4** Update all import paths across the codebase after the moves above

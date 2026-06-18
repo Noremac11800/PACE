@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Palette } from "@lucide/svelte";
-  import { settings } from "$lib/settings.svelte";
-  import { applyTheme } from "$lib/app-init";
+  import { settings } from "$lib/state/settings.svelte";
+  import { applyTheme } from "$lib/utils/app-init";
   import {
     SettingSelect,
     SettingRadioGroup,
@@ -32,8 +32,7 @@
       "Font Size",
       "Select the base font size for the application",
       settings.appearance.fontSize,
-      (v) =>
-        (settings.appearance.fontSize = v as "small" | "medium" | "large"),
+      (v) => (settings.appearance.fontSize = v as "small" | "medium" | "large"),
       [
         { value: "small", label: "Small" },
         { value: "medium", label: "Medium" },

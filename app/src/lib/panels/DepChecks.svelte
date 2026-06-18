@@ -6,14 +6,14 @@
     isPipxInstalled,
     installPipx,
     installPace,
-  } from "$lib/dependency_utils";
+  } from "$lib/utils/dependency_utils";
   import { Command } from "@tauri-apps/plugin-shell";
   import {
     setPaceInstalledStatus,
     setPaceVersion,
     paceStatus,
-  } from "$lib/pace-status.svelte";
-  import { checkPypiForCliUpdate } from "$lib/update-status.svelte";
+  } from "$lib/state/pace-status.svelte";
+  import { checkPypiForCliUpdate } from "$lib/state/update-status.svelte";
   import { onMount } from "svelte";
   import {
     Check,

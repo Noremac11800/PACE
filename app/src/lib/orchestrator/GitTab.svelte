@@ -2,16 +2,16 @@
   import { GitBranch } from "@lucide/svelte";
   import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import { untrack } from "svelte";
-  import { configStore } from "$lib/config-store.svelte";
+  import { configStore } from "$lib/state/config-store.svelte";
   import {
     loadGitStatuses,
     getGitStatus,
     isLoadingGit,
     clearGitStatuses,
-  } from "$lib/git-status.svelte";
+  } from "$lib/state/git-status.svelte";
   import { Command } from "@tauri-apps/plugin-shell";
-  import { paceArgs } from "$lib/config-store.svelte";
-  import type { PaceProject } from "$lib/pace-config";
+  import { paceArgs } from "$lib/state/config-store.svelte";
+  import type { PaceProject } from "$lib/types/pace-config";
   import GitActions from "$lib/orchestrator/git-tab/GitActions.svelte";
   import GitGroupCard from "$lib/orchestrator/git-tab/GitGroupCard.svelte";
 

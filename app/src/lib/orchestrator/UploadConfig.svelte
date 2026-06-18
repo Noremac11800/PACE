@@ -22,9 +22,9 @@
     settings,
     DEFAULT_UPLOAD_TAB_SETTINGS,
     type UploadTabSettings,
-  } from "$lib/settings.svelte";
-  import { saveSettings } from "$lib/app-init";
-  import { configStore } from "$lib/config-store.svelte";
+  } from "$lib/state/settings.svelte";
+  import { saveSettings } from "$lib/utils/app-init";
+  import { configStore } from "$lib/state/config-store.svelte";
   import { setUploadingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
   import type {

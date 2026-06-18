@@ -5,7 +5,11 @@
   import { homeDir, join } from "@tauri-apps/api/path";
   import { open } from "@tauri-apps/plugin-dialog";
   import { openPath } from "@tauri-apps/plugin-opener";
-  import { configStore, saveConfig, paceArgs } from "$lib/config-store.svelte";
+  import {
+    configStore,
+    saveConfig,
+    paceArgs,
+  } from "$lib/state/config-store.svelte";
   import type {
     NugetSource,
     CachedPackage,

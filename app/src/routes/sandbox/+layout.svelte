@@ -3,7 +3,7 @@
   import { setContext } from "svelte";
   import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
   import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
-  import { fetchAppVersion, appVersion } from "$lib/app-version.svelte";
+  import { fetchAppVersion, appVersion } from "$lib/state/app-version.svelte";
   import type { LayoutProps } from "./+layout";
 
   const { children } = $props();

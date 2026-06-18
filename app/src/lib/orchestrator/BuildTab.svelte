@@ -3,9 +3,12 @@
   import { Command } from "@tauri-apps/plugin-shell";
   import { Hammer, Square, RotateCcw } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
-  import { configStore, paceArgs } from "$lib/config-store.svelte";
-  import { settings, DEFAULT_BUILD_TAB_SETTINGS } from "$lib/settings.svelte";
-  import { saveSettings } from "$lib/app-init";
+  import { configStore, paceArgs } from "$lib/state/config-store.svelte";
+  import {
+    settings,
+    DEFAULT_BUILD_TAB_SETTINGS,
+  } from "$lib/state/settings.svelte";
+  import { saveSettings } from "$lib/utils/app-init";
   import { setBuildingStatus } from "$lib/orchestrator/command-status.svelte";
   import { type Framework } from "$lib/orchestrator/build-tab/frameworks";
   import BuildOptionsForm from "$lib/orchestrator/build-tab/BuildOptionsForm.svelte";

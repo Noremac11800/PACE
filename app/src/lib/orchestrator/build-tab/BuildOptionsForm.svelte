@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { Hammer, ChevronDown, FolderOpen } from "@lucide/svelte";
-  import type { PaceProject, PaceBuildProp } from "$lib/pace-config";
+  import type { PaceProject, PaceBuildProp } from "$lib/types/pace-config";
   import { FRAMEWORKS, type Framework } from "./frameworks";
 
   let {

@@ -18,9 +18,9 @@
     settings,
     DEFAULT_PUBLISH_TAB_SETTINGS,
     type PublishTabSettings,
-  } from "$lib/settings.svelte";
-  import { saveSettings } from "$lib/app-init";
-  import { configStore, paceArgs } from "$lib/config-store.svelte";
+  } from "$lib/state/settings.svelte";
+  import { saveSettings } from "$lib/utils/app-init";
+  import { configStore, paceArgs } from "$lib/state/config-store.svelte";
   import {
     type CodesigningData,
     type AndroidCodesignInfo,

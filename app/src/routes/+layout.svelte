@@ -4,14 +4,14 @@
   import { createToaster } from "@skeletonlabs/skeleton-svelte";
   import { Toast } from "@skeletonlabs/skeleton-svelte";
   import { setContext } from "svelte";
-  import { initI18n, isRtlLocale, locale } from "$lib/i18n";
-  import { setToaster } from "$lib/toaster";
+  import { initI18n, isRtlLocale, locale } from "$lib/utils/i18n";
+  import { setToaster } from "$lib/utils/toaster";
   import { fly } from "svelte/transition";
   import { page } from "$app/state";
   import { beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
-  import { initializeApp, applyFontSize } from "$lib/app-init";
-  import { settings } from "$lib/settings.svelte";
+  import { initializeApp, applyFontSize } from "$lib/utils/app-init";
+  import { settings } from "$lib/state/settings.svelte";
 
   const { children } = $props();
 

@@ -8,8 +8,8 @@
     Database,
     RotateCcw,
   } from "@lucide/svelte";
-  import { settings, resetSettings } from "$lib/settings.svelte";
-  import { saveSettings, applyTheme } from "$lib/app-init";
+  import { settings, resetSettings } from "$lib/state/settings.svelte";
+  import { saveSettings, applyTheme } from "$lib/utils/app-init";
   import GeneralSection from "$lib/panels/settings/GeneralSection.svelte";
   import AppearanceSection from "$lib/panels/settings/AppearanceSection.svelte";
   import StorageSection from "$lib/panels/settings/StorageSection.svelte";

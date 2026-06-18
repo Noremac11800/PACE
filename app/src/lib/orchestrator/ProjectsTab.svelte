@@ -8,7 +8,7 @@
     FolderOpen,
   } from "@lucide/svelte";
   import { revealItemInDir } from "@tauri-apps/plugin-opener";
-  import type { PaceConfig, PaceProject } from "$lib/pace-config";
+  import type { PaceConfig, PaceProject } from "$lib/types/pace-config";
 
   interface Props {
     config: PaceConfig;

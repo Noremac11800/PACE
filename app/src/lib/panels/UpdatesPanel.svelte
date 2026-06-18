@@ -14,8 +14,11 @@
   import {
     updateStatus,
     checkPypiForCliUpdate,
-  } from "$lib/update-status.svelte";
-  import { checkPaceInstalled, paceStatus } from "$lib/pace-status.svelte";
+  } from "$lib/state/update-status.svelte";
+  import {
+    checkPaceInstalled,
+    paceStatus,
+  } from "$lib/state/pace-status.svelte";
   import { View } from "$lib/panels/view-types";
 
   interface Props {
