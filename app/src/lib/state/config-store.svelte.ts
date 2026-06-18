@@ -6,7 +6,7 @@ import {
   mkdir,
   remove,
 } from "@tauri-apps/plugin-fs";
-import { homeDir } from "@tauri-apps/api/path";
+import { homeDir, join } from "@tauri-apps/api/path";
 import * as TOML from "js-toml";
 import type { PaceConfig, PaceProject } from "$lib/types/pace-config";
 import { settings } from "$lib/state/settings.svelte";
@@ -234,6 +234,17 @@ export async function paceArgs(args: string[]): Promise<string[]> {
     return ["-C", configPath, ...args];
   }
   return args;
+}
+
+export async function paceCommandPreview(args: string[]): Promise<string> {
+  const configName = configStore.activeConfigName;
+  if (configName) {
+    const home = await homeDir();
+    const configPath = await join(home, ".pace", "configs", configName);
+    // Quote the path for safety with spaces in usernames
+    return `pace -C "${configPath}" ${args.join(" ")}`;
+  }
+  return `pace ${args.join(" ")}`;
 }
 
 function serializeToml(config: PaceConfig): string {

@@ -14,13 +14,18 @@
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
+  import { join } from "@tauri-apps/api/path";
   import {
     settings,
     DEFAULT_PUBLISH_TAB_SETTINGS,
     type PublishTabSettings,
   } from "$lib/state/settings.svelte";
   import { saveSettings } from "$lib/utils/app-init";
-  import { configStore, paceArgs } from "$lib/state/config-store.svelte";
+  import {
+    configStore,
+    paceArgs,
+    paceCommandPreview,
+  } from "$lib/state/config-store.svelte";
   import {
     type CodesigningData,
     type AndroidCodesignInfo,
@@ -431,11 +436,18 @@
     currentProcess = null;
   }
 
-  const cleanCommandPreview = $derived.by(() => {
-    const parts: string[] = ["pace"];
+  // Async command preview using $state + $effect
+  let cleanCommandPreview = $state("pace clean --projects");
+
+  $effect(() => {
+    const parts: string[] = [];
     if (selectedProject) parts.push("--to", selectedProject);
     parts.push("clean", "--projects");
-    return parts.join(" ");
+    // Capture deps
+    const deps = { selectedProject };
+    paceCommandPreview(parts).then((preview) => {
+      cleanCommandPreview = preview;
+    });
   });
 
   // Command previews as async state+effect to support path expansion
@@ -449,9 +461,6 @@
 
     const project = projects.find((p) => p.name === selectedProject);
     const repodir = configStore.activeConfig?.repodir ?? "<repodir>";
-    const csprojPath = project?.csproj_path
-      ? `${repodir}/${project.name}/${project.csproj_path}`
-      : "<csproj_path>";
 
     // Capture reactive deps before async
     const platforms = [...orderedSelectedPlatforms];
@@ -464,36 +473,51 @@
     const nr = noRestore;
     const props = buildProps;
     const msbProps = { ...msbuildProps };
+    const projCsprojPath = project?.csproj_path;
+    const projName = project?.name;
 
-    Promise.all(
-      platforms.map(async (platform) => {
-        const runtime = getRuntimeForPlatform(platform);
-        const framework = getFrameworkForPlatform(platform);
-        let command = await buildCommandPreview(
-          csprojPath,
-          bc,
-          runtime,
-          framework,
-          nr,
-          platform,
-          config,
-          aKey,
-          iKey,
-          wKey,
-          signInfo,
-        );
-        // Add MSBuild properties to preview
-        for (const prop of props) {
-          const val = msbProps[prop.name];
-          const effective = val !== undefined ? val : String(prop.default);
-          if (effective !== "" && effective !== String(prop.default))
-            command += ` -p:${prop.name}=${effective}`;
-        }
-        return { platform, command };
-      }),
-    ).then((previews) => {
+    // Build path async to ensure proper OS separators
+    const buildPreviews = async () => {
+      let csprojPath: string;
+      if (projCsprojPath && projName && repodir !== "<repodir>") {
+        csprojPath = await join(repodir, projName, projCsprojPath);
+      } else if (projCsprojPath) {
+        csprojPath = "<csproj_path>";
+      } else {
+        csprojPath = "<csproj_path>";
+      }
+
+      const previews = await Promise.all(
+        platforms.map(async (platform) => {
+          const runtime = getRuntimeForPlatform(platform);
+          const framework = getFrameworkForPlatform(platform);
+          let command = await buildCommandPreview(
+            csprojPath,
+            bc,
+            runtime,
+            framework,
+            nr,
+            platform,
+            config,
+            aKey,
+            iKey,
+            wKey,
+            signInfo,
+          );
+          // Add MSBuild properties to preview
+          for (const prop of props) {
+            const val = msbProps[prop.name];
+            const effective = val !== undefined ? val : String(prop.default);
+            if (effective !== "" && effective !== String(prop.default))
+              command += ` -p:${prop.name}=${effective}`;
+          }
+          return { platform, command };
+        }),
+      );
       commandPreviews = previews;
-    });
+    };
+
+    buildPreviews();
   });
 
   const progressBarColor = $derived.by(() => {

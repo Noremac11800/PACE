@@ -3,7 +3,11 @@
   import { Command } from "@tauri-apps/plugin-shell";
   import { Hammer, Square, RotateCcw } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
-  import { configStore, paceArgs } from "$lib/state/config-store.svelte";
+  import {
+    configStore,
+    paceArgs,
+    paceCommandPreview,
+  } from "$lib/state/config-store.svelte";
   import {
     settings,
     DEFAULT_BUILD_TAB_SETTINGS,
@@ -171,16 +175,24 @@
     return projects.filter((p) => included.has(p.name));
   });
 
-  const cleanCommandPreview = $derived.by(() => {
-    const parts: string[] = ["pace"];
-    if (fromProject) parts.push("--from", fromProject);
-    if (toProject) parts.push("--to", toProject);
-    parts.push("clean", "--projects");
-    return parts.join(" ");
+  // Async command previews using $state + $effect
+  let cleanCommandPreview = $state("pace clean --projects");
+  let commandPreview = $state("pace dotnet build");
+
+  $effect(() => {
+    const cleanParts: string[] = [];
+    if (fromProject) cleanParts.push("--from", fromProject);
+    if (toProject) cleanParts.push("--to", toProject);
+    cleanParts.push("clean", "--projects");
+    // Capture deps
+    const deps = { fromProject, toProject };
+    paceCommandPreview(cleanParts).then((preview) => {
+      cleanCommandPreview = preview;
+    });
   });
 
-  const commandPreview = $derived.by(() => {
-    const parts: string[] = ["pace"];
+  $effect(() => {
+    const parts: string[] = [];
     if (fromProject) parts.push("--from", fromProject);
     if (toProject) parts.push("--to", toProject);
     parts.push("dotnet", "build");
@@ -193,10 +205,22 @@
       if (effective !== "" && effective !== String(prop.default))
         parts.push(`-p:${prop.name}=${effective}`);
     }
-    const buildCommand = parts.join(" ");
-    return cleanBeforeBuild
-      ? `${cleanCommandPreview}\n${buildCommand}`
-      : buildCommand;
+    // Capture deps
+    const deps = {
+      fromProject,
+      toProject,
+      buildConfig,
+      selectedFramework,
+      noRestore,
+      buildProps: [...buildProps],
+      msbuildProps: { ...msbuildProps },
+      cleanBeforeBuild,
+    };
+    paceCommandPreview(parts).then((preview) => {
+      commandPreview = cleanBeforeBuild
+        ? `${cleanCommandPreview}\n${preview}`
+        : preview;
+    });
   });
 
   function addLine(text: string, type: "out" | "err") {

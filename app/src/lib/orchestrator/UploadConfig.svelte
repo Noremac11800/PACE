@@ -24,7 +24,11 @@
     type UploadTabSettings,
   } from "$lib/state/settings.svelte";
   import { saveSettings } from "$lib/utils/app-init";
-  import { configStore } from "$lib/state/config-store.svelte";
+  import {
+    configStore,
+    paceArgs,
+    paceCommandPreview,
+  } from "$lib/state/config-store.svelte";
   import { setUploadingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
   import type {
@@ -313,7 +317,7 @@
   ): Promise<boolean> {
     const apiPlatform = getApiPlatform(pkg.platform);
 
-    const paceArgs = [
+    const uploadArgs = [
       "upload",
       pkg.path,
       "--username",
@@ -331,12 +335,14 @@
     ];
 
     if (buildNotes) {
-      paceArgs.push("--build-description", buildNotes);
+      uploadArgs.push("--build-description", buildNotes);
     }
+
+    const allArgs = await paceArgs(uploadArgs);
 
     return new Promise((resolve) => {
       try {
-        const cmd = Command.create("pace", paceArgs);
+        const cmd = Command.create("pace", allArgs);
 
         cmd.stdout.on("data", (data: string) => {
           uploadProgress[packagePath] = data.trim();
@@ -369,30 +375,67 @@
     resetOutput();
   }
 
-  // Command preview data structure for UI rendering
-  const commandPreviews = $derived.by(() => {
-    if (selectedPackages.length === 0) return [];
-    if (!username || !appName || !version) return [];
+  // Async command preview using $state + $effect
+  let commandPreviews = $state<{ pkg: PackageFile; command: string }[]>([]);
 
-    return selectedPackages
-      .map((packagePath) => {
+  $effect(() => {
+    if (selectedPackages.length === 0) {
+      commandPreviews = [];
+      return;
+    }
+    if (!username || !appName || !version) {
+      commandPreviews = [];
+      return;
+    }
+
+    // Capture dependencies
+    const deps = {
+      selectedPackages: [...selectedPackages],
+      availablePackages: [...availablePackages],
+      username,
+      appName,
+      version,
+      endpointUrl,
+      buildNotes,
+    };
+
+    Promise.all(
+      selectedPackages.map(async (packagePath) => {
         const pkg = availablePackages.find((p) => p.path === packagePath);
         if (!pkg) return null;
 
         const apiPlatform = getApiPlatform(pkg.platform);
-        let cmd = `pace upload "${pkg.path}" --username "${username}" --app-name "${appName}" --platform ${apiPlatform} --release-type ${pkg.buildConfig} --version "${version}" --endpoint "${endpointUrl}"`;
+        const uploadArgs = [
+          "upload",
+          `"${pkg.path}"`,
+          "--username",
+          `"${username}"`,
+          "--app-name",
+          `"${appName}"`,
+          "--platform",
+          apiPlatform,
+          "--release-type",
+          pkg.buildConfig,
+          "--version",
+          `"${version}"`,
+          "--endpoint",
+          `"${endpointUrl}"`,
+        ];
         if (buildNotes) {
-          cmd += ` --build-description "${buildNotes}"`;
+          uploadArgs.push("--build-description", `"${buildNotes}"`);
         }
+        const cmd = await paceCommandPreview(uploadArgs);
 
         return {
           pkg,
           command: cmd,
         };
-      })
-      .filter(
+      }),
+    ).then((results) => {
+      commandPreviews = results.filter(
         (item): item is { pkg: PackageFile; command: string } => item !== null,
       );
+    });
   });
 </script>
 
@@ -598,7 +641,7 @@
           class="input text-sm min-h-[80px] resize-none"
           placeholder="Enter build notes or description..."
           bind:value={buildNotes}
-        />
+        ></textarea>
       </div>
     </div>
 

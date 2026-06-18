@@ -13,6 +13,7 @@
   } from "@lucide/svelte";
   import ConsoleOutput from "$lib/panels/console/ConsoleOutput.svelte";
   import ConsoleInput from "$lib/panels/console/ConsoleInput.svelte";
+  import { paceCommandPreview } from "$lib/state/config-store.svelte";
 
   // Console state
   let consoleOutput = $state<string[]>([]);
@@ -258,18 +259,20 @@
     <div class="flex items-center gap-1">
       <button
         class="btn preset-tonal px-2 py-1 text-xs"
-        onclick={() => runPresetCommand("pace git pull")}
+        onclick={async () =>
+          runPresetCommand(await paceCommandPreview(["git", "pull"]))}
         disabled={isRunning}
-        title="pace git pull"
+        title="pace git pull (with config)"
       >
         <RotateCcw size={14} class="mr-1" />
         git pull
       </button>
       <button
         class="btn preset-tonal px-2 py-1 text-xs"
-        onclick={() => runPresetCommand("pace git clone")}
+        onclick={async () =>
+          runPresetCommand(await paceCommandPreview(["git", "clone"]))}
         disabled={isRunning}
-        title="pace git clone"
+        title="pace git clone (with config)"
       >
         <Download size={14} class="mr-1" />
         git clone
