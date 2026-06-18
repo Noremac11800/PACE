@@ -216,6 +216,13 @@ def main() -> int:
         "dotnet", help="Execute dotnet commands across the project graph"
     )
     dotnet_parser.add_argument(
+        "--summarize-warnings",
+        dest="summarize_warnings",
+        action="store_true",
+        help="After the build completes, parse its output and print a warning summary by code and project",
+        default=False,
+    )
+    dotnet_parser.add_argument(
         "dotnet_args",
         metavar="... <dotnet-args>",
         nargs=argparse.REMAINDER,
@@ -399,7 +406,9 @@ def _run(
                 dry_run=args.dry_run,
             )
         case "dotnet":
-            return dotnet.run(console, config, args.dotnet_args)
+            return dotnet.run(
+                console, config, args.dotnet_args, summarize_warnings=args.summarize_warnings
+            )
         case "git":
             return git.run(console, config, unknownargs)
         case "upload":

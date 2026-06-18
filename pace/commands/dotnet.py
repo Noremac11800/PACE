@@ -1,12 +1,93 @@
 """pace dotnet command - Execute dotnet commands across the project graph."""
 
 import json
+import re
 import subprocess
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from rich.console import Console
+from rich.table import Table
 
 from pace.config import Config, Project
+
+_WARNING_PATTERN = re.compile(r":\s+(?:\w+ )?warning (\w+):\s+(.+?)(?:\s+See https?://\S+)?\s*\[")
+_PROJECT_PATTERN = re.compile(r"\[([^\]]+\.csproj)")
+
+
+@dataclass
+class _WarningSummary:
+    count: int = field(default=0)
+    description: str = field(default="")
+
+
+def _build_stem_to_repo(config: Config) -> dict[str, str]:
+    """Map csproj stem names to their repo/project names from the config."""
+    mapping: dict[str, str] = {}
+    for project in config.projects:
+        stem = Path(project.csproj_path).stem
+        mapping[stem] = project.name
+    return mapping
+
+
+def _print_warning_tables(console: Console, config: Config, lines: list[str]) -> None:
+    """Parse captured build output lines and print warning summary tables."""
+    warnings: dict[str, _WarningSummary] = defaultdict(_WarningSummary)
+    by_project: dict[str, int] = defaultdict(int)
+    seen: set[str] = set()
+
+    for line in lines:
+        match = _WARNING_PATTERN.search(line)
+        if match:
+            if line in seen:
+                continue
+            seen.add(line)
+
+            code = match.group(1)
+            description = match.group(2).strip()
+            warnings[code].count += 1
+            warnings[code].description = description
+
+            proj_match = _PROJECT_PATTERN.search(line)
+            if proj_match:
+                proj_name = Path(proj_match.group(1)).stem
+                by_project[proj_name] += 1
+
+    if not warnings:
+        console.print("[yellow]No warnings found.[/yellow]")
+        return
+
+    stem_to_repo = _build_stem_to_repo(config)
+
+    sorted_warnings = sorted(warnings.items(), key=lambda x: x[1].count, reverse=True)
+
+    by_code_table = Table(title="Warnings by Code", show_header=True, header_style="bold cyan")
+    by_code_table.add_column("Code", style="bold yellow", no_wrap=True)
+    by_code_table.add_column("Count", justify="right", style="bold red")
+    by_code_table.add_column("Description")
+
+    for code, data in sorted_warnings:
+        by_code_table.add_row(code, str(data.count), data.description)
+
+    console.print(by_code_table)
+
+    sorted_projects = sorted(by_project.items(), key=lambda x: x[1], reverse=True)
+
+    by_project_table = Table(
+        title="Warnings by Project", show_header=True, header_style="bold cyan"
+    )
+    by_project_table.add_column("Project", style="bold blue")
+    by_project_table.add_column("Repo", style="dim")
+    by_project_table.add_column("Count", justify="right", style="bold red")
+
+    for proj_stem, count in sorted_projects:
+        repo_name = stem_to_repo.get(proj_stem, "")
+        by_project_table.add_row(proj_stem, repo_name, str(count))
+
+    console.print(by_project_table)
+    console.print(f"[bold]Total warnings:[/bold] {sum(v.count for v in warnings.values())}")
+
 
 # In-memory cache (loaded from disk)
 _tf_cache: dict[str, tuple[str, float]] = {}
@@ -276,13 +357,16 @@ def sync_slnx_file(console: Console, config: Config, slnx_name: str, framework: 
     return True
 
 
-def run(console: Console, config: Config, args: list[str]) -> int:
+def run(
+    console: Console, config: Config, args: list[str], *, summarize_warnings: bool = False
+) -> int:
     """Execute dotnet commands across all projects.
 
     Args:
         console: Rich console instance for output
         config: PACE configuration
         args: Additional arguments to pass to dotnet (first arg is the dotnet subcommand)
+        summarize_warnings: When True, parse build output after completion and print warning tables
 
     Returns:
         Exit code from the dotnet command (0 for success, non-zero for failure)
@@ -306,9 +390,21 @@ def run(console: Console, config: Config, args: list[str]) -> int:
     if not sync_slnx_file(console, config, slnx_name, framework):
         return 1  # No projects found for the framework
 
-    # Run the dotnet command with the solution file
     console.print(f"Running: dotnet {dotnet_cmd} {slnx_name}")
     cmd = ["dotnet", dotnet_cmd, str(slnx_path), *dotnet_args]
-    result = subprocess.run(cmd, capture_output=False, text=True, check=False)
 
-    return result.returncode
+    if not summarize_warnings:
+        result = subprocess.run(cmd, capture_output=False, text=True, check=False)
+        return result.returncode
+
+    # Stream output live while capturing it for post-build warning analysis
+    captured: list[str] = []
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    assert process.stdout is not None
+    for line in process.stdout:
+        console.out(line, end="")
+        captured.append(line)
+    process.wait()
+
+    _print_warning_tables(console, config, captured)
+    return process.returncode
