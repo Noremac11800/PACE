@@ -27,6 +27,7 @@
     Tag,
     Trash2,
   } from "@lucide/svelte";
+  import DepCheckRow from "$lib/panels/depchecks/DepCheckRow.svelte";
 
   let { class: classname = "" } = $props();
 
@@ -48,6 +49,28 @@
   let isCheckingPace = $state(false);
   let pipxInstallResult: string = $state("");
   let paceInstalled: boolean | undefined = $state(undefined);
+
+  let pythonStatusText = $derived(
+    pythonFound === undefined
+      ? "Checking..."
+      : pythonFound
+        ? `v${pythonVersion}`
+        : `Not installed or < ${MIN_PYTHON_VERSION}`,
+  );
+  let gitStatusText = $derived(
+    gitFound === undefined
+      ? "Checking..."
+      : gitFound
+        ? "Installed"
+        : "Not installed",
+  );
+  let pipxStatusText = $derived(
+    pipxFound === undefined
+      ? "Checking..."
+      : pipxFound
+        ? `v${pipxVersion || "Installed"}`
+        : "Not installed",
+  );
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -204,133 +227,51 @@
     </div>
 
     <!-- Python Status -->
-    <div
-      class="flex items-center justify-between py-2 border-b border-surface-200-800"
+    <DepCheckRow
+      name="Python"
+      found={pythonFound}
+      statusText={pythonStatusText}
     >
-      <div class="flex items-center gap-3">
-        <div class="ig-cell preset-tonal p-2 rounded">
-          <img src="/python.svg" alt="Python" class="h-5 w-5" />
-        </div>
-        <div>
-          <p class="font-medium">Python</p>
-          <p class="text-xs text-surface-700-300">
-            {#if pythonFound === undefined}
-              Checking...
-            {:else if pythonFound}
-              v{pythonVersion}
-            {:else}
-              Not installed or &lt; {MIN_PYTHON_VERSION}
-            {/if}
-          </p>
-        </div>
-      </div>
-      <div>
-        {#if pythonFound === undefined}
-          <Loader size={20} class="animate-spin text-surface-500" />
-        {:else if pythonFound}
-          <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={16} />
-            Ready
-          </span>
-        {:else}
-          <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={16} />
-            Missing
-          </span>
-        {/if}
-      </div>
-    </div>
+      {#snippet icon()}
+        <img src="/python.svg" alt="Python" class="h-5 w-5" />
+      {/snippet}
+    </DepCheckRow>
 
     <!-- Git Status -->
-    <div
-      class="flex items-center justify-between py-2 border-b border-surface-200-800"
-    >
-      <div class="flex items-center gap-3">
-        <div class="ig-cell preset-tonal p-2 rounded">
-          <Github size={20} />
-        </div>
-        <div>
-          <p class="font-medium">Git</p>
-          <p class="text-xs text-surface-700-300">
-            {#if gitFound === undefined}
-              Checking...
-            {:else if gitFound}
-              Installed
-            {:else}
-              Not installed
-            {/if}
-          </p>
-        </div>
-      </div>
-      <div>
-        {#if gitFound === undefined}
-          <Loader size={20} class="animate-spin text-surface-500" />
-        {:else if gitFound}
-          <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={16} />
-            Ready
-          </span>
-        {:else}
-          <span class="chip preset-filled-error-500 flex items-center gap-1">
-            <X size={16} />
-            Missing
-          </span>
-        {/if}
-      </div>
-    </div>
+    <DepCheckRow name="Git" found={gitFound} statusText={gitStatusText}>
+      {#snippet icon()}
+        <Github size={20} />
+      {/snippet}
+    </DepCheckRow>
 
     <!-- Pipx Status -->
-    <div class="flex items-center justify-between py-2">
-      <div class="flex items-center gap-3">
-        <div class="ig-cell preset-tonal p-2 rounded">
-          <Package size={20} />
-        </div>
-        <div>
-          <p class="font-medium">Pipx</p>
-          <p class="text-xs text-surface-700-300">
-            {#if pipxFound === undefined}
-              Checking...
-            {:else if pipxFound}
-              v{pipxVersion || "Installed"}
+    <DepCheckRow
+      name="Pipx"
+      found={pipxFound}
+      statusText={pipxStatusText}
+      border={false}
+    >
+      {#snippet icon()}
+        <Package size={20} />
+      {/snippet}
+      {#snippet action()}
+        {#if pythonFound}
+          <button
+            class="btn preset-filled-secondary-500 text-xs flex items-center gap-1 px-2 py-1"
+            onclick={installPipxHandler}
+            disabled={isInstallingPipx}
+          >
+            {#if isInstallingPipx}
+              <Loader size={14} class="animate-spin" />
+              Installing...
             {:else}
-              Not installed
+              <Package size={14} />
+              Install
             {/if}
-          </p>
-        </div>
-      </div>
-      <div>
-        {#if pipxFound === undefined}
-          <Loader size={20} class="animate-spin text-surface-500" />
-        {:else if pipxFound}
-          <span class="chip preset-filled-success-500 flex items-center gap-1">
-            <Check size={16} />
-            Ready
-          </span>
-        {:else}
-          <div class="flex items-center gap-2">
-            <span class="chip preset-filled-error-500 flex items-center gap-1">
-              <X size={16} />
-              Missing
-            </span>
-            {#if pythonFound}
-              <button
-                class="btn preset-filled-secondary-500 text-xs flex items-center gap-1 px-2 py-1"
-                onclick={installPipxHandler}
-                disabled={isInstallingPipx}
-              >
-                {#if isInstallingPipx}
-                  <Loader size={14} class="animate-spin" />
-                  Installing...
-                {:else}
-                  <Package size={14} />
-                  Install
-                {/if}
-              </button>
-            {/if}
-          </div>
+          </button>
         {/if}
-      </div>
-    </div>
+      {/snippet}
+    </DepCheckRow>
     {#if pipxInstallResult && pipxFound === false}
       <div class="mt-2 p-2 bg-surface-100-900 rounded text-xs">
         <pre

@@ -1,30 +1,15 @@
 <script lang="ts">
   import { tick, onMount, untrack } from "svelte";
-  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { Command } from "@tauri-apps/plugin-shell";
-  import {
-    Hammer,
-    Square,
-    ChevronDown,
-    Terminal,
-    FolderOpen,
-    RotateCcw,
-  } from "@lucide/svelte";
+  import { Hammer, Square, RotateCcw } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { configStore, paceArgs } from "$lib/config-store.svelte";
   import { settings, DEFAULT_BUILD_TAB_SETTINGS } from "$lib/settings.svelte";
   import { saveSettings } from "$lib/app-init";
   import { setBuildingStatus } from "$lib/orchestrator/command-status.svelte";
-  import CopyButton from "$lib/components/CopyButton.svelte";
-
-  const FRAMEWORKS = [
-    { id: "net10.0-android", label: "Android" },
-    { id: "net10.0-ios", label: "iOS" },
-    { id: "net10.0-maccatalyst", label: "macOS Catalyst" },
-    { id: "net10.0-windows10.0.20348.0", label: "Windows" },
-  ] as const;
-
-  type Framework = (typeof FRAMEWORKS)[number]["id"];
+  import { type Framework } from "$lib/orchestrator/build-tab/frameworks";
+  import BuildOptionsForm from "$lib/orchestrator/build-tab/BuildOptionsForm.svelte";
+  import BuildOutputPanel from "$lib/orchestrator/build-tab/BuildOutputPanel.svelte";
 
   let fromProject = $state<string>(settings.buildTab.fromProject);
   let toProject = $state<string>(settings.buildTab.toProject);
@@ -97,7 +82,7 @@
   let currentProcess: Awaited<
     ReturnType<ReturnType<typeof Command.create>["spawn"]>
   > | null = null;
-  let outputRef: HTMLDivElement | undefined;
+  let outputRef = $state<HTMLDivElement>();
 
   const projects = $derived(configStore.activeConfig?.projects ?? []);
 
@@ -235,12 +220,6 @@
       clearInterval(timerInterval);
       timerInterval = null;
     }
-  }
-
-  function formatElapsed(s: number): string {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return m > 0 ? `${m}m ${sec.toString().padStart(2, "0")}s` : `${sec}s`;
   }
 
   function resetOutput() {
@@ -395,332 +374,32 @@
 
 <div class="h-full flex flex-col">
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-    <!-- Configuration -->
-    <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <Hammer size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100"
-          >Build Configuration</span
-        >
-      </div>
+    <BuildOptionsForm
+      {projects}
+      {buildProps}
+      bind:fromProject
+      bind:toProject
+      bind:buildConfig
+      bind:selectedFramework
+      bind:noRestore
+      bind:cleanBeforeBuild
+      bind:msbuildProps
+      onpickPath={pickPath}
+    />
 
-      <!-- From / To project pickers -->
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-medium text-surface-600-400"
-            for="from-picker"
-          >
-            Build from
-          </label>
-          <div class="relative">
-            <select
-              id="from-picker"
-              bind:value={fromProject}
-              class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-              style="background-image:none"
-            >
-              <option value="">— None (all projects) —</option>
-              {#each projects as project}
-                <option value={project.name}>{project.name}</option>
-              {/each}
-            </select>
-            <ChevronDown
-              size={14}
-              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-medium text-surface-600-400"
-            for="to-picker"
-          >
-            Build to
-          </label>
-          <div class="relative">
-            <select
-              id="to-picker"
-              bind:value={toProject}
-              class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-2 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-              style="background-image:none"
-            >
-              <option value="">— None (all projects) —</option>
-              {#each projects as project}
-                <option value={project.name}>{project.name}</option>
-              {/each}
-            </select>
-            <ChevronDown
-              size={14}
-              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Build config radio -->
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium text-surface-600-400"
-          >Configuration</span
-        >
-        <div class="flex flex-wrap gap-2">
-          {#each ["Debug", "Release"] as const as cfg}
-            <button
-              type="button"
-              onclick={() => (buildConfig = cfg)}
-              class="px-3 py-1.5 rounded text-xs font-medium border transition-colors {buildConfig ===
-              cfg
-                ? 'bg-primary-500 border-primary-500 text-white'
-                : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
-            >
-              {cfg}
-            </button>
-          {/each}
-        </div>
-      </div>
-
-      <!-- Framework single-select -->
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium text-surface-600-400"
-          >Target Framework</span
-        >
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onclick={() => (selectedFramework = "")}
-            class="px-3 py-1.5 rounded text-xs font-medium border transition-colors {selectedFramework ===
-            ''
-              ? 'bg-primary-500 border-primary-500 text-white'
-              : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
-          >
-            All available
-          </button>
-          {#each FRAMEWORKS as fw}
-            <button
-              type="button"
-              onclick={() => (selectedFramework = fw.id)}
-              class="px-3 py-1.5 rounded text-xs font-medium border transition-colors {selectedFramework ===
-              fw.id
-                ? 'bg-primary-500 border-primary-500 text-white'
-                : 'bg-surface-100-900 border-surface-300-700 text-surface-700-300 hover:border-primary-500 hover:text-primary-500'}"
-            >
-              {fw.label}
-            </button>
-          {/each}
-        </div>
-      </div>
-
-      <!-- No Restore toggle -->
-      <div class="flex items-center gap-3">
-        <Switch
-          checked={noRestore}
-          onCheckedChange={(details) => (noRestore = details.checked)}
-        >
-          <Switch.Control><Switch.Thumb /></Switch.Control>
-          <Switch.HiddenInput />
-        </Switch>
-        <span class="text-sm text-surface-900-100"
-          >Skip restore (--no-restore)</span
-        >
-      </div>
-
-      <!-- Clean before build toggle -->
-      <div class="flex items-center gap-3">
-        <Switch
-          checked={cleanBeforeBuild}
-          onCheckedChange={(details) => (cleanBeforeBuild = details.checked)}
-        >
-          <Switch.Control><Switch.Thumb /></Switch.Control>
-          <Switch.HiddenInput />
-        </Switch>
-        <span class="text-sm text-surface-900-100"
-          >Clean bin/ and obj/ dirs before build</span
-        >
-      </div>
-    </div>
-
-    <!-- MSBuild Properties -->
-    {#if buildProps.length > 0}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-4">
-        <span class="font-semibold text-surface-900-100"
-          >MSBuild Properties</span
-        >
-
-        {#each buildProps as prop}
-          {#if prop.datatype === "boolean"}
-            {@const val =
-              msbuildProps[prop.name] !== undefined
-                ? msbuildProps[prop.name] === "true"
-                : prop.default === true || prop.default === "true"}
-            <div class="flex items-center gap-3">
-              <Switch
-                checked={val}
-                name="msbuild-{prop.name}"
-                onCheckedChange={(details) =>
-                  (msbuildProps = {
-                    ...msbuildProps,
-                    [prop.name]: details.checked ? "true" : "false",
-                  })}
-              >
-                <Switch.Control><Switch.Thumb /></Switch.Control>
-                <Switch.HiddenInput />
-              </Switch>
-              <span class="text-sm font-mono text-surface-900-100"
-                >{prop.name}</span
-              >
-              <span
-                class="text-xs ml-auto {val
-                  ? 'text-primary-400'
-                  : 'text-surface-500-400'}"
-              >
-                {val ? "true" : "false"}
-              </span>
-            </div>
-          {:else if prop.datatype === "path"}
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-xs font-medium text-surface-600-400"
-                for="msbuild-{prop.name}"
-              >
-                {prop.name}
-              </label>
-              <div class="input-group grid grid-cols-[1fr_auto]">
-                <input
-                  id="msbuild-{prop.name}"
-                  class="ig-input font-mono text-sm"
-                  type="text"
-                  placeholder="{String(prop.default) ||
-                    '/path/to/dir'} (optional)"
-                  value={msbuildProps[prop.name] ?? String(prop.default)}
-                  oninput={(e) =>
-                    (msbuildProps = {
-                      ...msbuildProps,
-                      [prop.name]: (e.target as HTMLInputElement).value,
-                    })}
-                />
-                <button
-                  class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-                  type="button"
-                  onclick={() => pickPath(prop.name)}
-                  title="Browse"
-                >
-                  <FolderOpen size={16} />
-                </button>
-              </div>
-            </div>
-          {:else}
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-xs font-medium text-surface-600-400"
-                for="msbuild-{prop.name}"
-              >
-                {prop.name}
-              </label>
-              <input
-                id="msbuild-{prop.name}"
-                class="input font-mono text-sm"
-                type="text"
-                placeholder={String(prop.default) || "(optional)"}
-                value={msbuildProps[prop.name] ?? String(prop.default)}
-                oninput={(e) =>
-                  (msbuildProps = {
-                    ...msbuildProps,
-                    [prop.name]: (e.target as HTMLInputElement).value,
-                  })}
-              />
-            </div>
-          {/if}
-        {/each}
-      </div>
-    {/if}
-
-    <!-- Command preview -->
-    <div class="card bg-surface-50-950 p-4">
-      <div class="flex items-center justify-between gap-2 mb-2">
-        <div class="flex items-center gap-2">
-          <Terminal size={16} class="text-primary-500 shrink-0" />
-          <span
-            class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-            >Command Preview</span
-          >
-        </div>
-        <CopyButton text={commandPreview} />
-      </div>
-      <code
-        class="block text-sm font-mono bg-surface-200-800 px-3 py-2 rounded break-all whitespace-pre-wrap text-surface-900-100"
-      >
-        {commandPreview}
-      </code>
-    </div>
-
-    <!-- Progress -->
-    {#if isRunning || progress > 0}
-      {@const total = projectsTotal || filteredProjects.length}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
-        <!-- Label + project counter + timer -->
-        <div class="flex items-center justify-between gap-2 text-xs">
-          <span class="text-surface-600-400 truncate">{progressLabel}</span>
-          <span
-            class="font-mono text-surface-600-400 shrink-0 flex items-center gap-2"
-          >
-            {#if total > 0 && progress > 0 && progress < 100}
-              <span>{projectsBuilt} / {total} projects</span>
-            {:else}
-              <span>{progress}%</span>
-            {/if}
-            <span class="text-surface-400-500">·</span>
-            <span>{formatElapsed(elapsedSeconds)}</span>
-          </span>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="w-full h-2 bg-surface-200-800 rounded-full overflow-hidden">
-          <div
-            class="h-full rounded-full transition-all duration-300 {progressBarColor}"
-            style="width: {progress}%"
-          ></div>
-        </div>
-
-        <!-- Per-project segment strip (when we know the total) -->
-        {#if total > 0 && total <= 50 && progress > 0 && progress < 100}
-          <div class="flex gap-0.5">
-            {#each { length: total } as _, i}
-              <div
-                class="h-1.5 flex-1 rounded-full transition-colors duration-200 {i <
-                projectsBuilt
-                  ? progressBarColor
-                  : 'bg-surface-200-800'}"
-              ></div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    {/if}
-
-    <!-- Output log -->
-    {#if outputLines.length > 0}
-      <div class="card bg-surface-50-950 p-4 flex flex-col gap-2">
-        <span
-          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-          >Output</span
-        >
-        <div
-          bind:this={outputRef}
-          class="h-60 overflow-auto bg-surface-200-800 rounded p-3 font-mono text-xs leading-relaxed"
-        >
-          {#each outputLines as line}
-            <div
-              class="{line.type === 'err'
-                ? 'text-error-400'
-                : 'text-surface-900-100'} wrap-break-word"
-            >
-              {line.text}
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
+    <BuildOutputPanel
+      {commandPreview}
+      {isRunning}
+      {progress}
+      {progressLabel}
+      {progressBarColor}
+      {projectsBuilt}
+      {projectsTotal}
+      filteredProjectsCount={filteredProjects.length}
+      {elapsedSeconds}
+      {outputLines}
+      bind:outputRef
+    />
   </div>
 
   <!-- Sticky footer -->

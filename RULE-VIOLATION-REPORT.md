@@ -122,18 +122,18 @@ Steps are ordered from smallest/safest to largest/most impactful. Complete each 
 
 ## Phase 15 — Large Component Splits (structural refactors)
 
-- [ ] **15.1** `DepChecks.svelte` (463 lines) — Extract individual dependency check rows into a `DepCheckRow.svelte` sub-component
-- [ ] **15.2** `ConsolePanel.svelte` (460 lines) — Extract input/history area and output area into sub-components
-- [ ] **15.3** `DirectoryBuildPropsPanel.svelte` (511 lines) — Extract the "add property" form and the property list into sub-components
-- [ ] **15.4** `AboutPanel.svelte` (372 lines) — Extract tech stack cards and feature grid into sub-components
-- [ ] **15.5** `ConfigSelector.svelte` (354 lines) — Extract the "create new config" form into a sub-component
-- [ ] **15.6** `SettingsPanel.svelte` (315 lines) — Extract each settings section (`GeneralSection`, `AppearanceSection`, `StorageSection`) into sub-components
-- [ ] **15.7** `GitTab.svelte` (388 lines) — Extract group rows and clone/pull action panels into sub-components
-- [ ] **15.8** `NugetTab.svelte` (663 lines) — Extract sources list, cache panels, and local source panels into sub-components
-- [ ] **15.9** `CodesigningConfig.svelte` (735 lines) — Extract iOS/Windows/Android tab content into separate sub-components
-- [ ] **15.10** `BuildTab.svelte` (793 lines) — Extract build options form and output panel into sub-components
-- [ ] **15.11** `UploadConfig.svelte` (857 lines) — Extract platform upload cards and output panel into sub-components
-- [ ] **15.12** `PublishingConfig.svelte` (1114 lines) — Extract per-platform publishing forms and output panel into sub-components
+- [x] **15.1** `DepChecks.svelte` (463 lines) — Extract individual dependency check rows into a `DepCheckRow.svelte` sub-component
+- [x] **15.2** `ConsolePanel.svelte` (460 lines) — Extract input/history area and output area into sub-components
+- [x] **15.3** `DirectoryBuildPropsPanel.svelte` (511 lines) — Extract the "add property" form and the property list into sub-components
+- [x] **15.4** `AboutPanel.svelte` (372 lines) — Extract tech stack cards and feature grid into sub-components
+- [x] **15.5** `ConfigSelector.svelte` (354 lines) — Extract the "create new config" form into a sub-component
+- [x] **15.6** `SettingsPanel.svelte` (315 lines) — Extract each settings section (`GeneralSection`, `AppearanceSection`, `StorageSection`) into sub-components
+- [x] **15.7** `GitTab.svelte` (388 lines) — Extract group rows and clone/pull action panels into sub-components
+- [x] **15.8** `NugetTab.svelte` (663 lines) — Extract sources list, cache panels, and local source panels into sub-components
+- [x] **15.9** `CodesigningConfig.svelte` (735 lines) — Extract iOS/Windows/Android tab content into separate sub-components
+- [x] **15.10** `BuildTab.svelte` (793 lines) — Extract build options form and output panel into sub-components
+- [x] **15.11** `UploadConfig.svelte` (857 lines) — Extract platform upload cards and output panel into sub-components
+- [x] **15.12** `PublishingConfig.svelte` (1114 lines) — Extract per-platform publishing forms and output panel into sub-components
 
 ---
 

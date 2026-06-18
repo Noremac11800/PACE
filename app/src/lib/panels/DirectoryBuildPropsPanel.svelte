@@ -1,13 +1,9 @@
 <script lang="ts">
   import {
     Plus,
-    Trash2,
-    Pencil,
     Check,
-    X,
     FileCode,
     Copy,
-    TriangleAlert,
     Folder,
     Save,
     FolderOpen,
@@ -21,13 +17,9 @@
   } from "@tauri-apps/plugin-fs";
   import { open } from "@tauri-apps/plugin-dialog";
   import { onMount } from "svelte";
-
-  interface BuildProp {
-    id: string;
-    name: string;
-    value: string;
-    editing: boolean;
-  }
+  import type { BuildProp } from "$lib/panels/directory-build-props/types.ts";
+  import AddPropertyForm from "$lib/panels/directory-build-props/AddPropertyForm.svelte";
+  import PropertyList from "$lib/panels/directory-build-props/PropertyList.svelte";
 
   let props: BuildProp[] = $state([]);
   let newName = $state("");
@@ -335,70 +327,18 @@
 
     <!-- Add new property form -->
     {#if isAdding}
-      <div class="card bg-surface-50-950 shadow-md p-4">
-        <h4 class="text-sm font-semibold text-surface-700-300 mb-3">
-          New Property
-        </h4>
-        <div class="flex flex-col gap-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label
-                for="new-prop-name"
-                class="block text-xs text-surface-700-300 mb-1">Name</label
-              >
-              <input
-                id="new-prop-name"
-                class="input text-sm"
-                type="text"
-                placeholder="e.g. TargetFramework"
-                bind:value={newName}
-                onkeydown={(e) => e.key === "Enter" && addProp()}
-              />
-            </div>
-            <div>
-              <label
-                for="new-prop-value"
-                class="block text-xs text-surface-700-300 mb-1">Value</label
-              >
-              <input
-                id="new-prop-value"
-                class="input text-sm"
-                type="text"
-                placeholder="e.g. net8.0"
-                bind:value={newValue}
-                onkeydown={(e) => e.key === "Enter" && addProp()}
-              />
-            </div>
-          </div>
-          {#if addError}
-            <p class="text-xs text-error-500 flex items-center gap-1">
-              <TriangleAlert size={14} />
-              {addError}
-            </p>
-          {/if}
-          <div class="flex items-center gap-2 justify-end">
-            <button
-              class="btn preset-tonal text-sm flex items-center gap-1"
-              onclick={() => {
-                isAdding = false;
-                addError = "";
-                newName = "";
-                newValue = "";
-              }}
-            >
-              <X size={16} />
-              Cancel
-            </button>
-            <button
-              class="btn preset-filled-primary-500 text-sm flex items-center gap-1"
-              onclick={addProp}
-            >
-              <Check size={16} />
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
+      <AddPropertyForm
+        bind:newName
+        bind:newValue
+        {addError}
+        onadd={addProp}
+        oncancel={() => {
+          isAdding = false;
+          addError = "";
+          newName = "";
+          newValue = "";
+        }}
+      />
     {/if}
 
     <!-- Properties list -->
@@ -414,75 +354,15 @@
         </p>
       </div>
     {:else}
-      <div class="flex flex-col gap-2">
-        {#each filteredProps as prop (prop.id)}
-          <div
-            class="card bg-surface-50-950 shadow-sm p-3 flex items-center gap-3"
-          >
-            {#if prop.editing && editDraft}
-              <div class="flex-1 grid grid-cols-2 gap-3">
-                <input
-                  class="input text-sm"
-                  type="text"
-                  bind:value={editDraft.name}
-                  onkeydown={(e) => e.key === "Enter" && saveEdit(prop.id)}
-                />
-                <input
-                  class="input text-sm"
-                  type="text"
-                  bind:value={editDraft.value}
-                  onkeydown={(e) => e.key === "Enter" && saveEdit(prop.id)}
-                />
-              </div>
-              <button
-                class="btn preset-filled-primary-500 p-2"
-                onclick={() => saveEdit(prop.id)}
-                title="Save"
-              >
-                <Check size={16} />
-              </button>
-              <button
-                class="btn preset-tonal p-2"
-                onclick={() => cancelEdit(prop.id)}
-                title="Cancel"
-              >
-                <X size={16} />
-              </button>
-            {:else}
-              <div class="flex-1 grid grid-cols-2 gap-3">
-                <div>
-                  <p class="text-xs text-surface-500">Name</p>
-                  <p class="font-mono text-sm font-medium">{prop.name}</p>
-                </div>
-                <div>
-                  <p class="text-xs text-surface-500">Value</p>
-                  <p class="font-mono text-sm">{prop.value || "—"}</p>
-                </div>
-              </div>
-              <button
-                class="btn preset-tonal p-2"
-                onclick={() => startEdit(prop.id)}
-                title="Edit"
-              >
-                <Pencil size={16} />
-              </button>
-              <button
-                class="btn preset-filled-error-500 p-2"
-                onclick={() => removeProp(prop.id)}
-                title="Delete"
-              >
-                <Trash2 size={16} />
-              </button>
-            {/if}
-          </div>
-        {/each}
-
-        {#if searchQuery && filteredProps.length === 0}
-          <p class="text-center text-surface-500 text-sm py-4">
-            No properties match "{searchQuery}"
-          </p>
-        {/if}
-      </div>
+      <PropertyList
+        {filteredProps}
+        bind:editDraft
+        {searchQuery}
+        onstartEdit={startEdit}
+        oncancelEdit={cancelEdit}
+        onsaveEdit={saveEdit}
+        onremove={removeProp}
+      />
 
       <!-- XML Preview -->
       <div class="card bg-surface-50-950 shadow-md p-4 mt-2">

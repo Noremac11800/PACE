@@ -5,29 +5,14 @@
   import { homeDir, join } from "@tauri-apps/api/path";
   import { open } from "@tauri-apps/plugin-dialog";
   import { openPath } from "@tauri-apps/plugin-opener";
-  import {
-    Package,
-    RefreshCw,
-    FolderOpen,
-    Server,
-    CircleCheckBig,
-    CircleX,
-    CircleAlert,
-    Loader,
-    Trash2,
-  } from "@lucide/svelte";
   import { configStore, saveConfig, paceArgs } from "$lib/config-store.svelte";
-
-  interface NugetSource {
-    name: string;
-    url: string;
-    enabled: boolean;
-  }
-
-  interface CachedPackage {
-    name: string;
-    versions: string[];
-  }
+  import type {
+    NugetSource,
+    CachedPackage,
+  } from "$lib/orchestrator/nuget-tab/types.ts";
+  import NugetSourcesPanel from "$lib/orchestrator/nuget-tab/NugetSourcesPanel.svelte";
+  import DefaultCachePanel from "$lib/orchestrator/nuget-tab/DefaultCachePanel.svelte";
+  import CustomCachePanel from "$lib/orchestrator/nuget-tab/CustomCachePanel.svelte";
 
   let sources = $state<NugetSource[]>([]);
   let sourcesLoading = $state(false);
@@ -329,334 +314,42 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <!-- NuGet Sources -->
-  <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <Server size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">NuGet Sources</span>
-      </div>
-      <div class="flex items-center gap-2">
-        {#if nugetConfigDir}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-            onclick={() => openPath(nugetConfigDir)}
-            title="Open NuGet config folder"
-          >
-            <FolderOpen size={14} />
-          </button>
-        {/if}
-        <button
-          class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-          onclick={loadSources}
-          disabled={sourcesLoading}
-          title="Refresh sources"
-        >
-          <RefreshCw size={14} class={sourcesLoading ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </div>
-    </div>
+  <NugetSourcesPanel
+    {sources}
+    loading={sourcesLoading}
+    error={sourcesError}
+    configDir={nugetConfigDir}
+    onrefresh={loadSources}
+    onopenConfig={() => openPath(nugetConfigDir)}
+  />
 
-    {#if nugetConfigDir}
-      <code class="text-xs text-surface-500-400">{nugetConfigDir}</code>
-    {/if}
+  <DefaultCachePanel
+    path={defaultCachePath}
+    loading={defaultCacheLoading}
+    cleaning={defaultCacheCleaning}
+    error={defaultCacheError}
+    packages={defaultCachePackages}
+    filtered={filteredDefaultPackages}
+    projectsCount={projects.length}
+    onrefresh={loadDefaultCachePackages}
+    onclean={cleanDefaultCache}
+    onopenFolder={() => openPath(defaultCachePath)}
+  />
 
-    {#if sourcesLoading}
-      <div class="flex items-center gap-2 text-sm text-surface-500-400 py-2">
-        <Loader size={16} class="animate-spin" />
-        Running dotnet nuget list source...
-      </div>
-    {:else if sourcesError}
-      <div
-        class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
-      >
-        <CircleAlert size={16} class="shrink-0" />
-        <span class="break-all">{sourcesError}</span>
-      </div>
-    {:else if sources.length === 0}
-      <p class="text-sm text-surface-500-400">No sources found.</p>
-    {:else}
-      <div class="flex flex-col gap-2">
-        {#each sources as source}
-          <div class="flex flex-col bg-surface-100-900/50 rounded">
-            <div class="flex items-start gap-3 p-3">
-              {#if source.enabled}
-                <CircleCheckBig
-                  size={16}
-                  class="text-success-500 mt-0.5 shrink-0"
-                />
-              {:else}
-                <CircleX size={16} class="text-error-500 mt-0.5 shrink-0" />
-              {/if}
-              <div class="flex flex-col gap-0.5 min-w-0 flex-1">
-                <span class="text-sm font-medium text-surface-900-100"
-                  >{source.name}</span
-                >
-                <code class="text-xs text-surface-500-400 break-all"
-                  >{source.url}</code
-                >
-              </div>
-              <span
-                class="ml-auto text-xs shrink-0 px-2 py-0.5 rounded-full {source.enabled
-                  ? 'bg-success-500/15 text-success-500'
-                  : 'bg-surface-300-700/30 text-surface-500-400'}"
-              >
-                {source.enabled ? "Enabled" : "Disabled"}
-              </span>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
-
-  <!-- Default NuGet Cache -->
-  <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <Package size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100"
-          >Default NuGet Cache</span
-        >
-      </div>
-      <div class="flex items-center gap-2">
-        {#if !defaultCacheLoading && defaultCachePath}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-            onclick={() => openPath(defaultCachePath)}
-            title="Open folder"
-          >
-            <FolderOpen size={14} />
-          </button>
-        {/if}
-        <button
-          class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-          onclick={loadDefaultCachePackages}
-          disabled={defaultCacheLoading || defaultCacheCleaning}
-          title="Refresh packages"
-        >
-          <RefreshCw
-            size={14}
-            class={defaultCacheLoading ? "animate-spin" : ""}
-          />
-          Refresh
-        </button>
-        <button
-          class="btn preset-filled-error-500 flex items-center gap-1.5 text-xs py-1 px-2"
-          onclick={cleanDefaultCache}
-          disabled={defaultCacheCleaning || defaultCacheLoading}
-          title="Clean default cache"
-        >
-          {#if defaultCacheCleaning}
-            <Loader size={14} class="animate-spin" />
-            Cleaning...
-          {:else}
-            <Trash2 size={14} />
-            Clean
-          {/if}
-        </button>
-      </div>
-    </div>
-
-    {#if !defaultCacheLoading && defaultCachePath}
-      <code class="text-xs text-surface-500-400">{defaultCachePath}</code>
-    {/if}
-
-    {#if projects.length > 0}
-      <p class="text-xs text-surface-500-400">
-        Showing packages matching {projects.length} project{projects.length ===
-        1
-          ? ""
-          : "s"} from the active config.
-      </p>
-    {/if}
-
-    {#if defaultCacheLoading}
-      <div class="flex items-center gap-2 text-sm text-surface-500-400 py-2">
-        <Loader size={16} class="animate-spin" />
-        Scanning cache directory...
-      </div>
-    {:else if defaultCacheError}
-      <div
-        class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
-      >
-        <CircleAlert size={16} class="shrink-0" />
-        <span class="break-all">{defaultCacheError}</span>
-      </div>
-    {:else if defaultCachePackages.length > 0}
-      {@const filtered = filteredDefaultPackages}
-      <div class="text-xs text-surface-500-400">
-        {filtered.length} matching package{filtered.length === 1 ? "" : "s"} (of
-        {defaultCachePackages.length} total)
-      </div>
-      {#if filtered.length === 0}
-        <div
-          class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
-        >
-          <CircleAlert size={16} class="shrink-0" />
-          No packages matched the projects in the active config.
-        </div>
-      {:else}
-        <div class="flex flex-col gap-0.5 max-h-72 overflow-y-auto">
-          {#each filtered as pkg}
-            <div
-              class="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-100-900/40"
-            >
-              <span
-                class="font-mono text-xs text-surface-900-100 flex-1 truncate"
-                >{pkg.name}</span
-              >
-              <div class="flex flex-wrap gap-1 shrink-0">
-                {#each pkg.versions as ver}
-                  <span
-                    class="text-xs font-mono px-1.5 py-0.5 rounded bg-surface-200-800 text-surface-700-300"
-                    >{ver}</span
-                  >
-                {/each}
-              </div>
-            </div>
-          {/each}
-        </div>
-      {/if}
-    {:else if !defaultCacheLoading}
-      <div
-        class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
-      >
-        <CircleAlert size={16} class="shrink-0" />
-        No packages found in the default cache directory.
-      </div>
-    {/if}
-  </div>
-
-  <!-- Custom NuGet Cache -->
-  <div class="card bg-surface-50-950 p-4 flex flex-col gap-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <FolderOpen size={18} class="text-primary-500" />
-        <span class="font-semibold text-surface-900-100">Custom Cache Path</span
-        >
-      </div>
-      <div class="flex items-center gap-2">
-        {#if customCachePath}
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-            onclick={() => openPath(customCachePath)}
-            title="Open folder"
-          >
-            <FolderOpen size={14} />
-          </button>
-          <button
-            class="btn preset-tonal flex items-center gap-1.5 text-xs py-1 px-2"
-            onclick={loadCustomCachePackages}
-            disabled={customCacheLoading || customCacheCleaning}
-            title="Refresh packages"
-          >
-            <RefreshCw
-              size={14}
-              class={customCacheLoading ? "animate-spin" : ""}
-            />
-            Refresh
-          </button>
-          <button
-            class="btn preset-filled-error-500 flex items-center gap-1.5 text-xs py-1 px-2"
-            onclick={cleanCustomCache}
-            disabled={customCacheCleaning ||
-              customCacheLoading ||
-              !customCachePath}
-            title="Clean custom cache"
-          >
-            {#if customCacheCleaning}
-              <Loader size={14} class="animate-spin" />
-              Cleaning...
-            {:else}
-              <Trash2 size={14} />
-              Clean
-            {/if}
-          </button>
-        {/if}
-      </div>
-    </div>
-
-    <div class="input-group grid grid-cols-[1fr_auto]">
-      <input
-        class="ig-input font-mono text-sm"
-        type="text"
-        placeholder="/path/to/nuget/packages"
-        bind:value={customCachePath}
-        oninput={() => {
-          customCachePackages = [];
-          customCacheError = null;
-        }}
-      />
-      <button
-        class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-        type="button"
-        onclick={pickCustomCachePath}
-        title="Browse"
-      >
-        <FolderOpen size={16} />
-      </button>
-    </div>
-
-    {#if customCacheLoading}
-      <div class="flex items-center gap-2 text-sm text-surface-500-400 py-2">
-        <Loader size={16} class="animate-spin" />
-        Scanning custom cache directory...
-      </div>
-    {:else if customCacheError}
-      <div
-        class="flex items-center gap-2 text-sm text-error-500 bg-error-500/10 rounded p-3"
-      >
-        <CircleAlert size={16} class="shrink-0" />
-        <span class="break-all">{customCacheError}</span>
-      </div>
-    {:else if customCachePackages.length > 0}
-      {@const filtered = filteredCustomPackages}
-      <div class="text-xs text-surface-500-400">
-        {filtered.length} matching package{filtered.length === 1 ? "" : "s"} (of
-        {customCachePackages.length} total)
-      </div>
-      {#if filtered.length === 0}
-        <div
-          class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
-        >
-          <CircleAlert size={16} class="shrink-0" />
-          No packages matched the projects in the active config.
-        </div>
-      {:else}
-        <div class="flex flex-col gap-0.5 max-h-72 overflow-y-auto">
-          {#each filtered as pkg}
-            <div
-              class="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-100-900/40"
-            >
-              <span
-                class="font-mono text-xs text-surface-900-100 flex-1 truncate"
-                >{pkg.name}</span
-              >
-              <div class="flex flex-wrap gap-1 shrink-0">
-                {#each pkg.versions as ver}
-                  <span
-                    class="text-xs font-mono px-1.5 py-0.5 rounded bg-surface-200-800 text-surface-700-300"
-                    >{ver}</span
-                  >
-                {/each}
-              </div>
-            </div>
-          {/each}
-        </div>
-      {/if}
-    {:else if customCachePath && !customCacheLoading}
-      <div
-        class="flex items-center gap-2 text-sm text-surface-500-400 bg-surface-100-900/40 rounded p-3"
-      >
-        <CircleAlert size={16} class="shrink-0" />
-        No .nupkg files found in this directory.
-      </div>
-    {:else if !customCachePath}
-      <p class="text-sm text-surface-500-400">
-        Select a folder to load packages from a custom NuGet cache location.
-      </p>
-    {/if}
-  </div>
+  <CustomCachePanel
+    bind:path={customCachePath}
+    loading={customCacheLoading}
+    cleaning={customCacheCleaning}
+    error={customCacheError}
+    packages={customCachePackages}
+    filtered={filteredCustomPackages}
+    onrefresh={loadCustomCachePackages}
+    onclean={cleanCustomCache}
+    onopenFolder={() => openPath(customCachePath)}
+    onbrowse={pickCustomCachePath}
+    oninput={() => {
+      customCachePackages = [];
+      customCacheError = null;
+    }}
+  />
 </div>

@@ -6,19 +6,13 @@
     Monitor,
     Palette,
     Database,
-    ExternalLink,
     RotateCcw,
-    TriangleAlert,
-    Check,
   } from "@lucide/svelte";
-  import { openUrl } from "@tauri-apps/plugin-opener";
   import { settings, resetSettings } from "$lib/settings.svelte";
   import { saveSettings, applyTheme } from "$lib/app-init";
-  import {
-    SettingSwitch,
-    SettingSelect,
-    SettingRadioGroup,
-  } from "$lib/snippets/SettingsSnippets.svelte";
+  import GeneralSection from "$lib/panels/settings/GeneralSection.svelte";
+  import AppearanceSection from "$lib/panels/settings/AppearanceSection.svelte";
+  import StorageSection from "$lib/panels/settings/StorageSection.svelte";
 
   interface TocEntry {
     id: string;
@@ -36,14 +30,6 @@
   let tocOpen = $state(true);
   let initialized = $state(false);
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  // Derived state for endpoint URL validation
-  const endpointUrl = $derived(settings.general.storageEndpointUrl);
-  const endpointUrlValid = $derived(
-    !endpointUrl ||
-      endpointUrl.startsWith("http://") ||
-      endpointUrl.startsWith("https://"),
-  );
 
   const settingsSnapshot = $derived.by(() => ({
     theme: settings.general.theme,
@@ -123,142 +109,9 @@
   >
     <!-- Main Content -->
     <div class="overflow-auto p-6 space-y-8" id="settings-content">
-      <!-- General Section -->
-      <section id="general" class="border-b border-surface-200-800 pb-8">
-        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
-          <Monitor size={24} class="text-primary-500" />
-          General
-        </h2>
-        <div class="space-y-1">
-          {@render SettingSelect(
-            "Language",
-            "Select the application language",
-            settings.general.language,
-            (v) => (settings.general.language = v),
-            [
-              { value: "en", label: "English" },
-              { value: "es", label: "Spanish" },
-              { value: "fr", label: "French" },
-              { value: "de", label: "German" },
-            ],
-          )}
-          {@render SettingSwitch(
-            "Auto-check for updates",
-            "Automatically check for CLI and app updates on startup",
-            settings.general.autoCheckUpdates,
-            (v) => (settings.general.autoCheckUpdates = v),
-          )}
-        </div>
-      </section>
-
-      <!-- Appearance Section -->
-      <section id="appearance" class="border-b border-surface-200-800 pb-8">
-        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
-          <Palette size={24} class="text-primary-500" />
-          Appearance
-        </h2>
-        <div class="space-y-1">
-          {@render SettingSelect(
-            "Theme",
-            "Choose your preferred color theme",
-            settings.general.theme,
-            (v) => {
-              settings.general.theme = v as "light" | "dark" | "system";
-              applyTheme(settings.general.theme);
-            },
-            [
-              { value: "light", label: "Light" },
-              { value: "dark", label: "Dark" },
-              { value: "system", label: "System" },
-            ],
-          )}
-          {@render SettingRadioGroup(
-            "Font Size",
-            "Select the base font size for the application",
-            settings.appearance.fontSize,
-            (v) =>
-              (settings.appearance.fontSize = v as
-                | "small"
-                | "medium"
-                | "large"),
-            [
-              { value: "small", label: "Small" },
-              { value: "medium", label: "Medium" },
-              { value: "large", label: "Large" },
-            ],
-          )}
-        </div>
-      </section>
-
-      <!-- Storage Section -->
-      <section id="storage" class="pb-8">
-        <h2 class="h2 text-primary-500 mb-4 flex items-center gap-2">
-          <Database size={24} class="text-primary-500" />
-          Storage
-        </h2>
-        <div class="space-y-1">
-          <!-- Storage Endpoint URL Input with Open Button -->
-          <div
-            class="py-4 px-4 rounded-lg hover:bg-surface-100-900/50 transition-colors"
-          >
-            <label
-              class="block text-sm font-semibold text-surface-900-50 mb-2"
-              for="storage-endpoint-url">Application storage endpoint URL</label
-            >
-            <p class="text-xs text-surface-600-300 mb-2 leading-relaxed">
-              Configure the endpoint URL for application storage uploads
-            </p>
-            <div class="input-group grid grid-cols-[1fr_auto]">
-              <input
-                id="storage-endpoint-url"
-                type="text"
-                class="ig-input {endpointUrl && !endpointUrlValid
-                  ? 'border-warning-500 focus:border-warning-500'
-                  : ''}"
-                placeholder="https://company.storage.com"
-                bind:value={settings.general.storageEndpointUrl}
-              />
-              <button
-                class="ig-cell btn preset-tonal hover:preset-filled-primary-500 transition-colors"
-                type="button"
-                title="Open in browser"
-                onclick={async () => {
-                  let url = settings.general.storageEndpointUrl;
-                  if (!url) return;
-                  if (
-                    !url.startsWith("http://") &&
-                    !url.startsWith("https://")
-                  ) {
-                    url = "https://" + url;
-                  }
-                  try {
-                    await openUrl(url);
-                  } catch (e) {
-                    console.error("Failed to open URL:", e);
-                  }
-                }}
-              >
-                <ExternalLink size={16} />
-              </button>
-            </div>
-            {#if endpointUrl && !endpointUrlValid}
-              <div
-                class="flex items-center gap-1.5 mt-2 text-xs text-warning-600-400"
-              >
-                <TriangleAlert size={12} />
-                <span>URL must start with http:// or https://</span>
-              </div>
-            {:else if endpointUrl && endpointUrlValid}
-              <div
-                class="flex items-center gap-1.5 mt-2 text-xs text-success-600-400"
-              >
-                <Check size={12} />
-                <span>Valid URL format</span>
-              </div>
-            {/if}
-          </div>
-        </div>
-      </section>
+      <GeneralSection />
+      <AppearanceSection />
+      <StorageSection />
     </div>
 
     <!-- Sidebar TOC -->

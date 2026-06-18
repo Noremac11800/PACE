@@ -20,6 +20,7 @@
     deleteConfig,
     importConfig,
   } from "$lib/config-store.svelte";
+  import ConfigNameForm from "$lib/panels/config-selector/ConfigNameForm.svelte";
 
   let configPickerOpen = $state(false);
   let newConfigName = $state("");
@@ -151,10 +152,6 @@
     }
   }
 
-  function focusOnMount(node: HTMLElement): void {
-    node.focus();
-  }
-
   function cancelImport(): void {
     importName = "";
     importError = null;
@@ -233,101 +230,41 @@
       {/if}
 
       {#if renameSource}
-        <div class="px-3 py-2 flex gap-2">
-          <input
-            class="flex-1 px-2 py-1.5 rounded border border-surface-300-700 bg-surface-100-900 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
-            type="text"
-            placeholder="new-name"
-            bind:value={renameName}
-            onkeydown={(e) => e.key === "Enter" && handleRename()}
-            use:focusOnMount
-          />
-          <button
-            class="btn preset-tonal text-xs px-2 py-1"
-            onclick={cancelRename}
-          >
-            Cancel
-          </button>
-          <button
-            class="btn preset-filled-primary-500 text-xs px-2 py-1"
-            onclick={handleRename}
-            disabled={renaming || !renameName.trim()}
-          >
-            {renaming ? "…" : "Rename"}
-          </button>
-        </div>
+        <ConfigNameForm
+          bind:value={renameName}
+          placeholder="new-name"
+          confirmLabel="Rename"
+          busy={renaming}
+          oncancel={cancelRename}
+          onconfirm={handleRename}
+        />
       {:else if duplicateSource}
-        <div class="px-3 py-2 flex gap-2">
-          <input
-            class="flex-1 px-2 py-1.5 rounded border border-surface-300-700 bg-surface-100-900 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
-            type="text"
-            placeholder="new-config-name"
-            bind:value={duplicateName}
-            onkeydown={(e) => e.key === "Enter" && handleDuplicate()}
-            use:focusOnMount
-          />
-          <button
-            class="btn preset-tonal text-xs px-2 py-1"
-            onclick={cancelDuplicate}
-          >
-            Cancel
-          </button>
-          <button
-            class="btn preset-filled-primary-500 text-xs px-2 py-1"
-            onclick={handleDuplicate}
-            disabled={duplicating || !duplicateName.trim()}
-          >
-            {duplicating ? "…" : "Duplicate"}
-          </button>
-        </div>
+        <ConfigNameForm
+          bind:value={duplicateName}
+          placeholder="new-config-name"
+          confirmLabel="Duplicate"
+          busy={duplicating}
+          oncancel={cancelDuplicate}
+          onconfirm={handleDuplicate}
+        />
       {:else if showNewInput}
-        <div class="px-3 py-2 flex gap-2">
-          <input
-            class="flex-1 px-2 py-1.5 rounded border border-surface-300-700 bg-surface-100-900 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
-            type="text"
-            placeholder="config-name"
-            bind:value={newConfigName}
-            onkeydown={(e) => e.key === "Enter" && handleCreateNew()}
-            use:focusOnMount
-          />
-          <button
-            class="btn preset-tonal text-xs px-2 py-1"
-            onclick={() => (showNewInput = false)}
-          >
-            Cancel
-          </button>
-          <button
-            class="btn preset-filled-primary-500 text-xs px-2 py-1"
-            onclick={handleCreateNew}
-            disabled={creatingNew || !newConfigName.trim()}
-          >
-            {creatingNew ? "…" : "Create"}
-          </button>
-        </div>
+        <ConfigNameForm
+          bind:value={newConfigName}
+          placeholder="config-name"
+          confirmLabel="Create"
+          busy={creatingNew}
+          oncancel={() => (showNewInput = false)}
+          onconfirm={handleCreateNew}
+        />
       {:else if showImportNameInput}
-        <div class="px-3 py-2 flex gap-2">
-          <input
-            class="flex-1 px-2 py-1.5 rounded border border-surface-300-700 bg-surface-100-900 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
-            type="text"
-            placeholder="config-name"
-            bind:value={importName}
-            onkeydown={(e) => e.key === "Enter" && handleImport()}
-            use:focusOnMount
-          />
-          <button
-            class="btn preset-tonal text-xs px-2 py-1"
-            onclick={cancelImport}
-          >
-            Cancel
-          </button>
-          <button
-            class="btn preset-filled-primary-500 text-xs px-2 py-1"
-            onclick={handleImport}
-            disabled={importing || !importName.trim()}
-          >
-            {importing ? "…" : "Import"}
-          </button>
-        </div>
+        <ConfigNameForm
+          bind:value={importName}
+          placeholder="config-name"
+          confirmLabel="Import"
+          busy={importing}
+          oncancel={cancelImport}
+          onconfirm={handleImport}
+        />
         {#if importError}
           <div class="px-3 pb-2 text-xs text-error-500">{importError}</div>
         {/if}

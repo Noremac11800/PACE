@@ -1,14 +1,5 @@
 <script lang="ts">
-  import {
-    GitBranch,
-    RefreshCw,
-    FolderOpen,
-    ChevronDown,
-    ChevronRight,
-    Download,
-    ArrowDownFromLine,
-    Loader,
-  } from "@lucide/svelte";
+  import { GitBranch } from "@lucide/svelte";
   import { revealItemInDir } from "@tauri-apps/plugin-opener";
   import { untrack } from "svelte";
   import { configStore } from "$lib/config-store.svelte";
@@ -20,8 +11,9 @@
   } from "$lib/git-status.svelte";
   import { Command } from "@tauri-apps/plugin-shell";
   import { paceArgs } from "$lib/config-store.svelte";
-  import ProjectGitStatusRow from "$lib/orchestrator/ProjectGitStatusRow.svelte";
   import type { PaceProject } from "$lib/pace-config";
+  import GitActions from "$lib/orchestrator/git-tab/GitActions.svelte";
+  import GitGroupCard from "$lib/orchestrator/git-tab/GitGroupCard.svelte";
 
   let refreshing = $state(false);
   let cloning = $state(false);
@@ -235,44 +227,15 @@
         </div>
       {/if}
     </div>
-    <div class="flex items-center gap-2">
-      <button
-        class="btn preset-tonal flex items-center gap-2 px-3 py-2 hover:preset-filled-primary-500 transition-colors"
-        onclick={runGitClone}
-        disabled={cloning || pulling || !configStore.activeConfig}
-        title="Clone all missing repositories"
-      >
-        {#if cloning}
-          <Loader size={16} class="animate-spin" />
-          <span class="text-sm">Cloning...</span>
-        {:else}
-          <Download size={16} />
-          <span class="text-sm">Clone</span>
-        {/if}
-      </button>
-      <button
-        class="btn preset-tonal flex items-center gap-2 px-3 py-2 hover:preset-filled-primary-500 transition-colors"
-        onclick={runGitPull}
-        disabled={cloning || pulling || !configStore.activeConfig}
-        title="Pull all repositories"
-      >
-        {#if pulling}
-          <Loader size={16} class="animate-spin" />
-          <span class="text-sm">Pulling...</span>
-        {:else}
-          <ArrowDownFromLine size={16} />
-          <span class="text-sm">Pull</span>
-        {/if}
-      </button>
-      <button
-        class="btn preset-tonal p-2 hover:preset-filled-primary-500 transition-colors"
-        onclick={refreshAll}
-        disabled={refreshing || cloning || pulling || !configStore.activeConfig}
-        title="Refresh all git statuses"
-      >
-        <RefreshCw size={16} class={refreshing ? "animate-spin" : ""} />
-      </button>
-    </div>
+    <GitActions
+      {cloning}
+      {pulling}
+      {refreshing}
+      disabled={!configStore.activeConfig}
+      onclone={runGitClone}
+      onpull={runGitPull}
+      onrefresh={refreshAll}
+    />
   </div>
 
   <!-- Status Message Banner -->
@@ -316,68 +279,16 @@
       </div>
     {:else}
       <div class="flex flex-col gap-3">
-        {#each getOrderedGroups() as group}
+        {#each getOrderedGroups() as group (group)}
           {@const groupProjects = getProjectsByGroup(group)}
           {#if groupProjects.length > 0}
-            {@const clonedCount = groupProjects.filter(
-              (p) => getGitStatus(p)?.cloned,
-            ).length}
-            {@const upToDateCount = groupProjects.filter((p) => {
-              const status = getGitStatus(p);
-              return status?.cloned && status?.upToDate;
-            }).length}
-            <div class="card bg-surface-50-950 overflow-hidden">
-              <!-- Group header -->
-              <button
-                class="w-full flex items-center justify-between p-3 text-left hover:bg-surface-100-900/30 transition-colors"
-                onclick={() => toggleGroup(group)}
-              >
-                <div class="flex items-center gap-2">
-                  {#if isGroupExpanded(group)}
-                    <ChevronDown size={16} class="text-primary-500" />
-                  {:else}
-                    <ChevronRight size={16} class="text-surface-500-400" />
-                  {/if}
-                  <span class="font-semibold text-surface-900-100">{group}</span
-                  >
-                  <span class="text-xs text-surface-500-400"
-                    >({groupProjects.length})</span
-                  >
-                </div>
-                <span
-                  class="text-xs {upToDateCount === clonedCount &&
-                  clonedCount > 0
-                    ? 'text-success-500'
-                    : 'text-warning-500'}"
-                >
-                  {upToDateCount}/{clonedCount} up to date
-                </span>
-              </button>
-
-              {#if isGroupExpanded(group)}
-                <div class="border-t border-surface-200-800">
-                  {#each groupProjects as project}
-                    <div class="flex items-center">
-                      <div class="flex-1 min-w-0">
-                        <ProjectGitStatusRow
-                          {project}
-                          gitStatus={getGitStatus(project)}
-                          loading={isLoadingGit(project)}
-                          compact={true}
-                        />
-                      </div>
-                      <button
-                        class="btn preset-tonal p-2 mx-2 hover:preset-filled-primary-500 transition-colors shrink-0"
-                        onclick={() => openRepoFolder(project)}
-                        title="Open repository folder"
-                      >
-                        <FolderOpen size={14} />
-                      </button>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-            </div>
+            <GitGroupCard
+              {group}
+              projects={groupProjects}
+              expanded={isGroupExpanded(group)}
+              ontoggle={() => toggleGroup(group)}
+              onopenFolder={openRepoFolder}
+            />
           {/if}
         {/each}
       </div>

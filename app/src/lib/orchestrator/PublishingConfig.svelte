@@ -8,14 +8,8 @@
     Square,
     ChevronDown,
     Terminal,
-    Apple,
-    Monitor,
-    Smartphone,
     RotateCcw,
     Folder,
-    Check,
-    X,
-    Loader,
     FolderOpen,
   } from "@lucide/svelte";
   import { open } from "@tauri-apps/plugin-dialog";
@@ -39,14 +33,14 @@
   } from "$lib/orchestrator/publishing.svelte";
   import { setPublishingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
-
-  const PLATFORMS = [
-    { id: "ios" as const, label: "iOS", icon: Apple },
-    { id: "android" as const, label: "Android", icon: Smartphone },
-    { id: "windows" as const, label: "Windows", icon: Monitor },
-  ];
-
-  type Platform = (typeof PLATFORMS)[number]["id"];
+  import {
+    PLATFORMS,
+    platformOrder,
+    type Platform,
+    type BuildStatus,
+  } from "$lib/orchestrator/publish-tab/platforms";
+  import CodesigningSection from "$lib/orchestrator/publish-tab/CodesigningSection.svelte";
+  import PublishOutputPanel from "$lib/orchestrator/publish-tab/PublishOutputPanel.svelte";
 
   // Load settings
   let selectedProject = $state(settings.publishTab.selectedProject);
@@ -98,11 +92,6 @@
       // Use default config if file doesn't exist or is invalid
     }
   }
-
-  // Derived lists for dropdowns
-  const iosBundleIds = $derived(Object.keys(codesigningConfig.ios));
-  const windowsKeys = $derived(Object.keys(codesigningConfig.windows));
-  const androidKeys = $derived(Object.keys(codesigningConfig.android));
 
   // Save settings on change
   $effect(() => {
@@ -184,15 +173,12 @@
   let currentProcess: Awaited<
     ReturnType<ReturnType<typeof Command.create>["spawn"]>
   > | null = null;
-  let outputRef: HTMLDivElement | undefined;
+  let outputRef = $state<HTMLDivElement>();
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
 
   // Build status tracking for each platform
-  type BuildStatus = "pending" | "building" | "success" | "error";
   let buildStatuses = $state<Record<string, BuildStatus>>({});
-
-  const platformOrder: Platform[] = ["ios", "android", "windows"];
 
   const orderedSelectedPlatforms = $derived(
     platformOrder.filter((p) => selectedPlatforms.includes(p)),
@@ -210,12 +196,6 @@
       clearInterval(timerInterval);
       timerInterval = null;
     }
-  }
-
-  function formatElapsed(s: number): string {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return m > 0 ? `${m}m ${sec.toString().padStart(2, "0")}s` : `${sec}s`;
   }
 
   function addLine(text: string, type: "out" | "err") {
@@ -730,153 +710,14 @@
 
     <!-- Codesigning Configuration -->
     {#if selectedPlatforms.length > 0}
-      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
-        <span class="font-semibold text-surface-900-100 text-sm"
-          >Codesigning</span
-        >
-        <div class="grid gap-3">
-          {#if selectedPlatforms.includes("ios")}
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-xs font-medium text-surface-600-400"
-                for="ios-bundle">iOS Bundle</label
-              >
-              <div class="relative">
-                <select
-                  id="ios-bundle"
-                  bind:value={iosBundleId}
-                  class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                  style="background-image:none"
-                >
-                  <option value="*">— Default (*) —</option>
-                  {#each iosBundleIds.filter((id) => id !== "*") as bundleId}
-                    <option value={bundleId}>{bundleId}</option>
-                  {/each}
-                </select>
-                <ChevronDown
-                  size={14}
-                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-                />
-              </div>
-            </div>
-          {/if}
-
-          {#if selectedPlatforms.includes("windows")}
-            <div class="flex flex-col gap-2">
-              <div class="flex flex-col gap-1">
-                <label
-                  class="text-xs font-medium text-surface-600-400"
-                  for="windows-cert">Windows Cert</label
-                >
-                <div class="relative">
-                  <select
-                    id="windows-cert"
-                    bind:value={windowsKey}
-                    class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                    style="background-image:none"
-                  >
-                    <option value="*">— Default (*) —</option>
-                    {#each windowsKeys.filter((k) => k !== "*") as key}
-                      <option value={key}>{key}</option>
-                    {/each}
-                  </select>
-                  <ChevronDown
-                    size={14}
-                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-                  />
-                </div>
-              </div>
-              {#if windowsKey && windowsKey !== "*"}
-                {@const config = codesigningConfig.windows[windowsKey]}
-                <div class="flex flex-col gap-1 text-xs">
-                  <span class="font-medium text-surface-600-400"
-                    >Thumbprint</span
-                  >
-                  <span
-                    class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 font-mono break-all {config?.PackageCertificateThumbprint
-                      ? 'text-surface-900-100'
-                      : 'text-surface-500-400 italic'}"
-                  >
-                    {config?.PackageCertificateThumbprint || "Not configured"}
-                  </span>
-                </div>
-              {/if}
-            </div>
-          {/if}
-
-          {#if selectedPlatforms.includes("android")}
-            <div class="flex flex-col gap-2">
-              <div class="flex flex-col gap-1">
-                <label
-                  class="text-xs font-medium text-surface-600-400"
-                  for="android-keystore">Android Keystore</label
-                >
-                <div class="relative">
-                  <select
-                    id="android-keystore"
-                    bind:value={androidKey}
-                    class="w-full appearance-none bg-surface-100-900 border border-surface-300-700 rounded px-3 py-1.5 pr-8 text-sm text-surface-900-100 focus:outline-none focus:border-primary-500 transition-colors"
-                    style="background-image:none"
-                  >
-                    <option value="*">— Default (*) —</option>
-                    {#each androidKeys.filter((k) => k !== "*") as key}
-                      <option value={key}>{key}</option>
-                    {/each}
-                  </select>
-                  <ChevronDown
-                    size={14}
-                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-surface-500-400 pointer-events-none"
-                  />
-                </div>
-              </div>
-              {#if androidKey && androidKey !== "*"}
-                {@const config = codesigningConfig.android[androidKey]}
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <div class="flex flex-col gap-1">
-                    <span class="font-medium text-surface-600-400">Alias</span>
-                    <span
-                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.Alias
-                        ? 'text-surface-900-100'
-                        : 'text-surface-500-400 italic'}"
-                    >
-                      {androidCodesignInfo?.Alias || "Not loaded"}
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-1">
-                    <span class="font-medium text-surface-600-400"
-                      >Key Pass</span
-                    >
-                    <span
-                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.KeyPass
-                        ? 'text-surface-900-100'
-                        : 'text-surface-500-400 italic'}"
-                    >
-                      {androidCodesignInfo?.KeyPass ? "••••••" : "Not loaded"}
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-1 col-span-2">
-                    <span class="font-medium text-surface-600-400"
-                      >Store Pass</span
-                    >
-                    <span
-                      class="px-2 py-1.5 bg-surface-100-900 rounded border border-surface-300-700 {androidCodesignInfo?.StorePass
-                        ? 'text-surface-900-100'
-                        : 'text-surface-500-400 italic'}"
-                    >
-                      {androidCodesignInfo?.StorePass ? "••••••" : "Not loaded"}
-                    </span>
-                  </div>
-                  {#if !androidCodesignInfo?.Alias && config?.CodesignInfoTxtPath}
-                    <div class="col-span-2 text-xs text-surface-500-400">
-                      Info file: {config.CodesignInfoTxtPath}
-                    </div>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-          {/if}
-        </div>
-      </div>
+      <CodesigningSection
+        {selectedPlatforms}
+        {codesigningConfig}
+        {androidCodesignInfo}
+        bind:iosBundleId
+        bind:windowsKey
+        bind:androidKey
+      />
     {/if}
 
     <!-- Command Preview -->
@@ -942,110 +783,17 @@
       </div>
     {/if}
 
-    <!-- Build Status -->
-    {#if isRunning || Object.keys(buildStatuses).length > 0}
-      <div class="card bg-surface-50-950 p-3 flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <span
-            class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-          >
-            Build Status
-          </span>
-          <span
-            class="font-mono text-xs text-surface-600-400 flex items-center gap-2"
-          >
-            <span>{progress}%</span>
-            <span class="text-surface-400-500">·</span>
-            <span>{formatElapsed(elapsedSeconds)}</span>
-          </span>
-        </div>
-
-        <div class="w-full h-2 bg-surface-200-800 rounded-full overflow-hidden">
-          <div
-            class="h-full rounded-full transition-all duration-300 {progressBarColor}"
-            style="width: {progress}%"
-          ></div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          {#each orderedSelectedPlatforms as platform}
-            {@const PLATFORMS_ = PLATFORMS}
-            {@const platformConfig = PLATFORMS_.find((p) => p.id === platform)}
-            {@const Icon = platformConfig?.icon}
-            {@const status = buildStatuses[platform] || "pending"}
-            <div
-              class="flex items-center gap-3 p-2 rounded bg-surface-100-900 border border-surface-300-700"
-            >
-              <div
-                class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {status ===
-                'success'
-                  ? 'bg-success-500/20'
-                  : status === 'error'
-                    ? 'bg-error-500/20'
-                    : status === 'building'
-                      ? 'bg-primary-500/20'
-                      : 'bg-surface-300-700/50'}"
-              >
-                {#if status === "success"}
-                  <Check size={16} class="text-success-500" />
-                {:else if status === "error"}
-                  <X size={16} class="text-error-500" />
-                {:else if status === "building"}
-                  <Loader size={16} class="animate-spin text-primary-500" />
-                {:else}
-                  <div class="w-4 h-4 rounded-full bg-surface-500-400"></div>
-                {/if}
-              </div>
-              <div class="flex-1 min-w-0">
-                <div
-                  class="text-sm font-medium text-surface-900-100 flex items-center gap-2"
-                >
-                  {#if Icon}
-                    <Icon size={14} />
-                  {/if}
-                  <span>{platformConfig?.label || platform}</span>
-                </div>
-              </div>
-              <div
-                class="text-xs font-medium uppercase {status === 'success'
-                  ? 'text-success-500'
-                  : status === 'error'
-                    ? 'text-error-500'
-                    : status === 'building'
-                      ? 'text-primary-500'
-                      : 'text-surface-500-400'}"
-              >
-                {status}
-              </div>
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
-
-    <!-- Output log -->
-    {#if outputLines.length > 0}
-      <div class="card bg-surface-50-950 p-3 flex flex-col gap-2">
-        <span
-          class="text-xs font-semibold text-surface-600-400 uppercase tracking-wide"
-          >Output</span
-        >
-        <div
-          bind:this={outputRef}
-          class="h-60 overflow-auto bg-surface-200-800 rounded p-3 font-mono text-xs leading-relaxed"
-        >
-          {#each outputLines as line}
-            <div
-              class="{line.type === 'err'
-                ? 'text-error-400'
-                : 'text-surface-900-100'} wrap-break-word"
-            >
-              {line.text}
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
+    <PublishOutputPanel
+      {isRunning}
+      {buildStatuses}
+      {orderedSelectedPlatforms}
+      {progress}
+      {progressLabel}
+      {progressBarColor}
+      {elapsedSeconds}
+      {outputLines}
+      bind:outputRef
+    />
   </div>
 
   <!-- Sticky footer -->

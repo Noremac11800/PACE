@@ -3,8 +3,6 @@
   import { Command, open } from "@tauri-apps/plugin-shell";
   import {
     Terminal,
-    Play,
-    Square,
     Trash2,
     Copy,
     Download,
@@ -13,6 +11,8 @@
     ChevronDown,
     Settings2,
   } from "@lucide/svelte";
+  import ConsoleOutput from "$lib/panels/console/ConsoleOutput.svelte";
+  import ConsoleInput from "$lib/panels/console/ConsoleInput.svelte";
 
   // Console state
   let consoleOutput = $state<string[]>([]);
@@ -23,57 +23,11 @@
   let currentProcess: Awaited<
     ReturnType<ReturnType<typeof Command.create>["spawn"]>
   > | null = null;
-  let consoleRef: HTMLDivElement;
-  let inputRef: HTMLInputElement;
+  let consoleRef = $state<HTMLDivElement>();
+  let inputRef = $state<HTMLInputElement>();
   let autoScroll = $state(true);
   let showTimestamps = $state(true);
   let workingDirectory = $state("$HOME");
-
-  // ANSI color codes to HTML converter
-  function ansiToHtml(text: string): string {
-    const ansiColors: Record<string, string> = {
-      "30": "color: #000000;",
-      "31": "color: #ef4444;",
-      "32": "color: #22c55e;",
-      "33": "color: #eab308;",
-      "34": "color: #3b82f6;",
-      "35": "color: #a855f7;",
-      "36": "color: #06b6d4;",
-      "37": "color: #e5e7eb;",
-      "90": "color: #6b7280;",
-      "91": "color: #f87171;",
-      "92": "color: #4ade80;",
-      "93": "color: #facc15;",
-      "94": "color: #60a5fa;",
-      "95": "color: #c084fc;",
-      "96": "color: #22d3ee;",
-      "97": "color: #f3f4f6;",
-    };
-
-    let html = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\n/g, "<br>");
-
-    // Handle ANSI codes
-    html = html.replace(/\x1b\[(\d+)(;\d+)*m/g, (match, ...groups) => {
-      const codes = groups[0].split(";");
-      const colorCode = codes.find((c: string) => ansiColors[c]);
-      if (colorCode) {
-        return `</span><span style="${ansiColors[colorCode]}">`;
-      }
-      if (codes.includes("0")) {
-        return "</span><span>";
-      }
-      if (codes.includes("1")) {
-        return '</span><span style="font-weight: bold;">';
-      }
-      return "";
-    });
-
-    return `<span>${html}</span>`;
-  }
 
   function getTimestamp(): string {
     if (!showTimestamps) return "";
@@ -391,71 +345,17 @@
   </div>
 
   <!-- Console Output -->
-  <div
-    bind:this={consoleRef}
-    class="flex-1 overflow-auto p-4 font-mono text-sm bg-surface-50-950 cursor-text"
-  >
-    {#each consoleOutput as line, i (i)}
-      <div class="text-surface-900-100 leading-relaxed break-words">
-        {@html ansiToHtml(line)}
-      </div>
-    {/each}
-
-    {#if consoleOutput.length === 0}
-      <div class="text-surface-600 italic">
-        Console ready. Type a command to begin...
-      </div>
-    {/if}
-  </div>
+  <ConsoleOutput {consoleOutput} bind:consoleRef />
 
   <!-- Command Input -->
-  <div class="p-3 bg-surface-200-800 border-t border-surface-300-700">
-    <div class="flex items-center gap-2">
-      <span class="text-primary-500 font-mono text-sm font-bold">$</span>
-      <input
-        bind:this={inputRef}
-        bind:value={commandInput}
-        onkeydown={handleKeyDown}
-        placeholder={isRunning
-          ? "Running... (Ctrl+C to cancel)"
-          : "Type a command..."}
-        disabled={isRunning}
-        class="flex-1 bg-transparent border-none outline-none font-mono text-sm text-surface-900-100 placeholder:text-surface-500-600"
-        spellcheck="false"
-        autocomplete="off"
-      />
-
-      {#if isRunning}
-        <button
-          class="btn preset-filled-error-500 p-2"
-          onclick={cancelCommand}
-          title="Cancel command"
-        >
-          <Square size={16} />
-        </button>
-      {:else}
-        <button
-          class="btn preset-filled-primary-500 p-2"
-          onclick={() => executeCommand(commandInput)}
-          disabled={!commandInput.trim()}
-          title="Run command"
-        >
-          <Play size={16} />
-        </button>
-      {/if}
-    </div>
-
-    <!-- Status Bar -->
-    <div
-      class="flex items-center justify-between mt-2 text-xs text-surface-500"
-    >
-      <span class="font-mono">{workingDirectory}</span>
-      <span>
-        {isRunning ? "Running..." : "Ready"}
-        {#if commandHistory.length > 0}
-          • {commandHistory.length} in history
-        {/if}
-      </span>
-    </div>
-  </div>
+  <ConsoleInput
+    bind:commandInput
+    bind:inputRef
+    {isRunning}
+    {workingDirectory}
+    historyCount={commandHistory.length}
+    onkeydown={handleKeyDown}
+    oncancel={cancelCommand}
+    onrun={() => executeCommand(commandInput)}
+  />
 </div>
