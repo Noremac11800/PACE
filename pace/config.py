@@ -56,6 +56,7 @@ class Config(BaseModel):
     @model_validator(mode="after")
     def apply_env_overrides(self) -> "Config":
         """Apply environment variable overrides to the configuration."""
+        return self  # Something is not working here
         env_repodir = os.getenv("REPODIR")
         if env_repodir is not None:
             self.repodir = Path(env_repodir)
