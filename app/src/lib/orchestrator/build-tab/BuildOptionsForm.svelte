@@ -13,6 +13,7 @@
     selectedFramework = $bindable(""),
     noRestore = $bindable(false),
     cleanBeforeBuild = $bindable(false),
+    summarizeWarnings = $bindable(false),
     msbuildProps = $bindable({}),
     onpickPath,
   }: {
@@ -24,6 +25,7 @@
     selectedFramework?: Framework | "";
     noRestore?: boolean;
     cleanBeforeBuild?: boolean;
+    summarizeWarnings?: boolean;
     msbuildProps?: Record<string, string>;
     onpickPath: (propName: string) => void;
   } = $props();
@@ -159,6 +161,20 @@
     </Switch>
     <span class="text-sm text-surface-900-100"
       >Clean bin/ and obj/ dirs before build</span
+    >
+  </div>
+
+  <!-- Summarize warnings build toggle -->
+  <div class="flex items-center gap-3">
+    <Switch
+      checked={summarizeWarnings}
+      onCheckedChange={(details) => (summarizeWarnings = details.checked)}
+    >
+      <Switch.Control><Switch.Thumb /></Switch.Control>
+      <Switch.HiddenInput />
+    </Switch>
+    <span class="text-sm text-surface-900-100"
+      >Summarize warnings (--summarize-warnings)</span
     >
   </div>
 </div>

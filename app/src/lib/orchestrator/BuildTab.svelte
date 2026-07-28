@@ -28,6 +28,9 @@
   let cleanBeforeBuild = $state<boolean>(
     settings.buildTab.cleanBeforeBuild ?? false,
   );
+  let summarizeWarnings = $state<boolean>(
+    settings.buildTab.summarizeWarnings ?? false,
+  );
 
   let msbuildProps = $state<Record<string, string>>({
     ...settings.buildTab.msbuildProps,
@@ -51,6 +54,7 @@
       msbuildProps: { ...msbuildProps },
       noRestore,
       cleanBeforeBuild,
+      summarizeWarnings,
     };
     let cancelled = false;
     untrack(() => {
@@ -73,6 +77,7 @@
     msbuildProps = {};
     noRestore = d.noRestore;
     cleanBeforeBuild = d.cleanBeforeBuild;
+    summarizeWarnings = d.summarizeWarnings;
   }
 
   async function pickPath(propName: string) {
@@ -195,7 +200,9 @@
     const parts: string[] = [];
     if (fromProject) parts.push("--from", fromProject);
     if (toProject) parts.push("--to", toProject);
-    parts.push("dotnet", "build");
+    parts.push("dotnet");
+    if (summarizeWarnings) parts.push("--summarize-warnings");
+    parts.push("build");
     parts.push("-c", buildConfig);
     if (selectedFramework) parts.push("-f", selectedFramework);
     if (noRestore) parts.push("--no-restore");
@@ -215,6 +222,7 @@
       buildProps: [...buildProps],
       msbuildProps: { ...msbuildProps },
       cleanBeforeBuild,
+      summarizeWarnings,
     };
     paceCommandPreview(parts).then((preview) => {
       commandPreview = cleanBeforeBuild
@@ -304,7 +312,12 @@
     progress = 0;
     progressLabel = "Starting...";
 
-    const dotnetPassthrough: string[] = ["build", "-c", buildConfig];
+    const dotnetPassthrough: string[] = [
+      ...(summarizeWarnings ? ["--summarize-warnings"] : []),
+      "build",
+      "-c",
+      buildConfig,
+    ];
     if (selectedFramework) dotnetPassthrough.push("-f", selectedFramework);
     if (noRestore) dotnetPassthrough.push("--no-restore");
     for (const prop of buildProps) {
@@ -410,6 +423,7 @@
       bind:selectedFramework
       bind:noRestore
       bind:cleanBeforeBuild
+      bind:summarizeWarnings
       bind:msbuildProps
       onpickPath={pickPath}
     />

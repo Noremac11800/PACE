@@ -112,9 +112,9 @@
     >
       {#each outputLines as line, i (i)}
         <div
-          class="{line.type === 'err'
-            ? 'text-error-400'
-            : 'text-surface-900-100'} wrap-break-word"
+          class="whitespace-pre {line.type === 'err'
+            ? 'text-red-500'
+            : 'text-surface-900-100'}"
         >
           {line.text}
         </div>

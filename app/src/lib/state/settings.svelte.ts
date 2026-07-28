@@ -6,6 +6,7 @@ export interface BuildTabSettings {
   msbuildProps: Record<string, string>;
   noRestore: boolean;
   cleanBeforeBuild: boolean;
+  summarizeWarnings: boolean;
 }
 
 export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
@@ -16,6 +17,7 @@ export const DEFAULT_BUILD_TAB_SETTINGS: BuildTabSettings = {
   msbuildProps: {},
   noRestore: false,
   cleanBeforeBuild: false,
+  summarizeWarnings: false,
 };
 
 export interface PublishTabSettings {
