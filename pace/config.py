@@ -1,12 +1,19 @@
 """Pydantic models for PACE configuration."""
 
+import json
 import os
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path
+from typing import Any
 
 import tomli
 from pydantic import BaseModel, model_validator
+
+PACE_DIR = Path.home() / ".pace"
+SETTINGS_PATH = PACE_DIR / "settings.json"
+CONFIGS_DIR = PACE_DIR / "configs"
+LAST_ACTIVE_CONFIG_KEY = "lastActiveConfig"
 
 
 class BuildProp(BaseModel):
@@ -66,7 +73,7 @@ class Config(BaseModel):
         try:
             self.repodir.mkdir(parents=True, exist_ok=True)
             return self
-        except Exception:  # noqa: BLE001
+        except Exception:
             raise RuntimeError(
                 f"Repository directory {self.repodir} does not exist and could not be created."
             ) from None
@@ -232,6 +239,78 @@ def filter_projects_in_dependency_chain(
         final_names = _filter_projects_between(projects, from_repo, to_repo, dependents)
 
     return [p for p in projects if p.name in final_names]
+
+
+def resolve_config_path(value: str | Path) -> Path:
+    """Resolve a config reference to a filesystem path.
+
+    Bare filenames (no directory component) are resolved against ~/.pace/configs.
+
+    Args:
+        value: Config filename or path.
+
+    Returns:
+        Path: Resolved path to the configuration file.
+    """
+    path = Path(value).expanduser()
+    if path.parent == Path() and not path.exists():
+        return CONFIGS_DIR / path.name
+    return path
+
+
+def get_last_active_config_path() -> Path | None:
+    """Read the last active config from ~/.pace/settings.json.
+
+    Returns:
+        Path to the config file if it is recorded and exists, otherwise None.
+    """
+    settings: Any
+    try:
+        settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    if not isinstance(settings, dict):
+        return None
+
+    value: Any = settings.get(LAST_ACTIVE_CONFIG_KEY)
+    if not isinstance(value, str) or not value:
+        return None
+
+    path = resolve_config_path(value)
+    return path if path.exists() else None
+
+
+def set_last_active_config(config_path: Path) -> None:
+    """Record the given config as the last active config in ~/.pace/settings.json.
+
+    Configs living in ~/.pace/configs are stored by filename, anything else by
+    absolute path. Failures are silently ignored so commands still run.
+
+    Args:
+        config_path: Path to the configuration file that was used.
+    """
+    resolved = config_path.expanduser().resolve()
+    value = resolved.name if resolved.parent == CONFIGS_DIR.resolve() else str(resolved)
+
+    settings: dict[str, Any] = {}
+    try:
+        if SETTINGS_PATH.exists():
+            loaded: Any = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                settings = loaded
+    except (OSError, json.JSONDecodeError):
+        settings = {}
+
+    if settings.get(LAST_ACTIVE_CONFIG_KEY) == value:
+        return
+
+    settings[LAST_ACTIVE_CONFIG_KEY] = value
+    try:
+        SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        SETTINGS_PATH.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    except OSError:
+        pass
 
 
 def load_config(

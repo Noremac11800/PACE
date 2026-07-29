@@ -8,7 +8,6 @@ import sys
 import urllib.request
 from argparse import Namespace
 from importlib.metadata import version as get_version
-from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -70,7 +69,13 @@ def print_version_check(console: Console) -> None:
 
 
 from pace.commands import clean, dotnet, git, upload
-from pace.config import Config, load_config
+from pace.config import (
+    Config,
+    get_last_active_config_path,
+    load_config,
+    resolve_config_path,
+    set_last_active_config,
+)
 from pace.rich_demos import columns, progress_bar
 
 _DEMOS = {
@@ -92,7 +97,7 @@ class _Options:
     CONFIG = _Option(
         "-C",
         "--config",
-        "Path to configuration file. Defaults to an internal pace.toml file.",
+        "Path to configuration file. Defaults to the last active config recorded in ~/.pace/settings.json.",
         metavar="<path>",
     )
     PRINT_CONFIG = _Option("", "--print-config", "Print the configuration and exit")
@@ -145,7 +150,7 @@ def main() -> int:
         _Options.CONFIG.short,
         _Options.CONFIG.long,
         metavar=_Options.CONFIG.metavar,
-        help="Path to configuration file. Defaults to an internal pace.toml file.",
+        help=_Options.CONFIG.description,
         type=Path,
     )
     parser.add_argument(
@@ -357,19 +362,18 @@ def _update(console: Console) -> int:
         return 1
 
 
-def process_options(console: Console, config: Config, args: Namespace) -> bool:
+def process_options(console: Console, config: Config, config_path: Path, args: Namespace) -> bool:
     """Process configuration options and return True if any were given.
 
     Args:
         console: Rich console for output
         config: Loaded configuration
+        config_path: Path to the configuration file in use
         args: Parsed command line arguments
 
     Returns:
         True if any configuration option was given, False otherwise
     """
-    config_path = args.config or files("pace.data").joinpath("pace.toml")
-
     was_option_given = False
     if args.print_config_path:
         console.print(config_path)
@@ -382,35 +386,69 @@ def process_options(console: Console, config: Config, args: Namespace) -> bool:
     return was_option_given
 
 
+_CONFIG_COMMANDS = {"clean", "dotnet", "git"}
+
+
+def _resolve_active_config_path(args: Namespace) -> Path:
+    """Determine which configuration file to use.
+
+    Uses the -C/--config value when given (and records it as the last active
+    config), otherwise falls back to the lastActiveConfig entry in
+    ~/.pace/settings.json.
+
+    Args:
+        args: Parsed command line arguments
+
+    Returns:
+        Path to the configuration file to load.
+
+    Raises:
+        ValueError: If no usable configuration file could be determined.
+    """
+    if args.config is not None:
+        config_path = resolve_config_path(args.config)
+        if not config_path.exists():
+            raise ValueError(f"Configuration file not found: {config_path}")
+        set_last_active_config(config_path)
+        return config_path
+
+    config_path = get_last_active_config_path()
+    if config_path is None:
+        raise ValueError(
+            "No configuration file found. Specify one with "
+            f"{_Options.CONFIG.short}/{_Options.CONFIG.long} {_Options.CONFIG.metavar}"
+        )
+    return config_path
+
+
 def _run(
     console: Console, args: Namespace, unknownargs: list[str], parser: argparse.ArgumentParser
 ) -> int:
-    if args.config is not None:
-        if args.config.exists():
-            config = load_config(args.config, from_repo=args.from_repo, to_repo=args.to_repo)
-        else:
-            return 1
-    else:
-        config = load_config(from_repo=args.from_repo, to_repo=args.to_repo)
+    needs_config = (
+        args.config is not None
+        or args.print_config
+        or args.print_config_path
+        or args.command in _CONFIG_COMMANDS
+    )
 
-    was_option_given = process_options(console, config, args)
+    config: Config | None = None
+    was_option_given = False
+    if needs_config:
+        config_path = _resolve_active_config_path(args)
+        config = load_config(config_path, from_repo=args.from_repo, to_repo=args.to_repo)
+        was_option_given = process_options(console, config, config_path, args)
+
+    if args.command in _CONFIG_COMMANDS:
+        if config is None:
+            raise ValueError(
+                "No configuration file found. Specify one with "
+                f"{_Options.CONFIG.short}/{_Options.CONFIG.long} {_Options.CONFIG.metavar}"
+            )
+        exit_code = _run_config_command(console, config, args, unknownargs)
+        print_version_check(console)
+        return exit_code
 
     match args.command:
-        case "clean":
-            clean.run(
-                console,
-                config,
-                cache=args.cache,
-                custom_cache=args.custom_cache,
-                project=args.project,
-                dry_run=args.dry_run,
-            )
-        case "dotnet":
-            return dotnet.run(
-                console, config, args.dotnet_args, summarize_warnings=args.summarize_warnings
-            )
-        case "git":
-            return git.run(console, config, unknownargs)
         case "upload":
             # Handle build description from file if provided
             build_description = args.build_description
@@ -443,6 +481,39 @@ def _run(
     if args.command != "update":
         print_version_check(console)
     return 0
+
+
+def _run_config_command(
+    console: Console, config: Config, args: Namespace, unknownargs: list[str]
+) -> int:
+    """Run a command that requires a loaded configuration.
+
+    Args:
+        console: Rich console for output
+        config: Loaded configuration
+        args: Parsed command line arguments
+        unknownargs: Remaining unparsed command line arguments
+
+    Returns:
+        Exit code for the command.
+    """
+    match args.command:
+        case "clean":
+            clean.run(
+                console,
+                config,
+                cache=args.cache,
+                custom_cache=args.custom_cache,
+                project=args.project,
+                dry_run=args.dry_run,
+            )
+            return 0
+        case "dotnet":
+            return dotnet.run(
+                console, config, args.dotnet_args, summarize_warnings=args.summarize_warnings
+            )
+        case _:
+            return git.run(console, config, unknownargs)
 
 
 if __name__ == "__main__":
