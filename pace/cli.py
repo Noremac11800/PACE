@@ -221,6 +221,7 @@ def main() -> int:
         "dotnet", help="Execute dotnet commands across the project graph"
     )
     dotnet_parser.add_argument(
+        "-w",
         "--summarize-warnings",
         dest="summarize_warnings",
         action="store_true",
