@@ -198,6 +198,9 @@
         },
         {
           "path": "$HOME/.pace/configs/**"
+        },
+        {
+          "path": "$HOME/.pace/cache"
         }
       ]
     },
