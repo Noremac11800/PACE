@@ -80,7 +80,7 @@ export async function getCodesigningParams(
           params.push(`/p:CodesignKey="${config.CodesignKey}"`);
         }
         if (config?.CodesignProvision) {
-          params.push(`/p:CodesignProvision=${config.CodesignProvision}`);
+          params.push(`/p:CodesignProvision="${config.CodesignProvision}"`);
         }
       }
       break;
@@ -182,6 +182,8 @@ export interface PublishOptions {
   noRestore: boolean;
   platform: Platform;
   codesigningParams: string[];
+  buildProps?: { name: string; default: string | boolean }[];
+  msbuildProps?: Record<string, string>;
 }
 
 export function buildPublishCommand(options: PublishOptions): string[] {
@@ -193,20 +195,40 @@ export function buildPublishCommand(options: PublishOptions): string[] {
     noRestore,
     platform,
     codesigningParams,
+    buildProps = [],
+    msbuildProps = {},
   } = options;
 
   const publishArgs: string[] = [
     "publish",
-    csprojPath,
-    "-c",
-    buildConfig,
     ...(platform !== "windows" ? ["--runtime", runtime] : []),
+    "--configuration",
+    buildConfig,
     "--framework",
     framework,
-    "--self-contained",
-    "/p:DistributionMethod=enterprise",
-    "/p:ArchiveOnBuild=true",
+    "--verbosity",
+    "minimal",
   ];
+
+  // iOS builds require the interpreter for publish scenarios
+  if (platform === "ios") {
+    publishArgs.push("/p:UseInterpreter=true");
+  }
+
+  // Add configured build props that differ from their defaults
+  for (const prop of buildProps) {
+    const val = msbuildProps[prop.name];
+    const effective = val !== undefined ? val : String(prop.default);
+    if (effective !== "" && effective !== String(prop.default)) {
+      publishArgs.push(`/p:${prop.name}=${effective}`);
+    }
+  }
+
+  // Add platform-specific codesigning params
+  publishArgs.push(...codesigningParams);
+
+  publishArgs.push("/p:ArchiveOnBuild=true");
+  publishArgs.push("/p:DistributionMethod=enterprise");
 
   // Add --no-restore if enabled
   if (noRestore) {
@@ -218,8 +240,8 @@ export function buildPublishCommand(options: PublishOptions): string[] {
     publishArgs.push("/p:EmbedAssembliesIntoApk=true");
   }
 
-  // Add platform-specific codesigning params
-  publishArgs.push(...codesigningParams);
+  // Project path goes last
+  publishArgs.push(csprojPath);
 
   return publishArgs;
 }
@@ -236,9 +258,49 @@ export async function buildCommandPreview(
   iosBundleId: string | undefined,
   windowsKey: string | undefined,
   androidCodesignInfo: AndroidCodesignInfo | undefined,
+  buildProps: { name: string; default: string | boolean }[] = [],
+  msbuildProps: Record<string, string> = {},
 ): Promise<string> {
+  const quoteArg = (arg: string): string => {
+    if (/[\s'"]/.test(arg)) {
+      return `'${arg}'`;
+    }
+    return arg;
+  };
+
   const runtimeArg = platform !== "windows" ? ` --runtime ${runtime}` : "";
-  let preview = `dotnet publish ${csprojPath} -c ${buildConfig}${runtimeArg} --framework ${framework} --self-contained /p:DistributionMethod=enterprise /p:ArchiveOnBuild=true`;
+  let preview = `dotnet publish${runtimeArg} --configuration ${buildConfig} --framework ${framework} --verbosity minimal`;
+
+  // iOS builds require the interpreter for publish scenarios
+  if (platform === "ios") {
+    preview += " /p:UseInterpreter=true";
+  }
+
+  // Add configured build props that differ from their defaults
+  for (const prop of buildProps) {
+    const val = msbuildProps[prop.name];
+    const effective = val !== undefined ? val : String(prop.default);
+    if (effective !== "" && effective !== String(prop.default)) {
+      preview += ` ${quoteArg(`/p:${prop.name}=${effective}`)}`;
+    }
+  }
+
+  // Add platform-specific codesigning params
+  const codesigningParams = await getCodesigningParams(
+    platform,
+    codesigningConfig,
+    androidKey,
+    iosBundleId,
+    windowsKey,
+    androidCodesignInfo,
+  );
+
+  for (const param of codesigningParams) {
+    preview += ` ${quoteArg(param)}`;
+  }
+
+  preview += " /p:ArchiveOnBuild=true";
+  preview += " /p:DistributionMethod=enterprise";
 
   // Add --no-restore if enabled
   if (noRestore) {
@@ -250,43 +312,8 @@ export async function buildCommandPreview(
     preview += " /p:EmbedAssembliesIntoApk=true";
   }
 
-  // Add codesigning preview for selected platform
-  if (platform === "ios" && iosBundleId) {
-    const config = codesigningConfig.ios[iosBundleId];
-    if (config?.CodesignKey) {
-      preview += ` /p:CodesignKey="${config.CodesignKey}"`;
-    }
-    if (config?.CodesignProvision) {
-      preview += ` /p:CodesignProvision=${config.CodesignProvision}`;
-    }
-  }
-
-  if (platform === "android" && androidKey) {
-    const config = codesigningConfig.android[androidKey];
-    if (config?.KeystorePath) {
-      preview += " /p:AndroidKeyStore=true";
-      const expandedPath = await expandPath(config.KeystorePath);
-      preview += ` /p:AndroidSigningKeyStore=${expandedPath}`;
-    }
-    if (androidCodesignInfo?.Alias) {
-      preview += ` /p:AndroidSigningKeyAlias=${androidCodesignInfo.Alias}`;
-    }
-    if (androidCodesignInfo?.KeyPass) {
-      preview += ` /p:AndroidSigningKeyPass=${androidCodesignInfo.KeyPass}`;
-    }
-    if (androidCodesignInfo?.StorePass) {
-      preview += ` /p:AndroidSigningStorePass=${androidCodesignInfo.StorePass}`;
-    }
-  }
-
-  if (platform === "windows" && windowsKey) {
-    const config = codesigningConfig.windows[windowsKey];
-    if (config?.PackageCertificateThumbprint) {
-      preview += " /p:AppxPackageSigningEnabled=true";
-      preview += " /p:WindowsPackageType=MSIX";
-      preview += ` /p:PackageCertificateThumbprint=${config.PackageCertificateThumbprint}`;
-    }
-  }
+  // Project path goes last
+  preview += ` ${quoteArg(csprojPath)}`;
 
   return preview;
 }

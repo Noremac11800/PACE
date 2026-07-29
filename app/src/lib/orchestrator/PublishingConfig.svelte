@@ -35,6 +35,7 @@
     getCodesigningParams,
     parseAndroidCodesignInfo,
     buildCommandPreview,
+    buildPublishCommand,
   } from "$lib/orchestrator/publishing.svelte";
   import { setPublishingStatus } from "$lib/orchestrator/command-status.svelte";
   import CopyButton from "$lib/components/CopyButton.svelte";
@@ -239,38 +240,6 @@
     const framework = getFrameworkForPlatform(platform);
     const runtime = getRuntimeForPlatform(platform);
 
-    // Build dotnet publish command
-    const publishArgs: string[] = [
-      "publish",
-      csprojPath,
-      "-c",
-      buildConfig,
-      ...(platform !== "windows" ? ["--runtime", runtime] : []),
-      "--framework",
-      framework,
-      "--self-contained",
-      "/p:DistributionMethod=enterprise",
-      "/p:ArchiveOnBuild=true",
-    ];
-
-    // Add --no-restore if enabled
-    if (noRestore) {
-      publishArgs.push("--no-restore");
-    }
-
-    // Add MSBuild properties from config
-    for (const prop of buildProps) {
-      const val = msbuildProps[prop.name];
-      const effective = val !== undefined ? val : String(prop.default);
-      if (effective !== "" && effective !== String(prop.default))
-        publishArgs.push(`-p:${prop.name}=${effective}`);
-    }
-
-    // Add Android-specific params for Debug builds
-    if (platform === "android" && buildConfig === "Debug") {
-      publishArgs.push("/p:EmbedAssembliesIntoApk=true");
-    }
-
     // Add platform-specific codesigning params
     const codesigningParams = await getCodesigningParams(
       platform,
@@ -280,7 +249,18 @@
       windowsKey,
       androidCodesignInfo,
     );
-    publishArgs.push(...codesigningParams);
+
+    const publishArgs = buildPublishCommand({
+      csprojPath,
+      buildConfig,
+      runtime,
+      framework,
+      noRestore,
+      platform,
+      codesigningParams,
+      buildProps,
+      msbuildProps,
+    });
 
     return new Promise((resolve) => {
       progressLabel = `Publishing ${platform}...`;
@@ -491,7 +471,7 @@
         platforms.map(async (platform) => {
           const runtime = getRuntimeForPlatform(platform);
           const framework = getFrameworkForPlatform(platform);
-          let command = await buildCommandPreview(
+          const command = await buildCommandPreview(
             csprojPath,
             bc,
             runtime,
@@ -503,14 +483,9 @@
             iKey,
             wKey,
             signInfo,
+            props,
+            msbProps,
           );
-          // Add MSBuild properties to preview
-          for (const prop of props) {
-            const val = msbProps[prop.name];
-            const effective = val !== undefined ? val : String(prop.default);
-            if (effective !== "" && effective !== String(prop.default))
-              command += ` -p:${prop.name}=${effective}`;
-          }
           return { platform, command };
         }),
       );
