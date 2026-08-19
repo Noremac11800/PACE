@@ -5,7 +5,7 @@ import os
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import tomli
 from pydantic import BaseModel, model_validator
@@ -13,6 +13,7 @@ from pydantic import BaseModel, model_validator
 PACE_DIR = Path.home() / ".pace"
 SETTINGS_PATH = PACE_DIR / "settings.json"
 CONFIGS_DIR = PACE_DIR / "configs"
+LOGS_DIR = PACE_DIR / "logs"
 LAST_ACTIVE_CONFIG_KEY = "lastActiveConfig"
 
 
@@ -212,9 +213,6 @@ def filter_projects_in_dependency_chain(
     Returns:
         Filtered list of projects in the dependency chain.
     """
-    if from_repo is None and to_repo is None:
-        return projects
-
     # Build lookup maps
     project_by_name = {p.name: p for p in projects}
 
@@ -231,12 +229,14 @@ def filter_projects_in_dependency_chain(
         raise ValueError(f"Project '{to_repo}' not found in configuration")
 
     # Determine which projects are on valid paths using helper functions
-    if from_repo is None and to_repo is not None:
+    if from_repo is not None and to_repo is not None:
+        final_names = _filter_projects_between(projects, from_repo, to_repo, dependents)
+    elif to_repo is not None:
         final_names = _filter_projects_to_target(projects, to_repo, dependencies)
-    elif from_repo is not None and to_repo is None:
+    elif from_repo is not None:
         final_names = _filter_projects_from_source(projects, from_repo, dependents)
     else:
-        final_names = _filter_projects_between(projects, from_repo, to_repo, dependents)
+        return projects
 
     return [p for p in projects if p.name in final_names]
 
@@ -264,15 +264,16 @@ def get_last_active_config_path() -> Path | None:
     Returns:
         Path to the config file if it is recorded and exists, otherwise None.
     """
-    settings: Any
+    loaded: object
     try:
-        settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+        loaded = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
 
-    if not isinstance(settings, dict):
+    if not isinstance(loaded, dict):
         return None
 
+    settings = cast("dict[str, Any]", loaded)
     value: Any = settings.get(LAST_ACTIVE_CONFIG_KEY)
     if not isinstance(value, str) or not value:
         return None
@@ -296,9 +297,9 @@ def set_last_active_config(config_path: Path) -> None:
     settings: dict[str, Any] = {}
     try:
         if SETTINGS_PATH.exists():
-            loaded: Any = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+            loaded: object = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
             if isinstance(loaded, dict):
-                settings = loaded
+                settings = cast("dict[str, Any]", loaded)
     except (OSError, json.JSONDecodeError):
         settings = {}
 

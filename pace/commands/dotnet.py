@@ -3,17 +3,23 @@
 import json
 import re
 import subprocess
+import textwrap
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from rich.console import Console
 from rich.table import Table
 
-from pace.config import Config, Project
+from pace.config import LOGS_DIR, Config, Project
 
 _WARNING_PATTERN = re.compile(r":\s+(?:\w+ )?warning (\w+):\s+(.+?)(?:\s+See https?://\S+)?\s*\[")
 _PROJECT_PATTERN = re.compile(r"\[([^\]]+\.csproj)")
+_UNKNOWN_REPO = "Unknown repo"
+_LOG_WIDTH = 100
+_MIN_TEXT_WIDTH = 40
+_COLUMN_GAP = "  "
 
 
 @dataclass
@@ -31,11 +37,22 @@ def _build_stem_to_repo(config: Config) -> dict[str, str]:
     return mapping
 
 
-def _print_warning_tables(console: Console, config: Config, lines: list[str]) -> None:
-    """Parse captured build output lines and print warning summary tables."""
+def _parse_warnings(
+    config: Config, lines: list[str]
+) -> tuple[dict[str, _WarningSummary], dict[str, int], dict[str, dict[str, dict[str, int]]]]:
+    """Extract warning counts from build output lines.
+
+    Returns:
+        A tuple of (counts per warning code, counts per project, counts per
+        repo -> project -> warning code).
+    """
     warnings: dict[str, _WarningSummary] = defaultdict(_WarningSummary)
     by_project: dict[str, int] = defaultdict(int)
+    by_repo: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(int))
+    )
     seen: set[str] = set()
+    stem_to_repo = _build_stem_to_repo(config)
 
     for line in lines:
         match = _WARNING_PATTERN.search(line)
@@ -53,6 +70,198 @@ def _print_warning_tables(console: Console, config: Config, lines: list[str]) ->
             if proj_match:
                 proj_name = Path(proj_match.group(1)).stem
                 by_project[proj_name] += 1
+                repo_name = stem_to_repo.get(proj_name, _UNKNOWN_REPO)
+                by_repo[repo_name][proj_name][code] += 1
+
+    return warnings, by_project, by_repo
+
+
+def _by_code_rows(warnings: dict[str, _WarningSummary]) -> list[list[str]]:
+    """Rows of (code, count, description), ordered by descending count."""
+    return [
+        [code, str(data.count), data.description]
+        for code, data in sorted(warnings.items(), key=lambda x: x[1].count, reverse=True)
+    ]
+
+
+def _by_project_rows(by_project: dict[str, int], stem_to_repo: dict[str, str]) -> list[list[str]]:
+    """Rows of (project, repo, count), ordered by descending count."""
+    return [
+        [proj_stem, stem_to_repo.get(proj_stem, ""), str(count)]
+        for proj_stem, count in sorted(by_project.items(), key=lambda x: x[1], reverse=True)
+    ]
+
+
+def _repo_groups(
+    warnings: dict[str, _WarningSummary],
+    by_repo: dict[str, dict[str, dict[str, int]]],
+) -> list[tuple[str, int, list[list[str]]]]:
+    """Group warning counts per repo, showing which codes are in which class library.
+
+    Returns:
+        A list of (repo name, repo total, rows of (class library, code, count,
+        description)) ordered by descending repo total. The class library cell is
+        only filled on the first row of each library so groups read cleanly.
+    """
+    groups: list[tuple[str, int, list[list[str]]]] = []
+
+    for repo_name, projects in sorted(
+        by_repo.items(),
+        key=lambda x: sum(sum(codes.values()) for codes in x[1].values()),
+        reverse=True,
+    ):
+        rows: list[list[str]] = []
+        repo_total = 0
+        sorted_projects = sorted(projects.items(), key=lambda x: sum(x[1].values()), reverse=True)
+        for proj_stem, codes in sorted_projects:
+            for index, (code, count) in enumerate(
+                sorted(codes.items(), key=lambda x: x[1], reverse=True)
+            ):
+                rows.append([
+                    proj_stem if index == 0 else "",
+                    code,
+                    str(count),
+                    warnings[code].description,
+                ])
+                repo_total += count
+
+        groups.append((repo_name, repo_total, rows))
+    return groups
+
+
+def _build_table(title: str, headers: list[str], rows: list[list[str]]) -> Table:
+    """Build a rich table for terminal output, sectioning on each new group."""
+    table = Table(title=title, show_header=True, header_style="bold cyan")
+    for header in headers:
+        if header == "Count":
+            table.add_column(header, justify="right", style="bold red")
+        elif header == "Code":
+            table.add_column(header, style="bold yellow", no_wrap=True)
+        elif header == "Repo":
+            table.add_column(header, style="dim")
+        elif header == "Description":
+            table.add_column(header)
+        else:
+            table.add_column(header, style="bold blue")
+
+    for row in rows:
+        # A filled first cell marks the start of a new class library group.
+        if row[0] and table.row_count:
+            table.add_section()
+        table.add_row(*row)
+    return table
+
+
+def _format_text_table(headers: list[str], rows: list[list[str]], *, wrap_last: bool) -> list[str]:
+    """Render rows as plain space-aligned columns for the log file.
+
+    Args:
+        headers: Column headers. "Count" columns are right-aligned.
+        rows: Row cells, one list per row, matching the header count.
+        wrap_last: Wrap the final column onto continuation lines so long
+            descriptions stay within the log width.
+
+    Returns:
+        The rendered lines, without trailing newlines.
+    """
+    if not rows:
+        return []
+
+    fixed = len(headers) - 1 if wrap_last else len(headers)
+    widths = [max(len(headers[i]), *(len(row[i]) for row in rows)) for i in range(fixed)]
+
+    def cells(row: list[str]) -> str:
+        return _COLUMN_GAP.join(
+            row[i].rjust(widths[i]) if headers[i] == "Count" else row[i].ljust(widths[i])
+            for i in range(fixed)
+        )
+
+    prefix_width = sum(widths) + len(_COLUMN_GAP) * (fixed - 1)
+    text_width = max(_MIN_TEXT_WIDTH, _LOG_WIDTH - prefix_width - len(_COLUMN_GAP))
+
+    header_cells = [headers[i].ljust(widths[i]) for i in range(fixed)]
+    rules = ["-" * widths[i] for i in range(fixed)]
+    if wrap_last:
+        header_cells.append(headers[-1])
+        rules.append("-" * text_width)
+    lines = [_COLUMN_GAP.join(header_cells).rstrip(), _COLUMN_GAP.join(rules)]
+
+    for row in rows:
+        prefix = cells(row)
+        if not wrap_last:
+            lines.append(prefix.rstrip())
+            continue
+        # Keep long tokens (URLs, MSBuild property names) intact and let them
+        # overflow rather than splitting them mid-word.
+        wrapped = textwrap.wrap(
+            row[-1], width=text_width, break_long_words=False, break_on_hyphens=False
+        ) or [""]
+        lines.append(f"{prefix}{_COLUMN_GAP}{wrapped[0]}".rstrip())
+        padding = " " * len(prefix) + _COLUMN_GAP
+        lines.extend(f"{padding}{line}".rstrip() for line in wrapped[1:])
+    return lines
+
+
+def _format_warning_log(
+    warnings: dict[str, _WarningSummary],
+    by_project: dict[str, int],
+    by_repo: dict[str, dict[str, dict[str, int]]],
+    stem_to_repo: dict[str, str],
+    timestamp: datetime,
+) -> str:
+    """Render the whole warning summary as plain text for the log file."""
+    title = "PACE WARNING SUMMARY"
+    lines = [
+        title,
+        "=" * len(title),
+        f"Generated:      {timestamp:%Y-%m-%d %H:%M:%S}",
+        f"Total warnings: {sum(v.count for v in warnings.values())}",
+    ]
+
+    def section(heading: str) -> None:
+        lines.extend(["", heading, "-" * len(heading)])
+
+    section("Warnings by code")
+    lines += _format_text_table(
+        ["Code", "Count", "Description"], _by_code_rows(warnings), wrap_last=True
+    )
+
+    section("Warnings by project")
+    lines += _format_text_table(
+        ["Project", "Repo", "Count"], _by_project_rows(by_project, stem_to_repo), wrap_last=False
+    )
+
+    for repo_name, repo_total, rows in _repo_groups(warnings, by_repo):
+        section(f"{repo_name} ({repo_total} {'warning' if repo_total == 1 else 'warnings'})")
+        lines += _format_text_table(
+            ["Class Library", "Code", "Count", "Description"], rows, wrap_last=True
+        )
+
+    return "\n".join(lines) + "\n"
+
+
+def _write_warning_log(
+    warnings: dict[str, _WarningSummary],
+    by_project: dict[str, int],
+    by_repo: dict[str, dict[str, dict[str, int]]],
+    stem_to_repo: dict[str, str],
+) -> Path:
+    """Write the warning summary to a timestamped log file under ~/.pace/logs.
+
+    Returns:
+        The absolute path to the log file that was written.
+    """
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().astimezone()
+    log_path = (LOGS_DIR / f"warnings-{timestamp:%Y%m%d-%H%M%S}.log").resolve()
+    content = _format_warning_log(warnings, by_project, by_repo, stem_to_repo, timestamp)
+    log_path.write_text(content, encoding="utf-8", newline="\n")
+    return log_path
+
+
+def _print_warning_tables(console: Console, config: Config, lines: list[str]) -> None:
+    """Parse captured build output, print warning summary tables and log them to disk."""
+    warnings, by_project, by_repo = _parse_warnings(config, lines)
 
     if not warnings:
         console.print("[yellow]No warnings found.[/yellow]")
@@ -60,33 +269,34 @@ def _print_warning_tables(console: Console, config: Config, lines: list[str]) ->
 
     stem_to_repo = _build_stem_to_repo(config)
 
-    sorted_warnings = sorted(warnings.items(), key=lambda x: x[1].count, reverse=True)
-
-    by_code_table = Table(title="Warnings by Code", show_header=True, header_style="bold cyan")
-    by_code_table.add_column("Code", style="bold yellow", no_wrap=True)
-    by_code_table.add_column("Count", justify="right", style="bold red")
-    by_code_table.add_column("Description")
-
-    for code, data in sorted_warnings:
-        by_code_table.add_row(code, str(data.count), data.description)
-
-    console.print(by_code_table)
-
-    sorted_projects = sorted(by_project.items(), key=lambda x: x[1], reverse=True)
-
-    by_project_table = Table(
-        title="Warnings by Project", show_header=True, header_style="bold cyan"
+    console.print(
+        _build_table("Warnings by Code", ["Code", "Count", "Description"], _by_code_rows(warnings))
     )
-    by_project_table.add_column("Project", style="bold blue")
-    by_project_table.add_column("Repo", style="dim")
-    by_project_table.add_column("Count", justify="right", style="bold red")
+    console.print(
+        _build_table(
+            "Warnings by Project",
+            ["Project", "Repo", "Count"],
+            _by_project_rows(by_project, stem_to_repo),
+        )
+    )
+    for repo_name, repo_total, rows in _repo_groups(warnings, by_repo):
+        console.print(
+            _build_table(
+                f"Warnings by Code - {repo_name}",
+                ["Class Library", "Code", "Count", "Description"],
+                rows,
+            )
+        )
+        console.print(f"[bold]{repo_name} warnings:[/bold] {repo_total}")
 
-    for proj_stem, count in sorted_projects:
-        repo_name = stem_to_repo.get(proj_stem, "")
-        by_project_table.add_row(proj_stem, repo_name, str(count))
-
-    console.print(by_project_table)
     console.print(f"[bold]Total warnings:[/bold] {sum(v.count for v in warnings.values())}")
+
+    try:
+        log_path = _write_warning_log(warnings, by_project, by_repo, stem_to_repo)
+    except OSError as exc:
+        console.print(f"[yellow]Could not write warning summary log: {exc}[/yellow]")
+        return
+    console.print(f"[bold]Warning summary log:[/bold] {log_path}")
 
 
 # In-memory cache (loaded from disk)
