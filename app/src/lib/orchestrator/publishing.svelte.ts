@@ -202,6 +202,7 @@ export function buildPublishCommand(options: PublishOptions): string[] {
   const publishArgs: string[] = [
     "publish",
     ...(platform !== "windows" ? ["--runtime", runtime] : []),
+    ...(platform === "windows" ? ["--self-contained"] : []),
     "--configuration",
     buildConfig,
     "--framework",
@@ -269,7 +270,8 @@ export async function buildCommandPreview(
   };
 
   const runtimeArg = platform !== "windows" ? ` --runtime ${runtime}` : "";
-  let preview = `dotnet publish${runtimeArg} --configuration ${buildConfig} --framework ${framework} --verbosity minimal`;
+  const selfContainedArg = platform === "windows" ? " --self-contained" : "";
+  let preview = `dotnet publish${runtimeArg}${selfContainedArg} --configuration ${buildConfig} --framework ${framework} --verbosity minimal`;
 
   // iOS builds require the interpreter for publish scenarios
   if (platform === "ios") {
