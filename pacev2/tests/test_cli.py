@@ -5,11 +5,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from pacev2.cli import app
 from typer.core import TyperGroup
 from typer.main import get_command
 from typer.testing import CliRunner
-
-from pacev2.cli import app
 
 runner = CliRunner(env={"COLUMNS": "160"})
 
@@ -81,7 +80,9 @@ def test_roothelp_listsinterface(arguments: list[str]) -> None:
         ("update", ["Update pace-dotnet"]),
     ],
 )
-def test_commandhelp_listsinterface(command: str, expected: list[str], help_flag: str) -> None:
+def test_commandhelp_listsinterface(
+    command: str, expected: list[str], help_flag: str
+) -> None:
     result = runner.invoke(app, [command, help_flag])
 
     assert result.exit_code == 0
@@ -206,7 +207,9 @@ def test_upload_requiresmetadata(missing: str) -> None:
 
 @pytest.mark.parametrize("global_flag", ["-v", "--version"])
 @pytest.mark.parametrize("include_upload_version", [True, False])
-def test_versionflags_keepscopes(global_flag: str, include_upload_version: bool) -> None:
+def test_versionflags_keepscopes(
+    global_flag: str, include_upload_version: bool
+) -> None:
     arguments = [global_flag, *UPLOAD_ARGUMENTS]
     if not include_upload_version:
         index = arguments.index("--version", 2)
@@ -294,8 +297,8 @@ def test_dotnet_preservesarguments(
     assert isinstance(command, TyperGroup)
 
     with command.commands["dotnet"].make_context("dotnet", arguments.copy()) as ctx:
-        assert list(ctx.params["dotnet_args"]) == expected
-        assert ctx.params["summarize_warnings"] is summarize
+        assert list(ctx.params["_dotnet_args"]) == expected
+        assert ctx.params["_summarize_warnings"] is summarize
 
 
 @pytest.mark.parametrize(

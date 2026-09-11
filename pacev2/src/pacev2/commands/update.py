@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Package update command interface."""
 
 from pacev2._stubs import not_implemented

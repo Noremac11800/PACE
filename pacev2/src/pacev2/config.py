@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """TOML loading, active-config history, and editable template initialization."""
 
 import json
@@ -16,6 +18,7 @@ LAST_ACTIVE_CONFIG_KEY = "lastActiveConfig"
 
 
 def load_config(path: Path) -> Config:
+    """Load and validate a TOML configuration file."""
     try:
         with path.open("rb") as stream:
             return Config.model_validate(tomllib.load(stream))
@@ -23,13 +26,27 @@ def load_config(path: Path) -> Config:
         raise ValueError(f"Invalid configuration in '{path}': {error}") from error
 
 
+def _parse_settings(content: str) -> dict[str, object]:
+    loaded: object = json.loads(content)
+    if not isinstance(loaded, dict):
+        raise TypeError("Settings must be a JSON object")
+    last_active = loaded.get(LAST_ACTIVE_CONFIG_KEY)
+    if last_active is not None and (not isinstance(last_active, str) or not last_active):
+        raise ValueError(f"{LAST_ACTIVE_CONFIG_KEY} must be a non-empty string")
+    return loaded
+
+
 class ConfigStore:
+    """Select, initialize, and remember active configuration files."""
+
     def __init__(self, directory: Path | None = None) -> None:
+        """Store history under the supplied directory or the user's .pace directory."""
         self.directory = directory if directory is not None else Path.home() / ".pace"
         self.configs_dir = self.directory / "configs"
         self.settings_path = self.directory / "settings.json"
 
     def resolve_path(self, value: str | Path, *, use_cwd: bool = True) -> Path:
+        """Resolve a config reference against the working or config directory."""
         path = normalize_path(value)
         if path.parent == Path() and (not use_cwd or not path.exists()):
             path = self.configs_dir / path
@@ -41,6 +58,7 @@ class ConfigStore:
         from_repo: str | None = None,
         to_repo: str | None = None,
     ) -> tuple[Path, Config]:
+        """Load the selected configuration, apply filters, and remember its path."""
         settings = self._read_settings()
         path, config = self._select_config(value, settings)
         config = config.filtered(from_repo, to_repo)
@@ -84,13 +102,7 @@ class ConfigStore:
 
     def _read_settings(self) -> dict[str, object] | None:
         try:
-            loaded: object = json.loads(self.settings_path.read_text(encoding="utf-8"))
-            if not isinstance(loaded, dict):
-                raise TypeError("Settings must be a JSON object")
-            last_active = loaded.get(LAST_ACTIVE_CONFIG_KEY)
-            if last_active is not None and (not isinstance(last_active, str) or not last_active):
-                raise ValueError(f"{LAST_ACTIVE_CONFIG_KEY} must be a non-empty string")
-            return loaded
+            return _parse_settings(self.settings_path.read_text(encoding="utf-8"))
         except FileNotFoundError:
             return {}
         except (OSError, TypeError, ValueError) as error:

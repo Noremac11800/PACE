@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Shared reporting for CLI features awaiting implementation."""
 
 from typing import NoReturn

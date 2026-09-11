@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Deferred CLI configuration so help never requires a usable config."""
 
 from dataclasses import dataclass

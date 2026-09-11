@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Run PACE with python -m pacev2."""
 
 from pacev2.cli import main

@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Path handling shared by configuration fields and CLI references."""
 
 from pathlib import Path, PureWindowsPath

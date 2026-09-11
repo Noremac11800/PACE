@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Arbitrary Git commands across the selected project checkouts."""
 
 import os
@@ -27,7 +29,10 @@ if TYPE_CHECKING:
 
 
 class GitCommand(TyperCommand):
+    """Preserve Git arguments while retaining PACE's leading help flags."""
+
     def parse_args(self, ctx: "Context", args: list[str]) -> list[str]:
+        """Parse PACE help flags and pass other arguments through verbatim."""
         # Prevent Click from splitting Git options such as -Cpath into short flags.
         if args and args[0] not in {"-h", "--help", "--"}:
             args = ["--", *args]
@@ -71,6 +76,22 @@ def _is_checkout(path: Path) -> bool:
     return (path / ".git").exists() or ((path / "HEAD").is_file() and (path / "objects").is_dir())
 
 
+def _check_directory(directory: Path, *, cloning: bool) -> TaskResult | None:
+    if cloning and _is_checkout(directory):
+        return TaskResult(TaskStatus.SKIPPED, f"Already cloned: {directory}")
+    if not cloning:
+        try:
+            directory.stat()
+        except FileNotFoundError:
+            return TaskResult(
+                TaskStatus.SKIPPED,
+                f"Warning: not cloned at {directory}. Run 'pacev2 git clone' first.",
+            )
+        if not directory.is_dir() or not _is_checkout(directory):
+            return TaskResult(TaskStatus.FAILED, f"Not a Git checkout: {directory}")
+    return None
+
+
 def _run_project(
     project: Project,
     repodir: Path,
@@ -85,18 +106,9 @@ def _run_project(
     directory = project_directory(repodir, project.name)
     command_index = _command_index(args)
     cloning = command_index is not None and args[command_index] == "clone"
-    if cloning and _is_checkout(directory):
-        return TaskResult(TaskStatus.SKIPPED, f"Already cloned: {directory}")
-    if not cloning:
-        try:
-            directory.stat()
-        except FileNotFoundError:
-            return TaskResult(
-                TaskStatus.SKIPPED,
-                f"Warning: not cloned at {directory}. Run 'pacev2 git clone' first.",
-            )
-        if not directory.is_dir() or not _is_checkout(directory):
-            return TaskResult(TaskStatus.FAILED, f"Not a Git checkout: {directory}")
+    directory_result = _check_directory(directory, cloning=cloning)
+    if directory_result is not None:
+        return directory_result
     if executable is None:
         return TaskResult(TaskStatus.FAILED, "Git executable not found on PATH.")
 

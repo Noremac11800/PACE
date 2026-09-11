@@ -8,12 +8,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from typer.testing import CliRunner
-
 from pacev2.cli import app
 from pacev2.execution import Reporter, TaskResult, TaskStatus
 from pacev2.models import Config, Project
 from pacev2.paths import project_directory
+from typer.testing import CliRunner
 
 runner = CliRunner(env={"COLUMNS": "160"})
 SUCCESS = TaskResult(TaskStatus.SUCCEEDED, "Completed\n", 0)
@@ -105,7 +104,9 @@ def test_clone_supplies_configured_urls_and_project_name_destinations(
         destination = Path(command[-1])
         assert destination.parent == git_config.repodir
         assert destination.name in {"alpha", "beta"}
-        assert command[-2] == f"https://example.invalid/team/remote-{destination.name}.git"
+        assert (
+            command[-2] == f"https://example.invalid/team/remote-{destination.name}.git"
+        )
         assert command[:-2] == [
             "git",
             "--no-pager",
@@ -323,13 +324,15 @@ def local_config(tmp_path: Path, local_git: str) -> Path:
             "-m",
             "Initial fixture",
         )
-        lines.extend([
-            "[[projects]]",
-            f"name = {json.dumps(name)}",
-            'csproj_path = "Project.csproj"',
-            f"repo_url = {json.dumps(str(origin))}",
-            'depends_on = ["alpha"]' if name == "beta" else "depends_on = []",
-        ])
+        lines.extend(
+            [
+                "[[projects]]",
+                f"name = {json.dumps(name)}",
+                'csproj_path = "Project.csproj"',
+                f"repo_url = {json.dumps(str(origin))}",
+                'depends_on = ["alpha"]' if name == "beta" else "depends_on = []",
+            ]
+        )
     config_path = tmp_path / "local.toml"
     config_path.write_text("\n".join(lines), encoding="utf-8")
     return config_path
@@ -411,7 +414,9 @@ def test_real_git_respects_filtered_config(local_config: Path, tmp_path: Path) -
     assert "1 succeeded" in result.output
 
 
-def test_real_bare_clones_support_other_git_commands(local_config: Path, tmp_path: Path) -> None:
+def test_real_bare_clones_support_other_git_commands(
+    local_config: Path, tmp_path: Path
+) -> None:
     clone = runner.invoke(app, ["-C", str(local_config), "git", "clone", "--bare"])
     assert clone.exit_code == 0, clone.output
     assert (tmp_path / "checkouts" / "alpha" / "HEAD").is_file()

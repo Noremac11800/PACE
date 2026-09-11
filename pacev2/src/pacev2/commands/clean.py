@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Build artifact and package cache cleanup command."""
 
 from typing import Annotated
@@ -10,25 +12,25 @@ from pacev2._stubs import not_implemented
 
 def run(
     ctx: typer.Context,
-    cache: Annotated[
+    _cache: Annotated[
         bool,
         typer.Option("--cache", help="Clean NuGet packages from ~/.nuget/packages"),
     ] = False,
-    custom_cache: Annotated[
+    _custom_cache: Annotated[
         bool,
         typer.Option(
             "--custom-cache",
             help=("Clean NuGet packages from the custom cache path configured in nuget_cache_path"),
         ),
     ] = False,
-    project: Annotated[
+    _project: Annotated[
         bool,
         typer.Option(
             "--project",
             help="Clean project bin/, obj/, and AppPackages/ directories",
         ),
     ] = False,
-    dry_run: Annotated[
+    _dry_run: Annotated[
         bool,
         typer.Option(
             "--dry-run",

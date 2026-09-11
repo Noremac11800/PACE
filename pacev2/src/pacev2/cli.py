@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Typer entry point mirroring the public PACE command-line interface."""
 
 from importlib.metadata import version as get_version
@@ -76,9 +78,10 @@ def options(
         ),
     ] = None,
 ) -> None:
+    """Configure global CLI options before dispatching a command."""
     if version and ctx.invoked_subcommand is None:
         typer.echo(f"pacev2 {get_version('pacev2')}")
-        raise typer.Exit()
+        raise typer.Exit
 
     config_options = ConfigOptions(
         path=config,

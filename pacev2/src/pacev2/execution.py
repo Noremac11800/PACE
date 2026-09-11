@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Reusable parallel command execution with live, per-project output."""
 
 import subprocess
@@ -18,6 +20,8 @@ Reporter = Callable[[str], None]
 
 
 class TaskStatus(StrEnum):
+    """Lifecycle states displayed for a project task."""
+
     QUEUED = "Queued"
     RUNNING = "Running"
     SUCCEEDED = "Succeeded"
@@ -27,6 +31,8 @@ class TaskStatus(StrEnum):
 
 @dataclass(frozen=True)
 class TaskResult:
+    """Outcome and combined output of a project task."""
+
     status: TaskStatus
     output: str = ""
     returncode: int | None = None
@@ -34,6 +40,8 @@ class TaskResult:
 
 @dataclass(frozen=True)
 class Task:
+    """Named project operation that reports progress while running."""
+
     name: str
     action: Callable[[Reporter], TaskResult]
 
@@ -168,13 +176,20 @@ def run_parallel(
 
     console.print(table())
     ordered = [results[index] for index in range(len(tasks))]
-    for task, result in zip(tasks, ordered, strict=True):
+    _print_results(tasks, ordered, console)
+    return ordered
+
+
+def _print_results(tasks: Sequence[Task], results: Sequence[TaskResult], console: Console) -> None:
+    for task, result in zip(tasks, results, strict=True):
         if result.output.strip():
             console.rule(Text(task.name))
             console.print(Text.from_ansi(result.output.rstrip()), soft_wrap=True)
-    counts = {status: sum(result.status == status for result in ordered) for status in colors}
+    counts = {
+        status: sum(result.status == status for result in results)
+        for status in (TaskStatus.SUCCEEDED, TaskStatus.FAILED, TaskStatus.SKIPPED)
+    }
     console.print(
         f"{counts[TaskStatus.SUCCEEDED]} succeeded, "
         f"{counts[TaskStatus.FAILED]} failed, {counts[TaskStatus.SKIPPED]} skipped."
     )
-    return ordered

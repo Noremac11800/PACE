@@ -9,9 +9,6 @@ from threading import Barrier
 from unittest.mock import patch
 
 import pytest
-from rich.console import Console
-from rich.table import Table
-
 from pacev2.execution import (
     Reporter,
     Task,
@@ -20,6 +17,8 @@ from pacev2.execution import (
     run_command,
     run_parallel,
 )
+from rich.console import Console
+from rich.table import Table
 
 
 def test_tasks_run_concurrently_and_results_keep_input_order() -> None:
@@ -175,7 +174,9 @@ print('finished', flush=True)
         if line == "ready":
             acknowledgement.touch()
 
-    result = run_command([sys.executable, "-c", script, str(acknowledgement)], tmp_path, report)
+    result = run_command(
+        [sys.executable, "-c", script, str(acknowledgement)], tmp_path, report
+    )
 
     assert result.returncode == 0
     assert result.output == "ready\nfinished\n"

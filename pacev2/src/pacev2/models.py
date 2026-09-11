@@ -1,3 +1,5 @@
+# Copyright (c) 2026
+
 """Validated PACE configuration and dependency-chain selection."""
 
 from graphlib import CycleError, TopologicalSorter
@@ -12,6 +14,8 @@ ConfigPath = Annotated[Path, BeforeValidator(normalize_path)]
 
 
 class BuildProp(BaseModel):
+    """MSBuild property with its declared datatype and default value."""
+
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
@@ -20,12 +24,15 @@ class BuildProp(BaseModel):
 
     @model_validator(mode="after")
     def normalize_default(self) -> Self:
+        """Normalize path-valued defaults while preserving empty values."""
         if self.datatype == "path" and self.default != "":
             self.default = normalize_path(self.default)
         return self
 
 
 class Project(BaseModel):
+    """Named repository with its project file and dependencies."""
+
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
@@ -36,6 +43,8 @@ class Project(BaseModel):
 
 
 class Config(BaseModel):
+    """Workspace paths, projects, and shared build properties."""
+
     model_config = ConfigDict(extra="forbid", validate_by_name=True)
 
     repodir: ConfigPath = Path()
@@ -45,6 +54,7 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def validate_dependencies(self) -> Self:
+        """Reject duplicate names, missing dependencies, and dependency cycles."""
         dependencies = {project.name: set(project.depends_on) for project in self.projects}
         if len(dependencies) != len(self.projects):
             raise ValueError("Project names must be unique")
