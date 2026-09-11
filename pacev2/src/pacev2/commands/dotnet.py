@@ -4,10 +4,12 @@ from typing import Annotated
 
 import typer
 
+from pacev2._context import configure
 from pacev2._stubs import not_implemented
 
 
 def run(
+    ctx: typer.Context,
     dotnet_args: Annotated[
         list[str] | None,
         typer.Argument(
@@ -28,4 +30,5 @@ def run(
     ] = False,
 ) -> None:
     """Execute dotnet commands across the project graph."""
+    configure(ctx, required=True)
     not_implemented("dotnet")

@@ -4,10 +4,12 @@ from typing import Annotated
 
 import typer
 
+from pacev2._context import configure
 from pacev2._stubs import not_implemented
 
 
 def run(
+    ctx: typer.Context,
     cache: Annotated[
         bool,
         typer.Option("--cache", help="Clean NuGet packages from ~/.nuget/packages"),
@@ -39,4 +41,5 @@ def run(
     ] = False,
 ) -> None:
     """Delete build artifacts and NuGet cache for all projects."""
+    configure(ctx, required=True)
     not_implemented("clean")

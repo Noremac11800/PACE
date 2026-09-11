@@ -6,6 +6,7 @@ from typing import Annotated
 
 import typer
 
+from pacev2._context import configure
 from pacev2._stubs import not_implemented
 
 
@@ -21,6 +22,7 @@ class ReleaseType(StrEnum):
 
 
 def run(
+    ctx: typer.Context,
     package_path: Annotated[
         Path,
         typer.Argument(
@@ -76,4 +78,5 @@ def run(
     ] = None,
 ) -> None:
     """Upload app packages to the deployment server."""
+    configure(ctx)
     not_implemented("upload")

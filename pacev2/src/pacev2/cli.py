@@ -6,6 +6,7 @@ from typing import Annotated
 
 import typer
 
+from pacev2._context import ConfigOptions, configure
 from pacev2._stubs import not_implemented
 from pacev2.commands import clean, dotnet, git, update, upload
 
@@ -32,7 +33,8 @@ def options(
             metavar="<path>",
             help=(
                 "Path to configuration file. Defaults to the last active config "
-                "recorded in ~/.pace/settings.json."
+                "recorded in ~/.pace/settings.json, or an editable template "
+                "in ~/.pace/configs/template.toml."
             ),
         ),
     ] = None,
@@ -74,21 +76,25 @@ def options(
         ),
     ] = None,
 ) -> None:
-    if ctx.invoked_subcommand is not None:
-        return
-
-    if version:
+    if version and ctx.invoked_subcommand is None:
         typer.echo(f"pacev2 {get_version('pacev2')}")
         raise typer.Exit()
 
-    if (
-        debug
-        or config is not None
-        or print_config
-        or print_config_path
-        or from_repo is not None
-        or to_repo is not None
-    ):
+    config_options = ConfigOptions(
+        path=config,
+        print_config=print_config,
+        print_config_path=print_config_path,
+        from_repo=from_repo,
+        to_repo=to_repo,
+    )
+    ctx.obj = config_options
+    if ctx.invoked_subcommand is not None:
+        return
+
+    configure(ctx)
+    if print_config or print_config_path:
+        return
+    if debug and not config_options.requested:
         not_implemented("Global option handling")
 
     typer.echo(ctx.get_help())

@@ -1,14 +1,15 @@
 """CLI contract tests that do not require configuration or external tools."""
 
+import tomllib
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-import tomllib
-from pacev2.cli import app
 from typer.core import TyperGroup
 from typer.main import get_command
 from typer.testing import CliRunner
+
+from pacev2.cli import app
 
 runner = CliRunner(env={"COLUMNS": "160"})
 
@@ -142,35 +143,10 @@ def test_forwardedhelp_preserveslegacyscope(arguments: list[str]) -> None:
 
 
 @pytest.mark.parametrize(
-    "arguments",
-    [
-        ["--debug"],
-        ["-C", "missing-config.toml"],
-        ["--config", "missing-config.toml"],
-        ["--print-config"],
-        ["--print-config-path"],
-        ["--from", "FirstRepo"],
-        ["--to", "LastRepo"],
-        [
-            "--debug",
-            "-C",
-            "missing-config.toml",
-            "--print-config",
-            "--print-config-path",
-            "--from",
-            "FirstRepo",
-            "--to",
-            "LastRepo",
-        ],
-    ],
-)
-@pytest.mark.parametrize(
     ("command", "feature"), [([], "Global option handling"), (["clean"], "clean")]
 )
-def test_globaloptions_remainstubs(
-    arguments: list[str], command: list[str], feature: str
-) -> None:
-    result = runner.invoke(app, [*arguments, *command])
+def test_debug_remainsstub(command: list[str], feature: str) -> None:
+    result = runner.invoke(app, ["--debug", *command])
 
     assert result.exit_code == 1
     assert f"{feature} is not implemented yet in pacev2." in result.stderr
