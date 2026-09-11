@@ -1,0 +1,93 @@
+target-version = "py310"
+line-length = 100
+
+[lint]
+select = [
+    "ALL",
+    # "F",     # pyflakes
+    # "E",     # pycodestyle errors
+    # "W",     # pycodestyle warnings
+    # "C90",   # mccabe complexity
+    # "I",     # isort
+    # "N",     # pep8-naming
+    # "D",     # pydocstyle
+    # "UP",    # pyupgrade
+    # "ANN",   # flake8-annotations
+    # "S",     # flake8-bandit (security)
+    # "BLE",   # flake8-blind-except
+    # "FBT",   # flake8-boolean-trap
+    # "B",     # flake8-bugbear
+    # "A",     # flake8-builtins
+    # "COM",   # flake8-commas
+    # "C4",    # flake8-comprehensions
+    # "DTZ",   # flake8-datetimez
+    # "T10",   # flake8-debugger
+    # "EM",    # flake8-errmsg
+    # "FA",    # flake8-future-annotations
+    # "ISC",   # flake8-implicit-str-concat
+    # "ICN",   # flake8-import-conventions
+    # "LOG",   # flake8-logging
+    # "G",     # flake8-logging-format
+    # "INP",   # flake8-no-pep420
+    # "PIE",   # flake8-pie
+    # "T20",   # flake8-print
+    # "PYI",   # flake8-pyi
+    # "PT",    # flake8-pytest-style
+    # "Q",     # flake8-quotes
+    # "RSE",   # flake8-raise
+    # "RET",   # flake8-return
+    # "SLF",   # flake8-self
+    # "SLOT",  # flake8-slots
+    # "SIM",   # flake8-simplify
+    # "TID",   # flake8-tidy-imports
+    # "TCH",   # flake8-type-checking
+    # "ARG",   # flake8-unused-arguments
+    # "PTH",   # flake8-use-pathlib
+    # "ERA",   # eradicate (commented-out code)
+    # "PD",    # pandas-vet
+    # "PGH",   # pygrep-hooks
+    # "PL",    # pylint
+    # "TRY",   # tryceratops
+    # "FLY",   # flynt
+    # "PERF",  # perflint
+    # "FURB",  # refurb
+    # "RUF",   # ruff-specific rules
+]
+ignore = [
+    "D203",   # one-blank-line-before-class (conflicts with D211)
+    "D213",   # multi-line-summary-second-line (conflicts with D212)
+    "COM812", # trailing-comma-missing (conflicts with ruff formatter)
+    "ISC001", # single-line-implicit-str-concat (conflicts with ruff formatter)
+    "T201",   # print-found
+    "S101",   # assert-used
+    "D415",   # first-line-should-end-with-period
+    "S311",   # stdlib-random-used
+    "S108",   # hardcoded-temp-file/dir
+    "S603",   # subprocess.run() without vetting user input
+    "S607",   # starting a process with a partial executable path
+    "TRY003", # avoid specifying long messages outside the exception
+    "TRY300", # consider moving this statement to an else block
+    "ERA001", # found commented-out code
+    "EM102",  # Exception must not use an f-string literal, assign to variable first
+    "ANN401", # allow type `Any` in type annotations
+    "E501",   # line too long (handled by formatter)
+    "BLE001", # do not catch blind exception
+]
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.pylint]
+max-args = 8
+max-returns = 5
+max-branches = 10
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+preview = true

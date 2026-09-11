@@ -1,8 +1,8 @@
 # PACE v2
 
 A Typer CLI for the Project Automation and Configuration Engine, using uv, Ruff,
-ty, and pytest. Configuration handling and version reporting are implemented;
-project operations remain placeholders.
+ty, and pytest. Configuration handling, version reporting, and parallel Git
+commands are implemented; other project operations remain placeholders.
 
 ## Run
 
@@ -21,10 +21,9 @@ No arguments, `-h`, and `--help` display help. With no subcommand, `-v` and
 installed package metadata generated from `project.version` in `pyproject.toml`,
 with no network requests or configuration loading.
 
-Commands and `--debug` remain placeholders. Commands report **not implemented**
-and exit with code 1 after any requested configuration processing. Nothing reads
-build notes, deletes project files, runs external commands, contacts servers,
-checks for newer versions, or installs updates.
+`clean`, `dotnet`, `upload`, `update`, and `--debug` remain placeholders. These
+commands report **not implemented** and exit with code 1 after any requested
+configuration processing.
 
 ## Configuration
 
@@ -79,10 +78,55 @@ backslashes inside double quotes (`"C:\\Repositories"`). Separator normalization
 does not map Windows drive letters to Unix mount points.
 
 `clean`, `dotnet`, and `git` receive the filtered `Config` through the Typer
-context; their operations are still stubs. Print flags can also precede these
-commands. `upload` loads configuration only when global config options are
-provided, while `update` bypasses them, matching the original CLI. Help and
+context. Print flags can also precede these commands. `upload` loads configuration
+only when global config options are
+provided, while `update` bypasses them, matching the original CLI. PACE's own help and
 standalone version reporting never load or initialize configuration.
+
+## Parallel Git commands
+
+Git runs against the active, filtered project list in parallel. Each checkout
+lives at `repodir/<project-name>`; the configured project name, not the URL's
+basename, determines its directory.
+
+```powershell
+uv run pacev2 git status
+uv run pacev2 git clone
+uv run pacev2 git clone --branch main --depth 1
+uv run pacev2 git pull --ff-only
+uv run pacev2 git checkout main
+uv run pacev2 --from common-lib --to application git status --short
+uv run pacev2 git -c alias.recent="log -5 --oneline" recent
+```
+
+Subcommands, aliases, options, and their values are forwarded as individual
+arguments, without a shell or a command allowlist. For bulk `clone`, provide only
+clone options: PACE appends each project's `repo_url` and absolute destination.
+Already-cloned projects are skipped; an existing empty directory can be cloned
+into, while Git reports an error for a non-empty, non-repository destination.
+
+A project without a non-empty `repo_url` is skipped with a warning. For commands
+other than `clone`, a missing checkout is also skipped with a warning to clone
+first. An existing directory that is not a Git checkout is an error: PACE will
+not accidentally run Git against an enclosing repository.
+
+The Rich table shows queued, running, succeeded, failed, and skipped projects,
+along with their latest output. Complete stdout/stderr follows the final table,
+grouped in config order, including failures and exit codes. A failed command or
+process-launch error makes PACE exit with code 1 after the other projects finish.
+Warnings and skips alone do not fail the invocation.
+
+This is a non-interactive batch runner: stdin, Git credential prompts, pagers,
+and commit/rebase editors are disabled. Configure authentication beforehand and
+provide non-interactive arguments such as `commit -m "message"` or `--no-edit`.
+Commands that require interactive input are not suitable for parallel execution.
+
+`pacev2 git -h` / `--help` shows PACE's Git help. Help flags following Git
+arguments are forwarded, so `pacev2 git status -h` asks Git for status help.
+Use `pacev2 git -- --help` to forward a leading help flag to Git itself.
+
+`execution.py` supplies the reusable task runner and streaming subprocess helper;
+other project commands can reuse its reporting and failure aggregation.
 
 ## CLI parity
 
@@ -113,8 +157,9 @@ Upload platform choices are `iOS`, `Android`, and `Windows`; release types are
 
 `dotnet`, `git`, and `demo` accept trailing tool or demo arguments. For example,
 `dotnet -w build -c Release` parses the PACE warning-summary flag, while
-`dotnet build -w` leaves `-w` in the dotnet arguments. Git and demo invocations
-still recognize `-h` / `--help` after their arguments, matching the original CLI.
+`dotnet build -w` leaves `-w` in the dotnet arguments. Git forwards all arguments
+after the initial wrapper help position; demo invocations still recognize
+`-h` / `--help` after their arguments.
 The `columns` demo accepts a directory path after its name.
 
 `init`, `test`, and `format` are not exposed because the original CLI does not

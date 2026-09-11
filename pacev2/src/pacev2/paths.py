@@ -1,6 +1,6 @@
 """Path handling shared by configuration fields and CLI references."""
 
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 
 def normalize_path(value: object) -> Path:
@@ -14,3 +14,15 @@ def normalize_path(value: object) -> Path:
         return Path(text.replace("\\", "/")).expanduser()
     except RuntimeError as error:
         raise ValueError(str(error)) from error
+
+
+def project_directory(repodir: Path, name: str) -> Path:
+    """Keep configured project names inside the repository directory."""
+    if (
+        not name.strip()
+        or name in {".", ".."}
+        or any(character in name for character in ("/", "\\", "\0"))
+        or PureWindowsPath(name).drive
+    ):
+        raise ValueError(f"Project name '{name}' must be a single directory name")
+    return repodir.resolve() / name

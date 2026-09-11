@@ -120,7 +120,7 @@ def test_config_selection_without_printing_is_remembered(config_file: Path) -> N
     assert remembered.stdout == f"{config_file}\n"
 
 
-@pytest.mark.parametrize("command", ["clean", "dotnet", "git"])
+@pytest.mark.parametrize("command", ["clean", "dotnet"])
 def test_prints_filtered_config_before_command_stub(
     config_file: Path, command: str
 ) -> None:
@@ -153,7 +153,7 @@ def test_filtered_config_is_available_in_context(config_file: Path) -> None:
         assert ctx.meta["config_path"] == config_file
 
 
-@pytest.mark.parametrize("arguments", [[], ["clean"], ["upload"], ["git", "pull"]])
+@pytest.mark.parametrize("arguments", [[], ["clean"], ["upload"], ["git"]])
 @pytest.mark.parametrize("help_flag", ["-h", "--help"])
 def test_help_never_loads_config(
     arguments: list[str], help_flag: str, isolated_home: Path

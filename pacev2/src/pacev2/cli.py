@@ -106,7 +106,7 @@ app.command(
     "dotnet",
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
 )(dotnet.run)
-app.command("git", context_settings={"ignore_unknown_options": True})(git.run)
+app.command("git", cls=git.GitCommand)(git.run)
 app.command("upload")(upload.run)
 app.command("update")(update.run)
 

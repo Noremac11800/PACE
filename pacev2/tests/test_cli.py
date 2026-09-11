@@ -102,11 +102,6 @@ def test_commandhelp_listsinterface(
         ["dotnet", "--summarize-warnings", "test"],
         ["dotnet", "--info"],
         ["dotnet", "build", "--help"],
-        ["git"],
-        ["git", "pull"],
-        ["git", "clone"],
-        ["git", "checkout", "main"],
-        ["git", "status", "--short"],
         ["update"],
         UPLOAD_ARGUMENTS,
         [*UPLOAD_ARGUMENTS, "-n", "Build notes", "-N", "missing-notes.txt"],
@@ -125,21 +120,6 @@ def test_commands_reportunimplemented(arguments: list[str]) -> None:
     assert result.exit_code == 1
     assert result.stdout == ""
     assert f"{arguments[0]} is not implemented yet in pacev2." in result.stderr
-
-
-@pytest.mark.parametrize(
-    "arguments",
-    [
-        ["git", "pull", "--help"],
-        ["git", "checkout", "main", "-h"],
-    ],
-)
-def test_forwardedhelp_preserveslegacyscope(arguments: list[str]) -> None:
-    result = runner.invoke(app, arguments)
-
-    assert result.exit_code == 0
-    assert "Usage:" in result.output
-    assert "not implemented" not in result.output
 
 
 @pytest.mark.parametrize(
@@ -326,6 +306,16 @@ def test_dotnet_preservesarguments(
     ("name", "arguments", "argument_name", "expected"),
     [
         ("git", ["--version"], "git_args", ["--version"]),
+        ("git", ["pull", "--help"], "git_args", ["pull", "--help"]),
+        ("git", ["checkout", "main", "-h"], "git_args", ["checkout", "main", "-h"]),
+        ("git", ["-Cpath-with-h", "status"], "git_args", ["-Cpath-with-h", "status"]),
+        ("git", ["--", "--help"], "git_args", ["--help"]),
+        (
+            "git",
+            ["-c", "alias.custom=!echo hello", "custom"],
+            "git_args",
+            ["-c", "alias.custom=!echo hello", "custom"],
+        ),
         (
             "git",
             ["checkout", "feature-branch", "--no-track"],
