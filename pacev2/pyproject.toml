@@ -1,7 +1,7 @@
 [project]
 name = "pacev2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Typer CLI scaffold for the Project Automation and Configuration Engine"
 readme = "README.md"
 authors = [
     { name = "Cameron Kirk", email = "51150380+Noremac11800@users.noreply.github.com" }
@@ -24,3 +24,6 @@ dev = [
     "ruff>=0.16.7",
     "ty>=0.0.80",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

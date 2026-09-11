@@ -1,0 +1,328 @@
+"""CLI contract tests that do not require configuration or external tools."""
+
+import pytest
+from pacev2.cli import app
+from typer.core import TyperGroup
+from typer.main import get_command
+from typer.testing import CliRunner
+
+runner = CliRunner(env={"COLUMNS": "160"})
+
+UPLOAD_ARGUMENTS = [
+    "upload",
+    "app.msix",
+    "--username",
+    "Developer",
+    "--app-name",
+    "Example App",
+    "--platform",
+    "Windows",
+    "--release-type",
+    "Release",
+    "--version",
+    "1.2.3",
+    "--endpoint",
+    "https://deploy.example.invalid",
+]
+
+
+@pytest.mark.parametrize("arguments", [[], ["-h"], ["--help"]])
+def test_roothelp_listsinterface(arguments: list[str]) -> None:
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 0
+    for name in ("clean", "dotnet", "git", "upload", "demo", "update"):
+        assert name in result.output
+    for option in (
+        "--debug",
+        "-C",
+        "--config",
+        "--print-config",
+        "--print-config-path",
+        "-v",
+        "--version",
+        "--from",
+        "--to",
+        "-h",
+        "--help",
+    ):
+        assert option in result.output
+    assert "--install-completion" not in result.output
+
+
+@pytest.mark.parametrize("help_flag", ["-h", "--help"])
+@pytest.mark.parametrize(
+    ("command", "expected"),
+    [
+        ("clean", ["--cache", "--custom-cache", "--project", "-n", "--dry-run"]),
+        ("dotnet", ["--summarize-warnings", "-w", "<dotnet-args>"]),
+        ("git", ["<git-args>"]),
+        (
+            "upload",
+            [
+                "<path-to-app-package>",
+                "--username",
+                "--app-name",
+                "--platform",
+                "--release-type",
+                "--version",
+                "--endpoint",
+                "-n",
+                "--build-description",
+                "-N",
+                "--build-description-from-file",
+            ],
+        ),
+        ("demo", ["columns", "progress_bar"]),
+        ("update", ["Update pace-dotnet"]),
+    ],
+)
+def test_commandhelp_listsinterface(
+    command: str, expected: list[str], help_flag: str
+) -> None:
+    result = runner.invoke(app, [command, help_flag])
+
+    assert result.exit_code == 0
+    for text in expected:
+        assert text in result.output
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["clean"],
+        ["clean", "--cache", "--custom-cache", "--project", "-n"],
+        ["clean", "--dry-run"],
+        ["dotnet"],
+        ["dotnet", "-w", "build", "-c", "Release", "--no-restore"],
+        ["dotnet", "--summarize-warnings", "test"],
+        ["dotnet", "--info"],
+        ["dotnet", "build", "--help"],
+        ["git"],
+        ["git", "pull"],
+        ["git", "clone"],
+        ["git", "checkout", "main"],
+        ["git", "status", "--short"],
+        ["demo", "columns", "missing-directory"],
+        ["demo", "progress_bar"],
+        ["update"],
+        UPLOAD_ARGUMENTS,
+        [*UPLOAD_ARGUMENTS, "-n", "Build notes", "-N", "missing-notes.txt"],
+        [
+            *UPLOAD_ARGUMENTS,
+            "--build-description",
+            "Build notes",
+            "--build-description-from-file",
+            "missing-notes.txt",
+        ],
+    ],
+)
+def test_commands_reportunimplemented(arguments: list[str]) -> None:
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 1
+    assert result.stdout == ""
+    assert f"{arguments[0]} is not implemented yet in pacev2." in result.stderr
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["git", "pull", "--help"],
+        ["git", "checkout", "main", "-h"],
+        ["demo", "columns", "missing-directory", "--help"],
+        ["demo", "progress_bar", "-h"],
+    ],
+)
+def test_forwardedhelp_preserveslegacyscope(arguments: list[str]) -> None:
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 0
+    assert "Usage:" in result.output
+    assert "not implemented" not in result.output
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["--debug"],
+        ["-C", "missing-config.toml"],
+        ["--config", "missing-config.toml"],
+        ["--print-config"],
+        ["--print-config-path"],
+        ["-v"],
+        ["--version"],
+        ["--from", "FirstRepo"],
+        ["--to", "LastRepo"],
+        [
+            "--debug",
+            "-C",
+            "missing-config.toml",
+            "--print-config",
+            "--print-config-path",
+            "--from",
+            "FirstRepo",
+            "--to",
+            "LastRepo",
+        ],
+    ],
+)
+@pytest.mark.parametrize(
+    ("command", "feature"), [([], "Global option handling"), (["clean"], "clean")]
+)
+def test_globaloptions_remainstubs(
+    arguments: list[str], command: list[str], feature: str
+) -> None:
+    result = runner.invoke(app, [*arguments, *command])
+
+    assert result.exit_code == 1
+    assert f"{feature} is not implemented yet in pacev2." in result.stderr
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "app.msix",
+        "--username",
+        "--app-name",
+        "--platform",
+        "--release-type",
+        "--version",
+        "--endpoint",
+    ],
+)
+def test_upload_requiresmetadata(missing: str) -> None:
+    arguments = UPLOAD_ARGUMENTS.copy()
+    index = arguments.index(missing)
+    del arguments[index : index + (2 if missing.startswith("--") else 1)]
+
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 2
+    assert "Missing" in result.output
+    assert "not implemented" not in result.output
+
+
+@pytest.mark.parametrize("global_flag", ["-v", "--version"])
+@pytest.mark.parametrize("include_upload_version", [True, False])
+def test_versionflags_keepscopes(
+    global_flag: str, include_upload_version: bool
+) -> None:
+    arguments = [global_flag, *UPLOAD_ARGUMENTS]
+    if not include_upload_version:
+        index = arguments.index("--version", 2)
+        del arguments[index : index + 2]
+
+    result = runner.invoke(app, arguments)
+
+    if include_upload_version:
+        assert result.exit_code == 1
+        assert "upload is not implemented yet in pacev2." in result.stderr
+    else:
+        assert result.exit_code == 2
+        assert "Missing option" in result.output
+
+
+@pytest.mark.parametrize("platform", ["iOS", "Android", "Windows"])
+@pytest.mark.parametrize("release_type", ["Debug", "Release"])
+def test_upload_acceptslegacychoices(platform: str, release_type: str) -> None:
+    arguments = UPLOAD_ARGUMENTS.copy()
+    arguments[arguments.index("--platform") + 1] = platform
+    arguments[arguments.index("--release-type") + 1] = release_type
+
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 1
+    assert "upload is not implemented yet in pacev2." in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("option", "value"),
+    [
+        ("--platform", "Linux"),
+        ("--platform", "ios"),
+        ("--release-type", "debug"),
+        ("--release-type", "Production"),
+    ],
+)
+def test_upload_rejectsinvalidchoices(option: str, value: str) -> None:
+    arguments = UPLOAD_ARGUMENTS.copy()
+    arguments[arguments.index(option) + 1] = value
+
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 2
+    assert "Invalid value" in result.output
+    assert "not implemented" not in result.output
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["unknown-command"],
+        ["--unknown-option"],
+        ["clean", "--unknown-option"],
+        ["demo"],
+        ["demo", "unknown-demo"],
+    ],
+)
+def test_invalidarguments_showusageerror(arguments: list[str]) -> None:
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 2
+    assert "Usage:" in result.output
+    assert "not implemented" not in result.output
+
+
+@pytest.mark.parametrize(
+    ("arguments", "expected", "summarize"),
+    [
+        ([], [], False),
+        (["--info"], ["--info"], False),
+        (
+            ["-w", "build", "-c", "Release", "--no-restore"],
+            ["build", "-c", "Release", "--no-restore"],
+            True,
+        ),
+        (["--summarize-warnings", "test"], ["test"], True),
+        (["build", "-w", "--help"], ["build", "-w", "--help"], False),
+        (["--", "--version"], ["--version"], False),
+    ],
+)
+def test_dotnet_preservesarguments(
+    arguments: list[str], expected: list[str], summarize: bool
+) -> None:
+    command = get_command(app)
+    assert isinstance(command, TyperGroup)
+
+    with command.commands["dotnet"].make_context("dotnet", arguments.copy()) as ctx:
+        assert list(ctx.params["dotnet_args"]) == expected
+        assert ctx.params["summarize_warnings"] is summarize
+
+
+@pytest.mark.parametrize(
+    ("name", "arguments", "argument_name", "expected"),
+    [
+        ("git", ["--version"], "git_args", ["--version"]),
+        (
+            "git",
+            ["checkout", "feature-branch", "--no-track"],
+            "git_args",
+            ["checkout", "feature-branch", "--no-track"],
+        ),
+        (
+            "demo",
+            ["columns", "directory with spaces", "--extra-flag"],
+            "demo_args",
+            ["directory with spaces", "--extra-flag"],
+        ),
+    ],
+)
+def test_passthrough_preservesarguments(
+    name: str, arguments: list[str], argument_name: str, expected: list[str]
+) -> None:
+    command = get_command(app)
+    assert isinstance(command, TyperGroup)
+
+    with command.commands[name].make_context(name, arguments.copy()) as ctx:
+        assert list(ctx.params[argument_name]) == expected
