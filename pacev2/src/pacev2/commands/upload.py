@@ -48,15 +48,11 @@ def run(
     ],
     version: Annotated[
         str,
-        typer.Option(
-            "--version", metavar="<version>", help="Version number or identifier"
-        ),
+        typer.Option("--version", metavar="<version>", help="Version number or identifier"),
     ],
     endpoint: Annotated[
         str,
-        typer.Option(
-            "--endpoint", metavar="<url>", help="Base URL of the deployment server"
-        ),
+        typer.Option("--endpoint", metavar="<url>", help="Base URL of the deployment server"),
     ],
     build_description: Annotated[
         str | None,

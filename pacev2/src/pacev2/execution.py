@@ -42,9 +42,7 @@ class Task:
 class _Progress:
     status: TaskStatus = TaskStatus.QUEUED
     detail: str = ""
-    spinner: Spinner = field(
-        default_factory=lambda: Spinner("dots", text="Running", style="cyan")
-    )
+    spinner: Spinner = field(default_factory=lambda: Spinner("dots", text="Running", style="cyan"))
 
 
 def run_command(
@@ -108,8 +106,7 @@ def run_parallel(
         result.add_column("Latest output", ratio=1)
         with lock:
             finished = sum(
-                item.status not in {TaskStatus.QUEUED, TaskStatus.RUNNING}
-                for item in progress
+                item.status not in {TaskStatus.QUEUED, TaskStatus.RUNNING} for item in progress
             )
             result.caption = f"{finished}/{len(tasks)} finished"
             for task, item in zip(tasks, progress, strict=True):
@@ -160,8 +157,7 @@ def run_parallel(
             transient=True,
         ):
             futures = {
-                executor.submit(execute, index, task): index
-                for index, task in enumerate(tasks)
+                executor.submit(execute, index, task): index for index, task in enumerate(tasks)
             }
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
@@ -176,9 +172,7 @@ def run_parallel(
         if result.output.strip():
             console.rule(Text(task.name))
             console.print(Text.from_ansi(result.output.rstrip()), soft_wrap=True)
-    counts = {
-        status: sum(result.status == status for result in ordered) for status in colors
-    }
+    counts = {status: sum(result.status == status for result in ordered) for status in colors}
     console.print(
         f"{counts[TaskStatus.SUCCEEDED]} succeeded, "
         f"{counts[TaskStatus.FAILED]} failed, {counts[TaskStatus.SKIPPED]} skipped."

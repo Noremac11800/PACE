@@ -81,9 +81,7 @@ def test_roothelp_listsinterface(arguments: list[str]) -> None:
         ("update", ["Update pace-dotnet"]),
     ],
 )
-def test_commandhelp_listsinterface(
-    command: str, expected: list[str], help_flag: str
-) -> None:
+def test_commandhelp_listsinterface(command: str, expected: list[str], help_flag: str) -> None:
     result = runner.invoke(app, [command, help_flag])
 
     assert result.exit_code == 0
@@ -208,9 +206,7 @@ def test_upload_requiresmetadata(missing: str) -> None:
 
 @pytest.mark.parametrize("global_flag", ["-v", "--version"])
 @pytest.mark.parametrize("include_upload_version", [True, False])
-def test_versionflags_keepscopes(
-    global_flag: str, include_upload_version: bool
-) -> None:
+def test_versionflags_keepscopes(global_flag: str, include_upload_version: bool) -> None:
     arguments = [global_flag, *UPLOAD_ARGUMENTS]
     if not include_upload_version:
         index = arguments.index("--version", 2)

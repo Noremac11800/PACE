@@ -175,9 +175,7 @@ print('finished', flush=True)
         if line == "ready":
             acknowledgement.touch()
 
-    result = run_command(
-        [sys.executable, "-c", script, str(acknowledgement)], tmp_path, report
-    )
+    result = run_command([sys.executable, "-c", script, str(acknowledgement)], tmp_path, report)
 
     assert result.returncode == 0
     assert result.output == "ready\nfinished\n"

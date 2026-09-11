@@ -68,9 +68,7 @@ def _command_index(args: list[str]) -> int | None:
 
 
 def _is_checkout(path: Path) -> bool:
-    return (path / ".git").exists() or (
-        (path / "HEAD").is_file() and (path / "objects").is_dir()
-    )
+    return (path / ".git").exists() or ((path / "HEAD").is_file() and (path / "objects").is_dir())
 
 
 def _run_project(

@@ -1,0 +1,3 @@
+lint.ignore = [
+    "D103",   # missing docstring in public function
+]

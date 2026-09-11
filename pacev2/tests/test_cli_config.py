@@ -87,9 +87,7 @@ def test_both_print_options_share_selection(config_file: Path) -> None:
 def test_both_print_options_validate_filters(
     config_file: Path, print_option: str, filter_option: str
 ) -> None:
-    result = runner.invoke(
-        app, ["-C", str(config_file), filter_option, "missing", print_option]
-    )
+    result = runner.invoke(app, ["-C", str(config_file), filter_option, "missing", print_option])
 
     assert result.exit_code == 1
     assert result.stdout == ""
@@ -121,12 +119,8 @@ def test_config_selection_without_printing_is_remembered(config_file: Path) -> N
 
 
 @pytest.mark.parametrize("command", ["clean", "dotnet"])
-def test_prints_filtered_config_before_command_stub(
-    config_file: Path, command: str
-) -> None:
-    result = runner.invoke(
-        app, ["-C", str(config_file), "--to", "lib", "--print-config", command]
-    )
+def test_prints_filtered_config_before_command_stub(config_file: Path, command: str) -> None:
+    result = runner.invoke(app, ["-C", str(config_file), "--to", "lib", "--print-config", command])
 
     assert result.exit_code == 1
     assert [project["name"] for project in json.loads(result.stdout)["projects"]] == [
@@ -155,9 +149,7 @@ def test_filtered_config_is_available_in_context(config_file: Path) -> None:
 
 @pytest.mark.parametrize("arguments", [[], ["clean"], ["upload"], ["git"]])
 @pytest.mark.parametrize("help_flag", ["-h", "--help"])
-def test_help_never_loads_config(
-    arguments: list[str], help_flag: str, isolated_home: Path
-) -> None:
+def test_help_never_loads_config(arguments: list[str], help_flag: str, isolated_home: Path) -> None:
     with patch("pacev2._context.ConfigStore") as store:
         result = runner.invoke(
             app,
@@ -197,9 +189,7 @@ def test_update_bypasses_config(isolated_home: Path) -> None:
 
 @pytest.mark.parametrize("command", [[], ["clean"]])
 def test_explicit_missing_config_reports_error(command: list[str]) -> None:
-    result = runner.invoke(
-        app, ["--config", "missing.toml", "--print-config", *command]
-    )
+    result = runner.invoke(app, ["--config", "missing.toml", "--print-config", *command])
 
     assert result.exit_code == 1
     assert result.stdout == ""

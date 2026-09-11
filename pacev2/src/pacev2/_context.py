@@ -30,16 +30,12 @@ class ConfigOptions:
 def configure(ctx: typer.Context, *, required: bool = False) -> None:
     options = ctx.find_object(ConfigOptions)
     if options is None:
-        raise RuntimeError(
-            "Global configuration options are missing from the CLI context"
-        )
+        raise RuntimeError("Global configuration options are missing from the CLI context")
     if not required and not options.requested:
         return
 
     try:
-        path, config = ConfigStore().load(
-            options.path, options.from_repo, options.to_repo
-        )
+        path, config = ConfigStore().load(options.path, options.from_repo, options.to_repo)
     except (OSError, ValueError) as error:
         typer.echo(f"error: {error}", err=True)
         raise typer.Exit(code=1) from error

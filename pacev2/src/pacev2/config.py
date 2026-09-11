@@ -2,10 +2,11 @@
 
 import json
 import logging
-import tomllib
 from importlib.resources import files
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+
+import tomllib
 
 from pacev2.models import Config
 from pacev2.paths import normalize_path
@@ -54,9 +55,7 @@ class ConfigStore:
             path = self.resolve_path(value)
             return path, load_config(path)
 
-        last_active = (
-            settings.get(LAST_ACTIVE_CONFIG_KEY) if settings is not None else None
-        )
+        last_active = settings.get(LAST_ACTIVE_CONFIG_KEY) if settings is not None else None
         if isinstance(last_active, str):
             try:
                 path = self.resolve_path(last_active, use_cwd=False)
@@ -89,9 +88,7 @@ class ConfigStore:
             if not isinstance(loaded, dict):
                 raise TypeError("Settings must be a JSON object")
             last_active = loaded.get(LAST_ACTIVE_CONFIG_KEY)
-            if last_active is not None and (
-                not isinstance(last_active, str) or not last_active
-            ):
+            if last_active is not None and (not isinstance(last_active, str) or not last_active):
                 raise ValueError(f"{LAST_ACTIVE_CONFIG_KEY} must be a non-empty string")
             return loaded
         except FileNotFoundError:
@@ -126,9 +123,7 @@ class ConfigStore:
                 stream.write("\n")
             temporary_path.replace(self.settings_path)
         except OSError as error:
-            logger.warning(
-                "Could not save config history at '%s': %s", self.settings_path, error
-            )
+            logger.warning("Could not save config history at '%s': %s", self.settings_path, error)
         finally:
             if temporary_path is not None:
                 try:

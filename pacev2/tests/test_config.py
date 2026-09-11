@@ -44,14 +44,12 @@ def test_load_preserves_schema(config_file: Path, isolated_home: Path) -> None:
     ],
 )
 def test_model_normalizes_all_path_fields(value: str, expected: str) -> None:
-    config = Config.model_validate(
-        {
-            "repodir": value,
-            "nuget_cache_path": value,
-            "projects": [{"name": "app", "csproj_path": value}],
-            "build-props": [{"name": "Output", "datatype": "path", "default": value}],
-        }
-    )
+    config = Config.model_validate({
+        "repodir": value,
+        "nuget_cache_path": value,
+        "projects": [{"name": "app", "csproj_path": value}],
+        "build-props": [{"name": "Output", "datatype": "path", "default": value}],
+    })
 
     assert config.repodir == Path(expected)
     assert config.nuget_cache_path == Path(expected)
@@ -165,12 +163,8 @@ def test_model_rejects_invalid_configs(data: dict[str, object], message: str) ->
 
 
 def test_model_defaults_are_independent() -> None:
-    first = Config.model_validate(
-        {"projects": [{"name": "one", "csproj_path": "One.csproj"}]}
-    )
-    second = Config.model_validate(
-        {"projects": [{"name": "two", "csproj_path": "Two.csproj"}]}
-    )
+    first = Config.model_validate({"projects": [{"name": "one", "csproj_path": "One.csproj"}]})
+    second = Config.model_validate({"projects": [{"name": "two", "csproj_path": "Two.csproj"}]})
 
     first.projects[0].depends_on.append("later")
 
@@ -185,13 +179,9 @@ def test_first_use_creates_an_editable_template() -> None:
     path, config = store.load()
 
     assert path == store.configs_dir / "template.toml"
-    assert (
-        path.read_bytes() == files("pacev2.data").joinpath("template.toml").read_bytes()
-    )
+    assert path.read_bytes() == files("pacev2.data").joinpath("template.toml").read_bytes()
     assert config.projects[0].name == "my-class-lib"
-    assert json.loads(store.settings_path.read_text()) == {
-        "lastActiveConfig": "template.toml"
-    }
+    assert json.loads(store.settings_path.read_text()) == {"lastActiveConfig": "template.toml"}
     assert list(store.configs_dir.iterdir()) == [path]
 
 
@@ -223,9 +213,7 @@ def test_explicit_config_is_remembered_across_directories(
 
     assert path == remembered_path == config_file
     assert config == remembered_config
-    assert json.loads(store.settings_path.read_text())["lastActiveConfig"] == str(
-        config_file
-    )
+    assert json.loads(store.settings_path.read_text())["lastActiveConfig"] == str(config_file)
 
 
 def test_explicit_config_overrides_history(config_file: Path, tmp_path: Path) -> None:
@@ -252,9 +240,7 @@ def test_named_config_search_and_history(config_file: Path) -> None:
     assert store.load("named.toml")[0] == local
     local.unlink()
     assert store.load("named.toml")[0] == internal
-    assert (
-        json.loads(store.settings_path.read_text())["lastActiveConfig"] == "named.toml"
-    )
+    assert json.loads(store.settings_path.read_text())["lastActiveConfig"] == "named.toml"
 
     local.write_text("not a valid config", encoding="utf-8")
     assert ConfigStore().load()[0] == internal
@@ -314,9 +300,7 @@ def test_inaccessible_history_target_falls_back(
 
 
 @pytest.mark.parametrize("source", ["[broken", "projects = 42"])
-def test_invalid_config_does_not_replace_history(
-    config_file: Path, source: str
-) -> None:
+def test_invalid_config_does_not_replace_history(config_file: Path, source: str) -> None:
     store = ConfigStore()
     store.load(config_file)
     original_settings = store.settings_path.read_bytes()
@@ -360,9 +344,7 @@ def test_explicit_missing_config_never_falls_back() -> None:
     assert not store.directory.exists()
 
 
-@pytest.mark.parametrize(
-    "content", ["{broken", "[]", '{"lastActiveConfig": 42}', "\ufffd"]
-)
+@pytest.mark.parametrize("content", ["{broken", "[]", '{"lastActiveConfig": 42}', "\ufffd"])
 def test_bad_history_is_reported_and_preserved(
     content: str, caplog: pytest.LogCaptureFixture
 ) -> None:

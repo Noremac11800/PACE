@@ -45,9 +45,7 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def validate_dependencies(self) -> Self:
-        dependencies = {
-            project.name: set(project.depends_on) for project in self.projects
-        }
+        dependencies = {project.name: set(project.depends_on) for project in self.projects}
         if len(dependencies) != len(self.projects):
             raise ValueError("Project names must be unique")
         for name, required in dependencies.items():
@@ -62,16 +60,12 @@ class Config(BaseModel):
             raise ValueError("Project dependencies contain a cycle") from error
         return self
 
-    def filtered(
-        self, from_repo: str | None = None, to_repo: str | None = None
-    ) -> Self:
+    def filtered(self, from_repo: str | None = None, to_repo: str | None = None) -> Self:
         """Keep the inclusive dependency chain, preserving declaration order."""
         if from_repo is None and to_repo is None:
             return self
 
-        dependencies = {
-            project.name: set(project.depends_on) for project in self.projects
-        }
+        dependencies = {project.name: set(project.depends_on) for project in self.projects}
         for name in (from_repo, to_repo):
             if name is not None and name not in dependencies:
                 raise ValueError(f"Project '{name}' not found in configuration")
@@ -87,11 +81,7 @@ class Config(BaseModel):
             included &= _reachable(to_repo, dependencies)
 
         return self.model_copy(
-            update={
-                "projects": [
-                    project for project in self.projects if project.name in included
-                ]
-            }
+            update={"projects": [project for project in self.projects if project.name in included]}
         )
 
 

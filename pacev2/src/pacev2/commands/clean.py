@@ -18,10 +18,7 @@ def run(
         bool,
         typer.Option(
             "--custom-cache",
-            help=(
-                "Clean NuGet packages from the custom cache path configured "
-                "in nuget_cache_path"
-            ),
+            help=("Clean NuGet packages from the custom cache path configured in nuget_cache_path"),
         ),
     ] = False,
     project: Annotated[
