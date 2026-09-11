@@ -1,6 +1,10 @@
 """CLI contract tests that do not require configuration or external tools."""
 
+from pathlib import Path
+from unittest.mock import patch
+
 import pytest
+import tomllib
 from pacev2.cli import app
 from typer.core import TyperGroup
 from typer.main import get_command
@@ -31,7 +35,7 @@ def test_roothelp_listsinterface(arguments: list[str]) -> None:
     result = runner.invoke(app, arguments)
 
     assert result.exit_code == 0
-    for name in ("clean", "dotnet", "git", "upload", "demo", "update"):
+    for name in ("clean", "dotnet", "git", "upload", "update"):
         assert name in result.output
     for option in (
         "--debug",
@@ -73,7 +77,6 @@ def test_roothelp_listsinterface(arguments: list[str]) -> None:
                 "--build-description-from-file",
             ],
         ),
-        ("demo", ["columns", "progress_bar"]),
         ("update", ["Update pace-dotnet"]),
     ],
 )
@@ -103,8 +106,6 @@ def test_commandhelp_listsinterface(
         ["git", "clone"],
         ["git", "checkout", "main"],
         ["git", "status", "--short"],
-        ["demo", "columns", "missing-directory"],
-        ["demo", "progress_bar"],
         ["update"],
         UPLOAD_ARGUMENTS,
         [*UPLOAD_ARGUMENTS, "-n", "Build notes", "-N", "missing-notes.txt"],
@@ -130,8 +131,6 @@ def test_commands_reportunimplemented(arguments: list[str]) -> None:
     [
         ["git", "pull", "--help"],
         ["git", "checkout", "main", "-h"],
-        ["demo", "columns", "missing-directory", "--help"],
-        ["demo", "progress_bar", "-h"],
     ],
 )
 def test_forwardedhelp_preserveslegacyscope(arguments: list[str]) -> None:
@@ -150,8 +149,6 @@ def test_forwardedhelp_preserveslegacyscope(arguments: list[str]) -> None:
         ["--config", "missing-config.toml"],
         ["--print-config"],
         ["--print-config-path"],
-        ["-v"],
-        ["--version"],
         ["--from", "FirstRepo"],
         ["--to", "LastRepo"],
         [
@@ -177,6 +174,56 @@ def test_globaloptions_remainstubs(
 
     assert result.exit_code == 1
     assert f"{feature} is not implemented yet in pacev2." in result.stderr
+
+
+@pytest.mark.parametrize("flag", ["-v", "--version"])
+def test_version_matchesprojectversion(flag: str) -> None:
+    project_path = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    with project_path.open("rb") as project_file:
+        expected_version = tomllib.load(project_file)["project"]["version"]
+
+    result = runner.invoke(app, [flag])
+
+    assert result.exit_code == 0
+    assert result.stdout == f"pacev2 {expected_version}\n"
+    assert result.stderr == ""
+
+
+@pytest.mark.parametrize("flag", ["-v", "--version"])
+@pytest.mark.parametrize(
+    "other_options",
+    [
+        [],
+        [
+            "--debug",
+            "-C",
+            "missing-config.toml",
+            "--print-config",
+            "--print-config-path",
+            "--from",
+            "FirstRepo",
+            "--to",
+            "LastRepo",
+        ],
+    ],
+)
+def test_version_readsinstalledmetadata(flag: str, other_options: list[str]) -> None:
+    with patch("pacev2.cli.get_version", return_value="2.3.4rc1") as get_version:
+        result = runner.invoke(app, [*other_options, flag])
+
+    get_version.assert_called_once_with("pacev2")
+    assert result.exit_code == 0
+    assert result.stdout == "pacev2 2.3.4rc1\n"
+    assert result.stderr == ""
+
+
+@pytest.mark.parametrize("flag", ["-v", "--version"])
+def test_version_withcommand_preservescommand(flag: str) -> None:
+    result = runner.invoke(app, [flag, "clean"])
+
+    assert result.exit_code == 1
+    assert result.stdout == ""
+    assert "clean is not implemented yet in pacev2." in result.stderr
 
 
 @pytest.mark.parametrize(
@@ -262,8 +309,7 @@ def test_upload_rejectsinvalidchoices(option: str, value: str) -> None:
         ["unknown-command"],
         ["--unknown-option"],
         ["clean", "--unknown-option"],
-        ["demo"],
-        ["demo", "unknown-demo"],
+        ["update"],
     ],
 )
 def test_invalidarguments_showusageerror(arguments: list[str]) -> None:
@@ -309,12 +355,6 @@ def test_dotnet_preservesarguments(
             ["checkout", "feature-branch", "--no-track"],
             "git_args",
             ["checkout", "feature-branch", "--no-track"],
-        ),
-        (
-            "demo",
-            ["columns", "directory with spaces", "--extra-flag"],
-            "demo_args",
-            ["directory with spaces", "--extra-flag"],
         ),
     ],
 )

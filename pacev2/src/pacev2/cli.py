@@ -1,5 +1,6 @@
 """Typer entry point mirroring the public PACE command-line interface."""
 
+from importlib.metadata import version as get_version
 from pathlib import Path
 from typing import Annotated
 
@@ -76,12 +77,15 @@ def options(
     if ctx.invoked_subcommand is not None:
         return
 
+    if version:
+        typer.echo(f"pacev2 {get_version('pacev2')}")
+        raise typer.Exit()
+
     if (
         debug
         or config is not None
         or print_config
         or print_config_path
-        or version
         or from_repo is not None
         or to_repo is not None
     ):
@@ -90,15 +94,13 @@ def options(
     typer.echo(ctx.get_help())
 
 
-_PASSTHROUGH_SETTINGS = {"ignore_unknown_options": True}
-
 app.command("clean")(clean.run)
 # Dotnet stops parsing PACE options at its first argument, as with argparse.REMAINDER.
 app.command(
     "dotnet",
-    context_settings={**_PASSTHROUGH_SETTINGS, "allow_interspersed_args": False},
+    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
 )(dotnet.run)
-app.command("git", context_settings=_PASSTHROUGH_SETTINGS)(git.run)
+app.command("git", context_settings={"ignore_unknown_options": True})(git.run)
 app.command("upload")(upload.run)
 app.command("update")(update.run)
 

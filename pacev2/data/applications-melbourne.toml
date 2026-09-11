@@ -1,0 +1,205 @@
+repodir = "C:\\Applications\\Melbourne"
+
+nuget_cache_path = "C:\\Users\\cam13469\\nuget-packages"
+
+[[projects]]
+name = "toolkit-msbuild"
+csproj_path = "src/Esri.Toolkit.MSBuild/Esri.Toolkit.MSBuild.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-msbuild.git"
+sln_group = "Toolkits"
+depends_on = []
+
+[[projects]]
+name = "toolkit-versioning"
+csproj_path = "src/Esri.Toolkit.Versioning/Esri.Toolkit.Versioning.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-versioning.git"
+sln_group = "Toolkits"
+depends_on = []
+
+[[projects]]
+name = "toolkit-maui-appconfig"
+csproj_path = "src/Esri.Toolkit.Maui.AppConfig/Esri.Toolkit.Maui.AppConfig.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-appconfig.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-core"
+csproj_path = "src/Esri.Toolkit.Core/Esri.Toolkit.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-core.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-maui-calcite"
+csproj_path = "src/Esri.Toolkit.Maui.Calcite/Esri.Toolkit.Maui.Calcite.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-calcite.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-maui-mvvm"
+csproj_path = "src/Esri.Toolkit.Maui.Mvvm/Esri.Toolkit.Maui.Mvvm.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-mvvm.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-maui-core"
+csproj_path = "src/Esri.Toolkit.Maui.Core/Esri.Toolkit.Maui.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-core.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-data"
+csproj_path = "src/Esri.Toolkit.Data/Esri.Toolkit.Data.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-data.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-versioning", "toolkit-msbuild"]
+
+[[projects]]
+name = "toolkit-maui-media"
+csproj_path = "src/Esri.Toolkit.Maui.Media/Esri.Toolkit.Maui.Media.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-media.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-calcite", "toolkit-maui-mvvm", "toolkit-maui-core"]
+
+[[projects]]
+name = "toolkit-maui-sensors"
+csproj_path = "src/Esri.Toolkit.Maui.Sensors/Esri.Toolkit.Maui.Sensors.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-sensors.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-calcite", "toolkit-maui-mvvm", "toolkit-maui-core"]
+
+[[projects]]
+name = "toolkit-maui-devices"
+csproj_path = "src/Esri.Toolkit.Maui.Devices/Esri.Toolkit.Maui.Devices.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-devices.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-calcite", "toolkit-maui-mvvm", "toolkit-maui-core"]
+
+[[projects]]
+name = "toolkit-maui-controls"
+csproj_path = "src/Esri.Toolkit.Maui.Controls/Esri.Toolkit.Maui.Controls.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-controls.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-mvvm"]
+
+[[projects]]
+name = "toolkit-maui"
+csproj_path = "src/Esri.Toolkit.Maui/Esri.Toolkit.Maui.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-core", "toolkit-maui-media", "toolkit-maui-sensors", "toolkit-maui-devices", "toolkit-maui-controls"]
+
+[[projects]]
+name = "toolkit-maui-localization"
+csproj_path = "src/Esri.Toolkit.Maui.Localization/Esri.Toolkit.Maui.Localization.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-localization.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-core"]
+
+[[projects]]
+name = "toolkit-maui-maps"
+csproj_path = "src/Esri.Toolkit.Maui.Maps/Esri.Toolkit.Maui.Maps.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/toolkit-maui-maps.git"
+sln_group = "Toolkits"
+depends_on = ["toolkit-maui-localization"]
+
+[[projects]]
+name = "appmodule-resources"
+csproj_path = "src/Esri.AppModule.Resources/Esri.AppModule.Resources.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-resources.git"
+sln_group = "AppModules"
+depends_on = ["toolkit-maui", "toolkit-maui-localization"]
+
+[[projects]]
+name = "appmodule-core"
+csproj_path = "src/Esri.AppModule.Core/Esri.AppModule.Core.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-core.git"
+sln_group = "AppModules"
+depends_on = ["toolkit-data", "toolkit-maui-maps", "appmodule-resources"]
+
+[[projects]]
+name = "appmodule-content"
+csproj_path = "src/Esri.AppModule.Content/Esri.AppModule.Content.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-content.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-core"]
+
+[[projects]]
+name = "appmodule-data"
+csproj_path = "src/Esri.AppModule.Data/Esri.AppModule.Data.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-data.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-core"]
+
+[[projects]]
+name = "appmodule-location"
+csproj_path = "src/Esri.AppModule.Location/Esri.AppModule.Location.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-location.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-core"]
+
+[[projects]]
+name = "appmodule-toolkit"
+csproj_path = "src/Esri.AppModule.Toolkit/Esri.AppModule.Toolkit.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-toolkit.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-content", "appmodule-data", "appmodule-location"]
+
+[[projects]]
+name = "appmodule-survey123"
+csproj_path = "src/Esri.AppModule.Survey123/Esri.AppModule.Survey123.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-survey123.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-toolkit"]
+
+[[projects]]
+name = "appmodule-quickcapture"
+csproj_path = "src/Esri.AppModule.QuickCapture/Esri.AppModule.QuickCapture.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/appmodule-quickcapture.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-toolkit"]
+
+[[projects]]
+name = "apps-sdk"
+csproj_path = "src/Esri.Apps.Sdk/Esri.Apps.Sdk.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/apps-sdk.git"
+sln_group = "AppModules"
+depends_on = ["appmodule-survey123", "appmodule-quickcapture"]
+
+[[projects]]
+name = "Survey123-Mobile"
+csproj_path = "src/Survey123.MobileApp/Survey123.MobileApp.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Mobile.git"
+sln_group = "Apps"
+depends_on = ["apps-sdk"]
+
+[[projects]]
+name = "Survey123-Studio"
+csproj_path = "src/Survey123.Studio/Survey123.Studio.csproj"
+repo_url = "git@devtopia.esri.com:Melbourne/Survey123-Studio.git"
+sln_group = "Apps"
+depends_on = ["apps-sdk"]
+
+[["build-props"]]
+name = "DevSolution"
+datatype = "boolean"
+default = false
+
+[["build-props"]]
+name = "AllSolution"
+datatype = "boolean"
+default = false
+
+[["build-props"]]
+name = "GeneratePackageOnBuild"
+datatype = "boolean"
+default = false
+
+[["build-props"]]
+name = "PackageOutputPath"
+datatype = "path"
+default = ""

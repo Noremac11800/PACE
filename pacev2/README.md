@@ -11,15 +11,21 @@ From the repository root:
 ```powershell
 Set-Location pacev2
 uv run pacev2 --help
+uv run pacev2 --version
 uv run pacev2 clean --help
 uv run python -m pacev2 --help
 ```
 
-No arguments, `-h`, and `--help` display help. Commands and global options are
-placeholders: they report **not implemented** and exit with code 1. Typer validates
+No arguments, `-h`, and `--help` display help. With no subcommand, `-v` and
+`--version` print `pacev2 <version>` and exit successfully. The version comes from
+installed package metadata generated from `project.version` in `pyproject.toml`,
+with no network requests or configuration loading.
+
+Commands and other global options are placeholders: they report **not implemented**
+and exit with code 1. Typer validates
 argument types, required values, and choices, but nothing loads configuration,
 reads build notes, deletes files, runs external commands, contacts servers, checks
-versions, or installs updates. In particular, `--version` is also a placeholder.
+for newer versions, or installs updates.
 
 ## CLI parity
 

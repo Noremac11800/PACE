@@ -1,0 +1,9 @@
+repodir = "/Applications/Pace"
+nuget_cache_path = "~/nuget-packages"
+
+[[projects]]
+name = "my-class-lib"
+csproj_path = "MyLib.csproj"
+repo_url = ""
+sln_group = "Classlibs"
+depends_on = []
