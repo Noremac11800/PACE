@@ -1,0 +1,126 @@
+"""Desktop adapter; validation and active-config history belong to pacev2."""
+
+import json
+import logging
+import os
+import subprocess
+import sys
+import tempfile
+import tomllib
+from importlib.metadata import version
+from pathlib import Path
+
+from pacev2.config import ConfigStore
+from pacev2.models import Config
+
+
+def workspace(path: str | None = None) -> dict:
+    store = ConfigStore()
+    source, config = store.load(path)
+    configs = sorted(store.configs_dir.glob("*.toml"))
+    if source not in configs:
+        configs.append(source)
+    return {
+        "path": str(source),
+        "content": source.read_text(encoding="utf-8"),
+        "config": config.model_dump(mode="json"),
+        "configs": [{"path": str(item), "name": item.stem} for item in configs],
+        "repoRoot": str(config.repodir.resolve()),
+        "version": version("pacev2"),
+    }
+
+
+def save_config(request: dict) -> dict:
+    path = Path(request["path"]).expanduser().resolve()
+    content = request["content"]
+    if path.suffix.lower() != ".toml":
+        raise ValueError("Configuration files must use the .toml extension.")
+    Config.model_validate(tomllib.loads(content))
+    expected = request.get("expected")
+    if expected is None:
+        # Save a copy never overwrites an existing file.
+        with path.open("x", encoding="utf-8") as stream:
+            stream.write(content)
+    else:
+        if path.read_text(encoding="utf-8") != expected:
+            raise ValueError(
+                "This file changed on disk. Reload it before saving to avoid losing changes."
+            )
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=path.parent, delete=False
+            ) as stream:
+                temporary = Path(stream.name)
+                stream.write(content)
+            temporary.chmod(path.stat().st_mode)
+            temporary.replace(path)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+    return workspace(str(path))
+
+
+def diagnostics() -> list[dict]:
+    results = [
+        {"name": "Python", "version": sys.version.split()[0], "available": True},
+        {"name": "pacev2", "version": version("pacev2"), "available": True},
+    ]
+    for name, executable in [("Git", "git"), (".NET SDK", "dotnet")]:
+        try:
+            result = subprocess.run(
+                [executable, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                stdin=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            )
+            results.append(
+                {
+                    "name": name,
+                    "available": result.returncode == 0,
+                    "version": (result.stdout or result.stderr).strip()
+                    or f"Exit code {result.returncode}",
+                }
+            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            results.append({"name": name, "available": False, "version": str(error)})
+    return results
+
+
+def dispatch(request: dict):
+    action = request["action"]
+    if action == "workspace":
+        return workspace(request.get("path"))
+    if action == "save":
+        return save_config(request)
+    if action == "validate":
+        config = Config.model_validate(tomllib.loads(request["content"]))
+        return config.model_dump(mode="json")
+    if action == "verify":
+        if Path(request["path"]).read_text(encoding="utf-8") != request["expected"]:
+            raise ValueError(
+                "The configuration changed on disk. Reload it before running a command."
+            )
+        return True
+    if action == "filter":
+        config = Config.model_validate(request["config"])
+        return [
+            project.name
+            for project in config.filtered(
+                request.get("from"), request.get("to")
+            ).projects
+        ]
+    if action == "diagnostics":
+        return diagnostics()
+    raise ValueError(f"Unknown desktop request: {action}")
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.WARNING, format="%(message)s")
+    try:
+        print(json.dumps(dispatch(json.load(sys.stdin))))
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(str(error), file=sys.stderr)
+        sys.exit(1)

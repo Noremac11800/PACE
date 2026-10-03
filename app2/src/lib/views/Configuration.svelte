@@ -1,0 +1,172 @@
+<script lang="ts">
+    import { app } from "$lib/state/app.svelte";
+    import PageHeader from "$lib/components/PageHeader.svelte";
+    import Button from "$lib/components/ui/Button.svelte";
+    import Chip from "$lib/components/ui/Chip.svelte";
+    import Tabs from "$lib/components/ui/Tabs.svelte";
+    import Icon from "$lib/components/ui/Icon.svelte";
+    let tab = $state("source");
+</script>
+
+<PageHeader
+    title="Configuration"
+    description="Edit the TOML source directly. Validation uses pacev2's models, including dependency and schema checks."
+>
+    {#snippet actions()}
+        <Button
+            scale="s"
+            kind="neutral"
+            appearance="outline-fill"
+            iconStart="copy"
+            disabled={app.locked}
+            onclick={() => app.save(true)}>Save a copy</Button
+        >
+        <Button
+            scale="s"
+            iconStart="save"
+            disabled={app.locked || !app.dirty}
+            onclick={() => app.save()}>Save changes</Button
+        >
+    {/snippet}
+</PageHeader>
+<section class="panel overflow-hidden">
+    <div class="panel-heading">
+        <div class="flex min-w-0 items-center gap-3">
+            <Icon name="file-code" class="shrink-0 text-brand" />
+            <div class="min-w-0">
+                <h2 class="text-title-small">{app.name}.toml</h2>
+                <p
+                    class="mt-1 truncate text-caption text-text-tertiary"
+                    title={app.workspace?.path}
+                >
+                    {app.workspace?.path}
+                </p>
+            </div>
+        </div>
+        <Chip
+            label={app.dirty ? "Unsaved changes" : "Saved"}
+            scale="s"
+            tone={app.dirty ? "yellow" : "green"}
+        />
+    </div>
+    <div class="px-5">
+        <Tabs
+            label="Configuration views"
+            bind:value={tab}
+            appearance="scrollable"
+            tabs={[
+                { value: "source", label: "TOML source" },
+                { value: "properties", label: "Build properties" },
+                { value: "paths", label: "Workspace paths" },
+            ]}
+        >
+            {#snippet panel(value)}
+                {#if value === "source"}
+                    <label class="sr-only" for="config-source"
+                        >TOML configuration source</label
+                    >
+                    <textarea
+                        id="config-source"
+                        class="mono min-h-96 w-full resize-y rounded-[2px] border border-border-input bg-foreground-secondary p-4 text-body-small leading-relaxed text-text-primary outline-offset-2"
+                        spellcheck="false"
+                        autocapitalize="off"
+                        autocomplete="off"
+                        bind:value={app.draft}
+                        disabled={app.locked}></textarea>
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-3 py-4"
+                    >
+                        <p class="text-caption text-text-tertiary">
+                            Comments and formatting are preserved. Invalid
+                            changes are never saved.
+                        </p>
+                        <div class="flex gap-2">
+                            <Button
+                                scale="s"
+                                kind="neutral"
+                                appearance="transparent"
+                                iconStart="refresh"
+                                disabled={app.locked}
+                                onclick={() => app.load(app.workspace?.path)}
+                                >Reload from disk</Button
+                            ><Button
+                                scale="s"
+                                kind="neutral"
+                                appearance="outline-fill"
+                                iconStart="check-circle"
+                                disabled={app.locked}
+                                onclick={() => app.validate()}>Validate</Button
+                            >
+                        </div>
+                    </div>
+                {:else if value === "properties"}
+                    <p
+                        class="mb-4 text-body-small leading-relaxed text-text-secondary"
+                    >
+                        Properties from the saved configuration. Edit <code
+                            >[[build-props]]</code
+                        > in the TOML source to change them. Building and writing
+                        Directory.Build.props are not yet implemented in pacev2.
+                    </p>
+                    <table class="mb-5 w-full">
+                        <thead class="table-head"
+                            ><tr
+                                ><th class="px-4 py-3">Property</th><th
+                                    class="px-4 py-3">Type</th
+                                ><th class="px-4 py-3">Default value</th></tr
+                            ></thead
+                        ><tbody>
+                            {#each app.workspace?.config.build_props ?? [] as property}
+                                <tr
+                                    ><td class="table-cell mono"
+                                        >{property.name}</td
+                                    ><td class="table-cell"
+                                        ><Chip
+                                            label={property.datatype}
+                                            scale="s"
+                                            appearance="none"
+                                        /></td
+                                    ><td class="table-cell mono break-all"
+                                        >{String(property.default) ||
+                                            "(empty)"}</td
+                                    ></tr
+                                >
+                            {:else}<tr
+                                    ><td
+                                        colspan="3"
+                                        class="p-6 text-center text-body-small text-text-tertiary"
+                                        >No build properties configured.</td
+                                    ></tr
+                                >{/each}
+                        </tbody>
+                    </table>
+                {:else}
+                    <dl class="space-y-6 pb-6">
+                        {#each [{ label: "Repository directory", value: app.workspace?.config.repodir }, { label: "Resolved repository directory", value: app.workspace?.repoRoot }, { label: "Custom NuGet cache", value: app.workspace?.config.nuget_cache_path || "Not configured" }, { label: "CLI working directory", value: app.options.directory }] as path}
+                            <div>
+                                <dt class="eyebrow mb-2">{path.label}</dt>
+                                <dd
+                                    class="mono break-all text-body-small leading-relaxed"
+                                >
+                                    {path.value}
+                                </dd>
+                            </div>
+                        {/each}
+                    </dl>
+                {/if}
+            {/snippet}
+        </Tabs>
+    </div>
+</section>
+<div
+    class="mt-5 flex items-start gap-3 text-body-small leading-relaxed text-text-secondary"
+>
+    <Icon name="information" size={18} class="mt-0.5 text-status-info" />
+    <p>
+        PACE shares configuration history with the CLI in <code
+            >~/.pace/settings.json</code
+        >. Opening a file makes it the active configuration for both. Older
+        PACE-only fields must be removed or migrated to the pacev2 schema before
+        loading.
+    </p>
+</div>

@@ -1,0 +1,444 @@
+/*
+ * Survey123 design tokens
+ * Source: "Esri Melbourne R&D.pen" → Survey123 Light/Dark, Typography
+ *
+ * Three tiers:
+ *   1. Core primitives (--core-*)  Calcite palette steps. Never use these in components.
+ *   2. Semantic roles (--*-color)  What a colour is *for*, named 1:1 with the design
+ *                                  (BrandHoverColor → --brand-hover-color). One
+ *                                  declaration per role, light-dark(<light>, <dark>).
+ *   3. Tailwind theme (--color-*)  Maps roles to utilities: bg-brand, text-text-secondary,
+ *                                  border-border-input, hover:bg-brand-hover, …
+ *
+ * Theme selection follows `color-scheme`: the OS preference by default, or forced with
+ * data-theme="light" | "dark" on <html> or on any subtree (see layout.css).
+ */
+
+/* ── Tier 1: Calcite core primitives ─────────────────────────────────────── */
+
+:root {
+    /* color/neutral */
+    --core-blk-000: #ffffff;
+    --core-blk-005: #f8f8f8;
+    --core-blk-010: #f3f3f3;
+    --core-blk-020: #eaeaea;
+    --core-blk-030: #dfdfdf;
+    --core-blk-040: #d4d4d4;
+    --core-blk-050: #cacaca;
+    --core-blk-060: #bfbfbf;
+    --core-blk-090: #9f9f9f;
+    --core-blk-100: #949494;
+    --core-blk-130: #757575;
+    --core-blk-140: #6a6a6a;
+    --core-blk-160: #555555;
+    --core-blk-170: #4a4a4a;
+    --core-blk-180: #404040;
+    --core-blk-190: #353535;
+    --core-blk-200: #2b2b2b;
+    --core-blk-210: #202020;
+    --core-blk-220: #151515;
+
+    /* color/opacity */
+    --core-blk-240-00: rgb(0 0 0 / 0);
+    --core-blk-240-04: rgb(0 0 0 / 0.04);
+    --core-blk-240-08: rgb(0 0 0 / 0.08);
+    --core-blk-240-30: rgb(0 0 0 / 0.3);
+    --core-blk-000-04: rgb(255 255 255 / 0.04);
+    --core-blk-000-08: rgb(255 255 255 / 0.08);
+    --core-blk-000-30: rgb(255 255 255 / 0.3);
+
+    /* color/high-saturation */
+    --core-h-gg-010: #bdf2c4;
+    --core-h-gg-060: #35ac46;
+    --core-h-gg-070: #288835;
+    --core-h-gg-080: #1a6324;
+    --core-h-gg-090: #0d3f14;
+    --core-h-bb-050: #2890ce;
+    --core-h-bb-070: #00619b;
+    --core-h-bb-080: #004874;
+    --core-h-bb-090: #00304d;
+    --core-h-yy-060: #edd317;
+    --core-h-yy-070: #d9bc00;
+    --core-h-yy-080: #bfa200;
+    --core-h-rr-060: #d83020;
+    --core-h-rr-070: #a82b1e;
+    --core-h-rr-080: #7c1d13;
+    --core-h-oo-060: #f36f20;
+    --core-h-gb-070: #009b98;
+
+    /* color/medium-saturation */
+    --core-m-bb-010: #dfeffa;
+    --core-m-bb-040: #9bccec;
+    --core-m-bb-090: #214155;
+    --core-m-gb-010: #dbf2f1;
+    --core-m-gb-040: #8be0df;
+    --core-m-gb-090: #2a5958;
+    --core-m-rr-010: #fadfdc;
+    --core-m-rr-090: #5e241e;
+    --core-m-yy-010: #faf7dc;
+    --core-m-yy-090: #584f1c;
+    --core-m-gg-010: #e4f0e4;
+    --core-m-gg-090: #2b472a;
+    --core-m-oo-040: #f5b590;
+
+    /* color/low-saturation */
+    --core-l-rr-010: #faf1f0;
+    --core-l-yy-010: #f7f5e6;
+
+    /* color/vibrant */
+    --core-v-gg-140: #3bed52;
+    --core-v-gg-160: #00b81b;
+    --core-v-bb-140: #3db8ff;
+    --core-v-bb-160: #009af2;
+    --core-v-yy-140: #ffee33;
+    --core-v-yy-160: #f5d000;
+    --core-v-rr-140: #ff0015;
+    --core-v-rr-160: #d90012;
+
+    /* color/dark */
+    --core-d-gg-420: #36da43;
+    --core-d-bb-420: #00a0ff;
+    --core-d-yy-420: #ffc900;
+    --core-d-rr-420: #fe583e;
+}
+
+/* ── Tier 2: semantic roles ──────────────────────────────────────────────────
+ * Declared on every theme scope, not just :root, so each [data-theme] subtree
+ * re-resolves light-dark() against its own color-scheme.
+ */
+
+:root,
+[data-theme] {
+    /* brand */
+    --brand-color: light-dark(var(--core-h-gg-070), var(--core-v-gg-160));
+    --brand-hover-color: light-dark(var(--core-h-gg-080), var(--core-h-gg-070));
+    --brand-press-color: light-dark(var(--core-h-gg-090), var(--core-h-gg-080));
+
+    /* background */
+    --background-color: light-dark(var(--core-blk-005), var(--core-blk-190));
+
+    /* foreground */
+    --foreground-primary-color: light-dark(
+        var(--core-blk-000),
+        var(--core-blk-200)
+    );
+    --foreground-secondary-color: light-dark(
+        var(--core-blk-010),
+        var(--core-blk-210)
+    );
+    --foreground-tertiary-color: light-dark(
+        var(--core-blk-020),
+        var(--core-blk-220)
+    );
+    --foreground-current-color: light-dark(
+        var(--core-h-gg-010),
+        var(--core-m-gg-090)
+    );
+
+    /* text */
+    --text-primary-color: light-dark(var(--core-blk-220), var(--core-blk-000));
+    --text-secondary-color: light-dark(
+        var(--core-blk-170),
+        var(--core-blk-060)
+    );
+    --text-tertiary-color: light-dark(var(--core-blk-140), var(--core-blk-090));
+    --text-inverse-color: light-dark(var(--core-blk-000), var(--core-blk-220));
+    --text-link-color: light-dark(var(--core-h-bb-070), var(--core-d-bb-420));
+    /* White in both themes, for text on fills that stay dark or saturated */
+    --text-white-color: var(--core-blk-000);
+
+    /* border */
+    --border-primary-color: light-dark(
+        var(--core-blk-050),
+        var(--core-blk-160)
+    );
+    --border-secondary-color: light-dark(
+        var(--core-blk-040),
+        var(--core-blk-170)
+    );
+    --border-tertiary-color: light-dark(
+        var(--core-blk-030),
+        var(--core-blk-180)
+    );
+    --border-input-color: light-dark(var(--core-blk-100), var(--core-blk-130));
+    --border-ghost-color: light-dark(
+        var(--core-blk-240-30),
+        var(--core-blk-000-30)
+    );
+    --border-white-color: light-dark(var(--core-blk-000), var(--core-blk-005));
+
+    /* status/info */
+    --status-info-color: light-dark(var(--core-h-bb-070), var(--core-d-bb-420));
+    --status-info-hover-color: light-dark(
+        var(--core-h-bb-080),
+        var(--core-v-bb-140)
+    );
+    --status-info-press-color: light-dark(
+        var(--core-h-bb-090),
+        var(--core-v-bb-160)
+    );
+
+    /* status/success */
+    --status-success-color: light-dark(
+        var(--core-h-gg-060),
+        var(--core-d-gg-420)
+    );
+    --status-success-hover-color: light-dark(
+        var(--core-h-gg-070),
+        var(--core-v-gg-140)
+    );
+    --status-success-press-color: light-dark(
+        var(--core-h-gg-080),
+        var(--core-v-gg-160)
+    );
+
+    /* status/warning */
+    --status-warning-color: light-dark(
+        var(--core-h-yy-060),
+        var(--core-d-yy-420)
+    );
+    --status-warning-hover-color: light-dark(
+        var(--core-h-yy-070),
+        var(--core-v-yy-140)
+    );
+    --status-warning-press-color: light-dark(
+        var(--core-h-yy-080),
+        var(--core-v-yy-160)
+    );
+
+    /* status/danger */
+    --status-danger-color: light-dark(
+        var(--core-h-rr-060),
+        var(--core-d-rr-420)
+    );
+    --status-danger-hover-color: light-dark(
+        var(--core-h-rr-070),
+        var(--core-v-rr-140)
+    );
+    --status-danger-press-color: light-dark(
+        var(--core-h-rr-080),
+        var(--core-v-rr-160)
+    );
+
+    /* inverse */
+    --inverse-color: light-dark(var(--core-blk-190), var(--core-blk-005));
+    --inverse-hover-color: light-dark(var(--core-blk-020), var(--core-blk-000));
+    --inverse-press-color: light-dark(var(--core-blk-210), var(--core-blk-010));
+
+    /* transparent */
+    --transparent-color: var(--core-blk-240-00);
+    --transparent-hover-color: light-dark(
+        var(--core-blk-240-04),
+        var(--core-blk-000-04)
+    );
+    --transparent-press-color: light-dark(
+        var(--core-blk-240-08),
+        var(--core-blk-000-08)
+    );
+    --transparent-scrim-color: var(--core-blk-240-30);
+
+    /* Avatar */
+    --avatar-blue-color: light-dark(var(--core-m-bb-010), var(--core-m-bb-090));
+    --avatar-teal-color: light-dark(var(--core-m-gb-010), var(--core-m-gb-090));
+    --avatar-red-color: light-dark(var(--core-m-rr-010), var(--core-m-rr-090));
+    --avatar-yellow-color: light-dark(
+        var(--core-m-yy-010),
+        var(--core-m-yy-090)
+    );
+    --avatar-green-color: light-dark(
+        var(--core-m-gg-010),
+        var(--core-m-gg-090)
+    );
+
+    /* Folders */
+    --inbox-blue-color: light-dark(var(--core-h-bb-050), var(--core-m-bb-040));
+    --draft-orange-color: light-dark(
+        var(--core-h-oo-060),
+        var(--core-m-oo-040)
+    );
+    --outbox-teal-color: light-dark(var(--core-h-gb-070), var(--core-m-gb-040));
+    --sent-grey-color: light-dark(var(--core-blk-140), var(--core-blk-040));
+
+    /* Required/Warning */
+    --required-background-color: light-dark(
+        var(--core-l-rr-010),
+        var(--core-m-rr-090)
+    );
+    --warning-background-color: light-dark(
+        var(--core-l-yy-010),
+        var(--core-m-yy-090)
+    );
+}
+
+/* ── Tier 3: Tailwind theme ──────────────────────────────────────────────── */
+
+@theme inline {
+    /* Only design-system colours and type styles are available as utilities. */
+    --color-*: initial;
+    --text-*: initial;
+
+    /* brand */
+    --color-brand: var(--brand-color);
+    --color-brand-hover: var(--brand-hover-color);
+    --color-brand-press: var(--brand-press-color);
+
+    /* background */
+    --color-background: var(--background-color);
+
+    /* foreground */
+    --color-foreground-primary: var(--foreground-primary-color);
+    --color-foreground-secondary: var(--foreground-secondary-color);
+    --color-foreground-tertiary: var(--foreground-tertiary-color);
+    --color-foreground-current: var(--foreground-current-color);
+
+    /* text */
+    --color-text-primary: var(--text-primary-color);
+    --color-text-secondary: var(--text-secondary-color);
+    --color-text-tertiary: var(--text-tertiary-color);
+    --color-text-inverse: var(--text-inverse-color);
+    --color-text-link: var(--text-link-color);
+    --color-text-white: var(--text-white-color);
+
+    /* border */
+    --color-border-primary: var(--border-primary-color);
+    --color-border-secondary: var(--border-secondary-color);
+    --color-border-tertiary: var(--border-tertiary-color);
+    --color-border-input: var(--border-input-color);
+    --color-border-ghost: var(--border-ghost-color);
+    --color-border-white: var(--border-white-color);
+
+    /* status/info */
+    --color-status-info: var(--status-info-color);
+    --color-status-info-hover: var(--status-info-hover-color);
+    --color-status-info-press: var(--status-info-press-color);
+
+    /* status/success */
+    --color-status-success: var(--status-success-color);
+    --color-status-success-hover: var(--status-success-hover-color);
+    --color-status-success-press: var(--status-success-press-color);
+
+    /* status/warning */
+    --color-status-warning: var(--status-warning-color);
+    --color-status-warning-hover: var(--status-warning-hover-color);
+    --color-status-warning-press: var(--status-warning-press-color);
+
+    /* status/danger */
+    --color-status-danger: var(--status-danger-color);
+    --color-status-danger-hover: var(--status-danger-hover-color);
+    --color-status-danger-press: var(--status-danger-press-color);
+
+    /* inverse */
+    --color-inverse: var(--inverse-color);
+    --color-inverse-hover: var(--inverse-hover-color);
+    --color-inverse-press: var(--inverse-press-color);
+
+    /* transparent */
+    --color-transparent: var(--transparent-color);
+    --color-transparent-hover: var(--transparent-hover-color);
+    --color-transparent-press: var(--transparent-press-color);
+    --color-transparent-scrim: var(--transparent-scrim-color);
+
+    /* Avatar */
+    --color-avatar-blue: var(--avatar-blue-color);
+    --color-avatar-teal: var(--avatar-teal-color);
+    --color-avatar-red: var(--avatar-red-color);
+    --color-avatar-yellow: var(--avatar-yellow-color);
+    --color-avatar-green: var(--avatar-green-color);
+
+    /* Folders */
+    --color-inbox-blue: var(--inbox-blue-color);
+    --color-draft-orange: var(--draft-orange-color);
+    --color-outbox-teal: var(--outbox-teal-color);
+    --color-sent-grey: var(--sent-grey-color);
+
+    /* Required/Warning */
+    --color-required-background: var(--required-background-color);
+    --color-warning-background: var(--warning-background-color);
+
+    /* ── Typography ──────────────────────────────────────────────────────────
+	 * Calcite fonts on the Material type scale. Each --text-* token sets size,
+	 * line height and weight together, so `text-title-medium` = TitleMediumStyle.
+	 * Avenir Next is bundled (see fonts.css): Regular and Medium come from Avenir
+	 * Next World, other weights and italics from Avenir Next LT Pro. System faces
+	 * only stand in for characters it doesn't cover.
+	 */
+    --font-sans:
+        "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+    /* Weights the bundled faces provide, as font-light … font-bold */
+    --font-weight-*: initial;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* DisplayLargeStyle · Regular 56/64 · Calcite size 8 */
+    --text-display-large: 3.5rem;
+    --text-display-large--line-height: 4rem;
+    --text-display-large--font-weight: 400;
+    /* DisplayMediumStyle · Regular 48/64 · Calcite size 6 */
+    --text-display-medium: 3rem;
+    --text-display-medium--line-height: 4rem;
+    --text-display-medium--font-weight: 400;
+    /* DisplaySmallStyle · Regular 40/48 · Calcite size 5 */
+    --text-display-small: 2.5rem;
+    --text-display-small--line-height: 3rem;
+    --text-display-small--font-weight: 400;
+
+    /* HeadlineLargeStyle · Regular 32/40 · Calcite size 4 */
+    --text-headline-large: 2rem;
+    --text-headline-large--line-height: 2.5rem;
+    --text-headline-large--font-weight: 400;
+    /* HeadlineMediumStyle · Regular 26/32 · Calcite size 3 */
+    --text-headline-medium: 1.625rem;
+    --text-headline-medium--line-height: 2rem;
+    --text-headline-medium--font-weight: 400;
+    /* HeadlineSmallStyle · Regular 24/28 */
+    --text-headline-small: 1.5rem;
+    --text-headline-small--line-height: 1.75rem;
+    --text-headline-small--font-weight: 400;
+
+    /* TitleLargeStyle · Regular 20/24 */
+    --text-title-large: 1.25rem;
+    --text-title-large--line-height: 1.5rem;
+    --text-title-large--font-weight: 400;
+    /* TitleMediumStyle · Medium 18/24 · Calcite size 1 */
+    --text-title-medium: 1.125rem;
+    --text-title-medium--line-height: 1.5rem;
+    --text-title-medium--font-weight: 500;
+    /* TitleSmallStyle · Medium 16/20 */
+    --text-title-small: 1rem;
+    --text-title-small--line-height: 1.25rem;
+    --text-title-small--font-weight: 500;
+
+    /* LabelLargeStyle · Medium 16/20 */
+    --text-label-large: 1rem;
+    --text-label-large--line-height: 1.25rem;
+    --text-label-large--font-weight: 500;
+    /* LabelMediumStyle · Medium 14/16 */
+    --text-label-medium: 0.875rem;
+    --text-label-medium--line-height: 1rem;
+    --text-label-medium--font-weight: 500;
+    /* LabelSmallStyle · Medium 12/16 */
+    --text-label-small: 0.75rem;
+    --text-label-small--line-height: 1rem;
+    --text-label-small--font-weight: 500;
+
+    /* BodyLargeStyle · Regular 18/24 */
+    --text-body-large: 1.125rem;
+    --text-body-large--line-height: 1.5rem;
+    --text-body-large--font-weight: 400;
+    /* BodyMediumStyle · Regular 16/20 */
+    --text-body-medium: 1rem;
+    --text-body-medium--line-height: 1.25rem;
+    --text-body-medium--font-weight: 400;
+    /* BodySmallStyle · Regular 14/16 */
+    --text-body-small: 0.875rem;
+    --text-body-small--line-height: 1rem;
+    --text-body-small--font-weight: 400;
+    /* Caption · Regular 12/16 */
+    --text-caption: 0.75rem;
+    --text-caption--line-height: 1rem;
+    --text-caption--font-weight: 400;
+}

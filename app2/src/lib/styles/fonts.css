@@ -1,0 +1,79 @@
+/*
+ * Avenir Next, bundled with the app so type renders the same on every platform.
+ *
+ * Two Esri-licensed families are combined into one "Avenir Next" family, so plain
+ * font-weight and font-style pick the right file:
+ *   - Avenir Next World sets the upright Regular (400) and Medium (500) that the
+ *     type scale uses. It covers far more scripts than LT Pro.
+ *   - Avenir Next LT Pro fills in Light (300), Demi (600), Bold (700) and every
+ *     italic, which World doesn't have. Its files label Demi and Bold as 700 and
+ *     800; they're declared here at the conventional 600 and 700, as Calcite does.
+ * Faces are only downloaded when text actually uses them.
+ */
+
+/* Avenir Next World */
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextWorld-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextWorld-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Avenir Next LT Pro */
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-LightIt.ttf") format("truetype");
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-It.ttf") format("truetype");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-Demi.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-DemiIt.ttf") format("truetype");
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Avenir Next";
+    src: url("../assets/fonts/AvenirNextLTPro-BoldIt.ttf") format("truetype");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}

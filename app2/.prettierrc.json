@@ -1,0 +1,8 @@
+{
+  "plugins": ["prettier-plugin-svelte"],
+  "tabWidth": 4,
+  "overrides": [
+    { "files": "*.svelte", "options": { "parser": "svelte" } },
+    { "files": ["*.json", "*.md"], "options": { "tabWidth": 2 } }
+  ]
+}
