@@ -1,7 +1,17 @@
 import * as api from "$lib/services/desktop";
 import { dotnetForm } from "./dotnet.svelte";
 import { defaultDotnetOptions } from "$lib/domain/dotnet";
-import { cleanOutput, commandPreview, scopedArgs } from "$lib/domain/commands";
+import {
+    cleanOutput,
+    commandPreview,
+    monitoredArgs,
+    scopedArgs,
+} from "$lib/domain/commands";
+import {
+    applyMonitorEvent,
+    closeMonitor,
+    newMonitorState,
+} from "$lib/domain/monitor";
 import type {
     Diagnostic,
     PaceConfig,
@@ -288,8 +298,13 @@ class App {
         }
         const allArgs =
             scoped && this.workspace
-                ? scopedArgs(this.workspace.path, this.from, this.to, args)
-                : args;
+                ? scopedArgs(
+                      this.workspace.path,
+                      this.from,
+                      this.to,
+                      monitoredArgs(args),
+                  )
+                : monitoredArgs(args);
         this.notice = null;
         const id = Date.now();
         this.runs.unshift({
@@ -302,6 +317,7 @@ class App {
             status: "running",
             output: "",
             truncated: false,
+            progress: newMonitorState(),
         });
         this.runs = this.runs.slice(0, 20);
         this.selectedRunId = id;
@@ -314,7 +330,7 @@ class App {
                     path: this.workspace.path,
                     expected: this.workspace.content,
                 });
-            run.code = await api.execute(
+            const result = await api.execute(
                 $state.snapshot(this.options),
                 allArgs,
                 (text) => {
@@ -322,7 +338,18 @@ class App {
                     if (output.length > OUTPUT_LIMIT) run.truncated = true;
                     run.output = output.slice(-OUTPUT_LIMIT);
                 },
+                (event) => applyMonitorEvent(run.progress, event),
             );
+            run.code = result.code;
+            if (result.monitorError) throw result.monitorError;
+            if (run.progress.active && !run.progress.finished)
+                throw new Error(
+                    "pacev2 ended without a monitor completion event. Review the output for errors.",
+                );
+            if (run.progress.finished && run.progress.returncode !== run.code)
+                throw new Error(
+                    "pacev2 monitor result does not match the process exit code.",
+                );
             run.status = run.code === 0 ? "succeeded" : "failed";
             if (run.code !== 0)
                 this.notify(
@@ -333,6 +360,7 @@ class App {
             run.output += `\n${error instanceof Error ? error.message : String(error)}\n`;
             this.error(error);
         } finally {
+            closeMonitor(run.progress);
             run.duration = Date.now() - run.started.getTime();
         }
     }

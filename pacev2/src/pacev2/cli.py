@@ -21,11 +21,15 @@ app = typer.Typer(
 
 
 @app.callback(invoke_without_command=True)
-def options(
+def options(  # noqa: PLR0913, PLR0917 - Typer declares each public global option as a parameter.
     ctx: typer.Context,
     debug: Annotated[
         bool,
         typer.Option("--debug", help="Enable debug mode with full tracebacks"),
+    ] = False,
+    monitor: Annotated[
+        bool,
+        typer.Option("--monitor", help="Emit JSON Lines progress from supported commands"),
     ] = False,
     config: Annotated[
         Path | None,
@@ -79,6 +83,7 @@ def options(
     ] = None,
 ) -> None:
     """Configure global CLI options before dispatching a command."""
+    ctx.meta["monitor"] = monitor
     if version and ctx.invoked_subcommand is None:
         typer.echo(f"pacev2 {get_version('pacev2')}")
         raise typer.Exit

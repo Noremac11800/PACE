@@ -2,6 +2,7 @@ import { Channel, invoke, isTauri } from "@tauri-apps/api/core";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import type { Environment, RuntimeOptions } from "$lib/domain/types";
+import { MonitorOutput, type MonitorEvent } from "$lib/domain/monitor";
 
 export const desktop = isTauri();
 
@@ -21,10 +22,17 @@ export async function execute(
     options: RuntimeOptions,
     args: string[],
     onOutput: (text: string) => void,
+    onEvent: (event: MonitorEvent) => void,
 ) {
     const output = new Channel<{ stream: string; text: string }>();
-    output.onmessage = (line) => onOutput(line.text + "\n");
-    return invoke<number>("run_pace", { options, args, output });
+    const decoder = new MonitorOutput(onOutput, onEvent);
+    output.onmessage = (line) => decoder.push(line.text + "\n", line.stream);
+    const code = await invoke<number>("run_pace", {
+        options,
+        args,
+        output,
+    }).finally(() => decoder.finish());
+    return { code, monitorError: decoder.error };
 }
 
 export const chooseConfig = () =>

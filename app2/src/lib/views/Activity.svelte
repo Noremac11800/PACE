@@ -3,6 +3,7 @@
     import { app } from "$lib/state/app.svelte";
     import { desktop } from "$lib/services/desktop";
     import PageHeader from "$lib/components/PageHeader.svelte";
+    import CommandProgress from "$lib/components/CommandProgress.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Chip from "$lib/components/ui/Chip.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
@@ -196,6 +197,9 @@
                 class="block break-all border-b border-border-tertiary bg-foreground-secondary px-5 py-4 text-caption leading-relaxed text-text-secondary"
                 >{run.command}</code
             >
+            {#if run.progress.projects.length}
+                <CommandProgress progress={run.progress} />
+            {/if}
             {#if run.truncated}<p
                     class="bg-warning-background px-5 py-2 text-caption"
                 >

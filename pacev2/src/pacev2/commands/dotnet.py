@@ -13,10 +13,12 @@ from rich.text import Text
 from typer.core import TyperCommand
 
 from pacev2._context import configure
+from pacev2.commands.dotnet_monitor import execute_monitored
 from pacev2.commands.dotnet_solution import sync_solution
 from pacev2.commands.dotnet_warnings import print_warning_summary
 from pacev2.execution import TaskResult, run_command
 from pacev2.models import Config, Project
+from pacev2.monitor import Monitor
 from pacev2.paths import project_directory
 
 if TYPE_CHECKING:
@@ -111,16 +113,21 @@ def _selected_projects(
     executable: str,
     args: list[str],
     console: Console,
+    monitor: Monitor | None = None,
 ) -> dict[Path, Project]:
     framework = _framework(args)
     properties = _evaluation_properties(args)
     selected: dict[Path, Project] = {}
     for project in config.projects:
         path = (project_directory(config.repodir, project.name) / project.csproj_path).resolve()
+        if monitor:
+            monitor.project(str(path), name=project.name, path=str(path))
         try:
             path.stat()
         except FileNotFoundError:
             console.print(f"Warning: project file not found: {path}", style="yellow", markup=False)
+            if monitor:
+                monitor.project(str(path), status="skipped", detail="Project file not found.")
             continue
         if not path.is_file():
             raise ValueError(f"Project path is not a file: {path}")
@@ -130,16 +137,25 @@ def _selected_projects(
                 style="yellow",
                 markup=False,
             )
+            if monitor:
+                monitor.project(str(path), status="skipped", detail=f"Does not target {framework}.")
             continue
         selected[path] = project
     return selected
 
 
-def _execute(executable: str, args: list[str], console: Console) -> TaskResult:
+def _execute(
+    executable: str,
+    args: list[str],
+    console: Console,
+    monitor: Monitor | None = None,
+) -> TaskResult:
     return run_command(
         [executable, *args],
         Path.cwd(),
-        lambda line: console.print(Text.from_ansi(line), soft_wrap=True),
+        monitor.log
+        if monitor
+        else lambda line: console.print(Text.from_ansi(line), soft_wrap=True),
     )
 
 
@@ -156,6 +172,7 @@ def _run_solution(
     console: Console,
     *,
     summarize_warnings: bool,
+    monitor: Monitor | None = None,
 ) -> TaskResult | None:
     configure(ctx, required=True)
     config = ctx.find_object(Config)
@@ -165,13 +182,24 @@ def _run_solution(
         console.print("No projects selected.", style="yellow")
         return None
     executable = _find_executable()
-    selected = _selected_projects(config, executable, args, console)
+    selected = _selected_projects(
+        config,
+        executable,
+        args,
+        console,
+        monitor if args[0] in {"build", "publish", "test"} else None,
+    )
     if not selected:
         raise ValueError("No existing projects match the selected configuration and framework.")
     solution = sync_solution(config, selected)
     console.print(f"Solution: {solution} ({len(selected)} projects)", markup=False)
     console.print(f"Running dotnet {args[0]} against PACE.slnx", markup=False)
-    result = _execute(executable, [args[0], str(solution), *args[1:]], console)
+    command = [args[0], str(solution), *args[1:]]
+    result = (
+        execute_monitored(executable, command, selected, monitor)
+        if monitor and args[0] in {"build", "publish", "test"}
+        else _execute(executable, command, console, monitor)
+    )
     if summarize_warnings:
         print_warning_summary(console, config, result.output)
     return result
@@ -200,7 +228,8 @@ def run(
         raise typer.BadParameter(
             "Provide a dotnet command, such as 'build' or 'test'.", param_hint="<dotnet-args>"
         )
-    console = Console()
+    monitor = Monitor(f"dotnet.{dotnet_args[0]}") if ctx.meta.get("monitor") else None
+    console = Console(stderr=monitor is not None)
     try:
         if dotnet_args[0] in {
             "--info",
@@ -209,16 +238,29 @@ def run(
             "--list-runtimes",
             "help",
         } or any(arg in {"--help", "-h", "-?"} for arg in dotnet_args):
-            result = _execute(_find_executable(), dotnet_args, console)
+            result = _execute(_find_executable(), dotnet_args, console, monitor)
         else:
             result = _run_solution(
                 ctx,
                 dotnet_args,
                 console,
                 summarize_warnings=summarize_warnings,
+                monitor=monitor,
             )
+    except typer.Exit as error:
+        if monitor:
+            monitor.finish(error.exit_code)
+        raise
     except (OSError, ValueError) as error:
-        typer.echo(f"error: {error}", err=True)
+        if monitor:
+            monitor.log(f"error: {error}")
+            monitor.finish(1)
+        else:
+            typer.echo(f"error: {error}", err=True)
         raise typer.Exit(code=1) from error
-    if result is not None and result.returncode:
-        raise typer.Exit(code=result.returncode if result.returncode > 0 else 1)
+    returncode = result.returncode if result and result.returncode else 0
+    returncode = max(returncode, 1) if returncode else 0
+    if monitor:
+        monitor.finish(returncode)
+    if returncode:
+        raise typer.Exit(code=returncode)

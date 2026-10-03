@@ -128,6 +128,83 @@ Use `pacev2 git -- --help` to forward a leading help flag to Git itself.
 `execution.py` supplies the reusable task runner and streaming subprocess helper;
 other project commands can reuse its reporting and failure aggregation.
 
+## Machine-readable progress
+
+Put the global `--monitor` option **before** the command:
+
+```sh
+pacev2 --monitor git status
+pacev2 -C workspace.toml --monitor dotnet build -c Release
+pacev2 --monitor dotnet publish
+pacev2 --monitor dotnet -w test --no-build
+```
+
+Git replaces its live table and repeated final output with **JSON Lines on
+stdout**, flushed after every event. Dotnet wraps its streamed logs in the same
+protocol; `build`, `publish`, and MSBuild-based `test` additionally report real
+project/stage progress, even with `--verbosity quiet`. Normal invocations are
+unchanged. Help, version, and commands that have not opted into monitoring retain
+their normal output. Leading configuration print flags write to stderr in monitor
+mode so they do not corrupt the event stream. Preparation messages, configuration
+warnings, and `-w` warning summaries also remain available on stderr.
+
+Every record has `protocol: "pace.monitor"`, `version: 1`, a consecutive
+`sequence` starting at 1, a UTC ISO-8601 `timestamp`, a `command` (such as `git` or
+`dotnet.build`), and an `event`:
+
+| Event | Additional fields |
+| --- | --- |
+| `start` | Begins one command's stream. |
+| `project` | Full snapshot: `id`, `name`, `path` (nullable), `status`, `detail`, `stages` (stage name to status). |
+| `log` | `text` (may contain embedded newlines), `project_id` (nullable). |
+| `finish` | `status`, `returncode`, and project `counts` for succeeded/failed/skipped/incomplete. |
+
+For example, a project snapshot is a single line:
+
+```json
+{"protocol":"pace.monitor","version":1,"sequence":8,"timestamp":"2026-10-04T00:00:00+00:00","command":"dotnet.build","event":"project","id":"/repos/app/App.csproj","name":"app","path":"/repos/app/App.csproj","status":"running","detail":"Build: succeeded","stages":{"compile":"succeeded","build":"succeeded"}}
+```
+
+Project statuses are `queued`, `running`, `succeeded`, `failed`, `skipped`, or
+`incomplete`. Consumers should replace a project's snapshot by `id`, rather than
+append duplicate rows. Git uses configured project names as IDs; .NET uses resolved
+project-file paths and discovers referenced projects outside the selected scope.
+Events from parallel workers are serialized; stdout and stderr ordering relative
+to each other is not guaranteed. Parse stdout one line at a time, preserve `log`
+events and stderr, and check the actual process exit code. An interrupted process
+may not emit `finish`; do not infer success from its last project event.
+
+The reusable `Monitor` in `monitor.py` provides `project()`, `log()`, and `finish()`;
+commands can opt in via `ctx.meta["monitor"]`. `run_parallel(..., monitor=...)`
+reuses the same project lifecycle for future parallel commands.
+
+### .NET stage semantics
+
+The bundled, read-only MSBuild logger observes `Restore`, `CoreCompile`, `Build`,
+`Publish`, and `VSTest` targets (reported as `restore`, `compile`, `build`, `publish`,
+and `test`). Only targets actually observed on a project appear. Solution-wide
+restore does not necessarily produce a per-project Restore target. A test-stage
+success means the MSBuild test target completed; it is **not** a test count and
+does not imply a library contained tests. The newer Microsoft.Testing.Platform
+CLI mode is not an MSBuild invocation and is not supported by this monitor.
+
+Stages update during execution. Multi-framework/repeated target instances are
+aggregated, failures are retained, and a project remains in progress until the
+command ends so an earlier framework's success cannot hide a later failure.
+Missing/framework-incompatible projects are skipped. A project without a matching
+command target is skipped on a successful run, or incomplete on an unsuccessful
+run; completed stages remain visible. There is deliberately no estimated
+percentage. MSBuild still owns the solution graph and runs it once; monitoring
+does not rewrite project files or run competing per-project builds.
+
+On first use per SDK/source version, PACE compiles the small bundled logger
+against the installed SDK's `Microsoft.Build.Framework` and caches it in
+`~/.pace/cache/msbuild-monitor`. This uses local framework references, without
+NuGet package dependencies or downloads. Compiler/cache errors are reported, not
+silently replaced with guessed progress. A private temporary event file is tailed
+alongside stdout and removed afterward. Monitor mode disables MSBuild's terminal
+logger; other forwarded arguments and exit codes are preserved.
+
 ## Solution-based dotnet commands
 
 PACE synchronizes `repodir/PACE.slnx` to the selected projects, then invokes
@@ -205,6 +282,7 @@ Global options precede the command:
 | Option | Value |
 | --- | --- |
 | `--debug` | Flag |
+| `--monitor` | Stream JSON Lines from supported commands |
 | `-C`, `--config` | Configuration file path |
 | `--print-config` | Flag |
 | `--print-config-path` | Flag |

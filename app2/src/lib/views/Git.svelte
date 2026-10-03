@@ -2,6 +2,7 @@
     import { app } from "$lib/state/app.svelte";
     import {
         commandPreview,
+        monitoredArgs,
         parseArguments,
         scopedArgs,
     } from "$lib/domain/commands";
@@ -17,10 +18,12 @@
     let preview = $derived.by(() => {
         try {
             return commandPreview(
-                scopedArgs(app.workspace?.path ?? "", app.from, app.to, [
-                    "git",
-                    ...parseArguments(custom),
-                ]),
+                scopedArgs(
+                    app.workspace?.path ?? "",
+                    app.from,
+                    app.to,
+                    monitoredArgs(["git", ...parseArguments(custom)]),
+                ),
             );
         } catch {
             return "Finish the quoted argument to preview this command.";

@@ -9,7 +9,11 @@
         supportsFramework,
         supportsNoRestore,
     } from "$lib/domain/dotnet";
-    import { commandPreview, scopedArgs } from "$lib/domain/commands";
+    import {
+        commandPreview,
+        monitoredArgs,
+        scopedArgs,
+    } from "$lib/domain/commands";
     import PageHeader from "$lib/components/PageHeader.svelte";
     import ScopeBar from "$lib/components/ScopeBar.svelte";
     import DotnetProperties from "$lib/components/DotnetProperties.svelte";
@@ -41,7 +45,7 @@
                       app.workspace?.path ?? "",
                       app.from,
                       app.to,
-                      command.args,
+                      monitoredArgs(command.args),
                   ),
               ),
     );

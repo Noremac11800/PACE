@@ -39,6 +39,7 @@ def test_roothelp_listsinterface(arguments: list[str]) -> None:
         assert name in result.output
     for option in (
         "--debug",
+        "--monitor",
         "-C",
         "--config",
         "--print-config",

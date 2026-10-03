@@ -62,6 +62,12 @@ export function scopedArgs(
     ];
 }
 
+export function monitoredArgs(args: string[]): string[] {
+    return args[0] === "git" || args[0] === "dotnet"
+        ? ["--monitor", ...args]
+        : args;
+}
+
 export function cleanOutput(text: string): string {
     return text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "").replace(/\r/g, "");
 }

@@ -1,7 +1,7 @@
 # PACE Desktop
 
 A desktop-only Tauri 2 / Svelte 5 app for `pacev2`, using the Survey123 design
-system. The original `app/` and the Python CLI are unchanged.
+system. The original `app/` is unchanged; this app uses the `pacev2` CLI.
 
 ## Development
 
@@ -45,6 +45,8 @@ bun run tauri build
   and custom commands with configuration/framework options and warning summaries.
 - Stream command output, inspect exit codes, copy results, and run CLI help,
   version, and configuration-printing commands.
+- Use `--monitor` automatically for Git and dotnet commands. Command activity
+  shows live per-project statuses and observed .NET stages above the readable log.
 - Switch between system, light, and dark themes; inspect runtime/tool versions.
 
 The separate PACE clean, upload, and update commands remain unimplemented. The
@@ -99,8 +101,26 @@ additional arguments require confirmation.
 Options survive navigation to Command activity and back during the session.
 Reset options restores defaults; changing the active config resets options and
 property overrides. Configuration edits must be saved before execution.
-The shared runner streams output and reports the actual exit code without
-inventing a build-progress percentage. Commands must finish before the app closes.
+The shared runner uses pacev2's versioned JSON Lines monitor protocol. Command
+activity shows queued/running/succeeded/failed/skipped/incomplete projects, plus
+observed restore, compile, build, publish, and test stages for build/publish/test.
+Stage counts update while the command runs, even at quiet verbosity. Referenced
+projects discovered by MSBuild appear too. Projects remain in progress until
+command completion because another framework or target can still fail. Stages
+describe MSBuild targets, not individual tests or a guessed percentage.
+
+Human-readable logs, stderr, warning summaries, and the actual process exit code
+remain available beneath the progress table; Copy output copies the readable log,
+not JSON envelopes. Progress survives log truncation and stays with each command
+in session history. Broken/unsupported event streams and unexpected process exits
+are reported explicitly; unfinished projects are marked incomplete.
+
+Use an updated pacev2 installation with `--monitor` support. The first monitored
+.NET build/publish/test compiles a small bundled MSBuild logger locally and caches
+it under `~/.pace/cache/msbuild-monitor`; no NuGet package downloads are needed.
+MSBuild-based `dotnet test` is supported, not the Microsoft.Testing.Platform CLI
+mode. Other dotnet tasks retain streamed logs without fabricated project stages.
+Commands must finish before the app closes.
 
 The selected range determines the direct members of `PACE.slnx`. MSBuild may
 also build project references outside that range; it owns dependency ordering

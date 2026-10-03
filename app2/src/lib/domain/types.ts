@@ -57,4 +57,6 @@ export interface Run {
     status: "running" | "succeeded" | "failed";
     output: string;
     truncated: boolean;
+    progress: MonitorState;
 }
+import type { MonitorState } from "./monitor";

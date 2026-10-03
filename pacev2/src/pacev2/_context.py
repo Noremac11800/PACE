@@ -45,6 +45,9 @@ def configure(ctx: typer.Context, *, required: bool = False) -> None:
     ctx.obj = config
     ctx.meta["config_path"] = path
     if options.print_config_path:
-        typer.echo(str(path))
+        typer.echo(str(path), err=ctx.meta.get("monitor", False))
     if options.print_config:
-        typer.echo(config.model_dump_json(indent=2, by_alias=True))
+        typer.echo(
+            config.model_dump_json(indent=2, by_alias=True),
+            err=ctx.meta.get("monitor", False),
+        )

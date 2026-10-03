@@ -22,6 +22,7 @@ from pacev2.execution import (
     run_parallel,
 )
 from pacev2.models import Config, Project
+from pacev2.monitor import Monitor
 from pacev2.paths import project_directory
 
 if TYPE_CHECKING:
@@ -163,6 +164,10 @@ def run(
         )
         for project in config.projects
     ]
-    results = run_parallel(tasks, Console(), title="Git")
-    if any(result.status == TaskStatus.FAILED for result in results):
+    monitor = Monitor("git") if ctx.meta.get("monitor") else None
+    results = run_parallel(tasks, Console(), title="Git", monitor=monitor)
+    failed = any(result.status == TaskStatus.FAILED for result in results)
+    if monitor:
+        monitor.finish(int(failed))
+    if failed:
         raise typer.Exit(code=1)

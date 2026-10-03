@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import {
     mkdtempSync,
     mkdirSync,
@@ -58,12 +58,14 @@ test.beforeEach(async ({ page }) => {
         TERM: "dumb",
         DOTNET_CLI_HOME: directory,
         DOTNET_NOLOGO: "1",
+        DOTNET_GENERATE_ASPNET_CERTIFICATE: "false",
+        DOTNET_CLI_TELEMETRY_OPTOUT: "1",
     };
 
     // Only the native IPC transport is replaced. Commands use real pacev2.
     await page.exposeFunction(
         "testInvoke",
-        (command: string, payload: Record<string, unknown>) => {
+        async (command: string, payload: Record<string, unknown>) => {
             if (command === "environment")
                 return { python, directory, appVersion: "0.1.0" };
             if (command === "bridge") {
@@ -86,16 +88,58 @@ test.beforeEach(async ({ page }) => {
             }
             if (command === "run_pace") {
                 const args = payload.args as string[];
-                const result = spawnSync(python, ["-m", "pacev2", ...args], {
-                    encoding: "utf8",
-                    cwd: directory,
-                    env,
+                return new Promise((resolve, reject) => {
+                    const child = spawn(
+                        python,
+                        ["-u", "-m", "pacev2", ...args],
+                        {
+                            cwd: directory,
+                            env,
+                            stdio: ["ignore", "pipe", "pipe"],
+                        },
+                    );
+                    let index = 0;
+                    let delivery = Promise.resolve();
+                    const send = (stream: string, text: string) => {
+                        const message = {
+                            channelId: Number(payload.outputId),
+                            index: index++,
+                            stream,
+                            text,
+                        };
+                        delivery = delivery.then(() =>
+                            page.evaluate((message) => {
+                                const deliver = Reflect.get(
+                                    window,
+                                    "deliverTestOutput",
+                                ) as (message: unknown) => void;
+                                deliver(message);
+                            }, message),
+                        );
+                    };
+                    for (const [stream, reader] of [
+                        ["stdout", child.stdout],
+                        ["stderr", child.stderr],
+                    ] as const) {
+                        reader.setEncoding("utf8");
+                        let pending = "";
+                        reader.on("data", (chunk: string) => {
+                            const lines = (pending + chunk).split("\n");
+                            pending = lines.pop() ?? "";
+                            for (const line of lines) send(stream, line);
+                        });
+                        reader.on("end", () => {
+                            if (pending) send(stream, pending);
+                        });
+                    }
+                    child.on("error", reject);
+                    child.on("close", (code) => {
+                        delivery.then(
+                            () => resolve({ code, count: index }),
+                            reject,
+                        );
+                    });
                 });
-                if (result.error) throw result.error;
-                return {
-                    code: result.status,
-                    text: result.stdout + result.stderr,
-                };
             }
             if (command === "plugin:event|listen") return 1;
             if (command === "plugin:event|unlisten") return null;
@@ -113,6 +157,17 @@ test.beforeEach(async ({ page }) => {
         let nextId = 0;
         Object.assign(window, {
             isTauri: true,
+            deliverTestOutput(message: {
+                channelId: number;
+                index: number;
+                stream: string;
+                text: string;
+            }) {
+                callbacks.get(message.channelId)?.({
+                    index: message.index,
+                    message: { stream: message.stream, text: message.text },
+                });
+            },
             __TAURI_INTERNALS__: {
                 metadata: { currentWindow: { label: "main" } },
                 transformCallback(callback: (message: unknown) => void) {
@@ -132,19 +187,29 @@ test.beforeEach(async ({ page }) => {
                     ) => Promise<unknown>;
                     const result = await transport(
                         command,
-                        JSON.parse(JSON.stringify(payload ?? {})),
+                        JSON.parse(
+                            JSON.stringify({
+                                ...payload,
+                                ...(command === "run_pace"
+                                    ? {
+                                          outputId: (
+                                              payload.output as { id: number }
+                                          ).id,
+                                      }
+                                    : {}),
+                            }),
+                        ),
                     );
                     if (command === "run_pace") {
-                        const { code, text } = result as {
+                        const { code, count } = result as {
                             code: number;
-                            text: string;
+                            count: number;
                         };
                         const channel = payload.output as { id: number };
                         callbacks.get(channel.id)?.({
-                            index: 0,
-                            message: { stream: "stdout", text },
+                            index: count,
+                            end: true,
                         });
-                        callbacks.get(channel.id)?.({ index: 1, end: true });
                         return code;
                     }
                     return result;
@@ -460,6 +525,16 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
     const output = page.getByRole("region", { name: "Command output" });
     await expect(output).toContainText("Total warnings: 2");
     await expect(output).toContainText("Warning summary log:");
+    const progress = page.getByRole("region", { name: "Project progress" });
+    await expect(progress.locator("tbody tr")).toHaveCount(4);
+    await expect(progress.locator('[data-project="foundation"]')).toContainText(
+        "Build: Succeeded",
+    );
+    await expect(output).not.toContainText('"protocol": "pace.monitor"');
+    await page.screenshot({
+        path: testInfo.outputPath("dotnet-progress-light.png"),
+        animations: "disabled",
+    });
     expect(readFileSync(join(directory, "repos/PACE.slnx"), "utf8")).toContain(
         "desktop-client/desktop-client/desktop-client.csproj",
     );
@@ -517,7 +592,7 @@ test("dotnet custom commands surface failures, reject malformed quotes, and hono
     ).toBeDisabled();
     await input.fill("build -t:NotARealTarget --nologo");
     await expect(page.getByTestId("dotnet-preview")).toContainText(
-        "--from services --to desktop-client dotnet build",
+        "--from services --to desktop-client --monitor dotnet build",
     );
     await page
         .getByRole("button", { name: "Run command", exact: true })
@@ -526,9 +601,11 @@ test("dotnet custom commands surface failures, reject malformed quotes, and hono
         .getByRole("dialog")
         .getByRole("button", { name: "Run command", exact: true })
         .click();
-    await expect(page.getByText("Failed", { exact: true })).toBeVisible({
-        timeout: 60_000,
-    });
+    await expect(page.getByText("Failed", { exact: true }).first()).toBeVisible(
+        {
+            timeout: 60_000,
+        },
+    );
     await expect(
         page.getByRole("region", { name: "Command output" }),
     ).toContainText("NotARealTarget");
@@ -609,8 +686,81 @@ test("Git status and a failed custom command report real CLI results", async ({
         .getByRole("dialog")
         .getByRole("button", { name: "Run command", exact: true })
         .click();
-    await expect(page.getByText("Failed", { exact: true })).toBeVisible();
+    await expect(
+        page.getByText("Failed", { exact: true }).first(),
+    ).toBeVisible();
     await expect(
         page.getByRole("region", { name: "Command output" }),
     ).toContainText("not-a-real-git-command");
+});
+
+test("project stages update live before a quiet build can finish", async ({
+    page,
+}, testInfo) => {
+    test.setTimeout(60_000);
+    createDotnetProjects();
+    const acknowledged = join(directory, "ui-observed");
+    const waiter = join(directory, "wait-for-ui.py");
+    writeFileSync(
+        waiter,
+        "import sys, time\nfrom pathlib import Path\n" +
+            "deadline = time.monotonic() + 30\n" +
+            "while not Path(sys.argv[1]).exists():\n" +
+            "    if time.monotonic() > deadline: sys.exit(9)\n" +
+            "    time.sleep(0.05)\n",
+    );
+    const project = join(directory, "repos/services/services/services.csproj");
+    const command = [python, waiter, acknowledged]
+        .map((path) => `&quot;${path.replaceAll("&", "&amp;")}&quot;`)
+        .join(" ");
+    writeFileSync(
+        project,
+        readFileSync(project, "utf8").replace(
+            "</Project>",
+            `<Target Name="WaitForUI" BeforeTargets="CoreCompile"><Exec Command="${command}" /></Target></Project>`,
+        ),
+    );
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await page
+        .getByRole("textbox", {
+            name: "Additional arguments (optional)",
+            exact: true,
+        })
+        .fill("--verbosity quiet");
+    await page
+        .getByRole("button", { name: "Build solution", exact: true })
+        .click();
+    await page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Run command", exact: true })
+        .click();
+    try {
+        const progress = page.getByRole("region", { name: "Project progress" });
+        await expect(
+            progress.locator('[data-project="foundation"]'),
+        ).toContainText("Compile: Succeeded", { timeout: 30_000 });
+        await expect(page.getByText("Running", { exact: true })).toBeVisible();
+        await expect(
+            page.getByText("Completed", { exact: true }),
+        ).not.toBeVisible();
+        await page.screenshot({
+            path: testInfo.outputPath("live-project-progress.png"),
+        });
+        await page.setViewportSize({ width: 960, height: 640 });
+        expect(
+            await page
+                .locator("main")
+                .evaluate((main) => main.scrollWidth <= main.clientWidth),
+        ).toBe(true);
+    } finally {
+        writeFileSync(acknowledged, "");
+    }
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible({
+        timeout: 30_000,
+    });
+    await expect(
+        page.getByRole("region", { name: "Project progress" }),
+    ).toContainText("4 succeeded");
 });
