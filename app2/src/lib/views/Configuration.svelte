@@ -105,8 +105,9 @@
                     >
                         Properties from the saved configuration. Edit <code
                             >[[build-props]]</code
-                        > in the TOML source to change them. Building and writing
-                        Directory.Build.props are not yet implemented in pacev2.
+                        > in the TOML source to change them. Use pacev2 dotnet from
+                        the CLI to build. Generating Directory.Build.props is not
+                        yet implemented.
                     </p>
                     <table class="mb-5 w-full">
                         <thead class="table-head"

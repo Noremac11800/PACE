@@ -1,8 +1,8 @@
 # PACE v2
 
 A Typer CLI for the Project Automation and Configuration Engine, using uv, Ruff,
-ty, and pytest. Configuration handling, version reporting, and parallel Git
-commands are implemented; other project operations remain placeholders.
+ty, and pytest. Configuration handling, version reporting, parallel Git commands,
+and solution-based dotnet commands are implemented.
 
 ## Run
 
@@ -21,7 +21,7 @@ No arguments, `-h`, and `--help` display help. With no subcommand, `-v` and
 installed package metadata generated from `project.version` in `pyproject.toml`,
 with no network requests or configuration loading.
 
-`clean`, `dotnet`, `upload`, `update`, and `--debug` remain placeholders. These
+`clean`, `upload`, `update`, and `--debug` remain placeholders. These
 commands report **not implemented** and exit with code 1 after any requested
 configuration processing.
 
@@ -127,6 +127,75 @@ Use `pacev2 git -- --help` to forward a leading help flag to Git itself.
 
 `execution.py` supplies the reusable task runner and streaming subprocess helper;
 other project commands can reuse its reporting and failure aggregation.
+
+## Solution-based dotnet commands
+
+PACE synchronizes `repodir/PACE.slnx` to the selected projects, then invokes
+`dotnet <command> <absolute-path-to-PACE.slnx> <arguments>` **once**. MSBuild owns
+dependency ordering, incremental builds, and parallelism; PACE does not start
+competing builds per repository. Use a .NET SDK with `.slnx` support
+(9.0.200 or newer), plus the SDKs/workloads required by your projects.
+
+```powershell
+uv run pacev2 dotnet build -c Release
+uv run pacev2 dotnet -w build --no-restore
+uv run pacev2 --to application dotnet test -c Release
+uv run pacev2 --from common-lib --to application dotnet build -f net10.0
+uv run pacev2 dotnet restore --ignore-failed-sources
+uv run pacev2 dotnet pack -c Release
+uv run pacev2 dotnet --info
+```
+
+Project files resolve as `repodir/<project-name>/<csproj_path>`; absolute project
+paths are also accepted. Remote URLs are not required. Missing project files are
+reported and omitted; inaccessible or invalid paths fail the invocation. An empty
+`--from`/`--to` selection is a successful no-op and does not touch an existing
+solution. A nonempty selection with no existing/compatible project files is an
+error rather than a reason to build a stale solution.
+
+Only selected projects are direct solution members. **MSBuild may still build
+their referenced projects outside the selected range.** The actual
+`ProjectReference` entries, not TOML `depends_on`, determine build dependencies;
+keep both declarations consistent. PACE does not disable project-reference builds
+or assume that excluded dependencies have already been built.
+
+Solution membership is synchronized directly as XML, without `dotnet sln add`'s
+SDK-dependent auto-inclusion of referenced projects. New projects use `sln_group`
+as their solution folder. Existing folders, comments, and configuration metadata
+are retained; stale/duplicate project entries are removed. Unchanged solutions
+are not rewritten. Writes use atomic replacement. A malformed existing solution
+is reported and left untouched, not deleted or overwritten.
+
+`-f FRAMEWORK`, `--framework FRAMEWORK`, and `--framework=FRAMEWORK` filter
+solution membership using MSBuild-evaluated `TargetFramework` and
+`TargetFrameworks`, including imported properties and conditions. The match is
+against the full target framework, not just its platform suffix. Configuration,
+runtime, and explicit MSBuild property arguments are included during evaluation.
+Evaluation errors stop the command, and incompatible projects are reported.
+There is no persisted framework cache to go stale when imported files change.
+
+Arguments are forwarded individually without a shell. Do not supply another
+project or solution target: PACE supplies `PACE.slnx`. Commands run in the caller's
+working directory, preserving relative argument paths, with stdin closed and
+merged stdout/stderr streamed to the console. The underlying dotnet exit code is
+returned; preparation/process-launch failures exit with code 1. This wrapper is
+intended for solution-capable commands such as `build`, `restore`, `test`, `pack`,
+`publish`, `clean`, and `msbuild`; dotnet itself reports unsupported combinations.
+The standalone `pacev2 clean` command is still a placeholder.
+
+SDK information flags (`--info`, `--version`, `--list-sdks`, `--list-runtimes`),
+`dotnet help`, and forwarded dotnet help run without loading configuration or
+creating a solution. `pacev2 dotnet --help` displays the wrapper's help; use
+`pacev2 dotnet -- --help` to forward a leading help flag to dotnet.
+
+Place `-w` / `--summarize-warnings` **before** the dotnet subcommand. It reports
+warnings by code, project, and repository, deduplicating MSBuild's repeated
+diagnostic lines, and writes a plain-text summary to
+`~/.pace/logs/warnings-<timestamp>.log`. It also summarizes warnings from failed
+builds without changing their exit code. No log is created when there are no
+warnings; log-write failures are reported without masking the build result.
+Configuration `build-props` are not automatically applied or written to
+`Directory.Build.props`; pass explicit `-p:Name=Value` arguments as needed.
 
 ## CLI parity
 

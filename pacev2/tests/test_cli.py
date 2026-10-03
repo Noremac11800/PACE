@@ -96,11 +96,6 @@ def test_commandhelp_listsinterface(
         ["clean"],
         ["clean", "--cache", "--custom-cache", "--project", "-n"],
         ["clean", "--dry-run"],
-        ["dotnet"],
-        ["dotnet", "-w", "build", "-c", "Release", "--no-restore"],
-        ["dotnet", "--summarize-warnings", "test"],
-        ["dotnet", "--info"],
-        ["dotnet", "build", "--help"],
         ["update"],
         UPLOAD_ARGUMENTS,
         [*UPLOAD_ARGUMENTS, "-n", "Build notes", "-N", "missing-notes.txt"],
@@ -288,6 +283,11 @@ def test_invalidarguments_showusageerror(arguments: list[str]) -> None:
         (["--summarize-warnings", "test"], ["test"], True),
         (["build", "-w", "--help"], ["build", "-w", "--help"], False),
         (["--", "--version"], ["--version"], False),
+        (
+            ["-p:MyProperty=value with spaces"],
+            ["-p:MyProperty=value with spaces"],
+            False,
+        ),
     ],
 )
 def test_dotnet_preservesarguments(
@@ -297,8 +297,8 @@ def test_dotnet_preservesarguments(
     assert isinstance(command, TyperGroup)
 
     with command.commands["dotnet"].make_context("dotnet", arguments.copy()) as ctx:
-        assert list(ctx.params["_dotnet_args"]) == expected
-        assert ctx.params["_summarize_warnings"] is summarize
+        assert list(ctx.params["dotnet_args"]) == expected
+        assert ctx.params["summarize_warnings"] is summarize
 
 
 @pytest.mark.parametrize(

@@ -45,10 +45,10 @@ bun run tauri build
   version, and configuration-printing commands.
 - Switch between system, light, and dark themes; inspect runtime/tool versions.
 
-Build, clean, NuGet management, publishing, uploading, and updates are
-deliberately not presented as working features: pacev2 has not implemented those
-operations. Build properties are editable in TOML and viewable in the UI, but
-are not applied to project files.
+The desktop UI does not yet expose dotnet operations; use `pacev2 dotnet`
+for solution-based build, restore, test, pack, and publish commands. The separate
+PACE clean, upload, and update commands remain unimplemented. Build properties
+are editable in TOML and viewable in the UI, but are not applied to project files.
 
 Configuration history is shared with the CLI in `~/.pace/settings.json`. Relative
 configuration paths resolve against the configured working directory (the home

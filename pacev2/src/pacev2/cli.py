@@ -107,6 +107,7 @@ app.command("clean")(clean.run)
 # Dotnet stops parsing PACE options at its first argument, as with argparse.REMAINDER.
 app.command(
     "dotnet",
+    cls=dotnet.DotnetCommand,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
 )(dotnet.run)
 app.command("git", cls=git.GitCommand)(git.run)
