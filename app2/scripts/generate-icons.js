@@ -55,6 +55,7 @@ const names = [
     "clock",
     "list",
     "link",
+    "minus",
 ];
 const directory = new URL("../src/lib/generated/", import.meta.url);
 mkdirSync(directory, { recursive: true });

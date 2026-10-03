@@ -7,6 +7,7 @@
     import type { View } from "$lib/domain/types";
     import type { IconName } from "$lib/components/ui/icons";
     import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+    import AppGlyph from "$lib/components/AppGlyph.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
     import Spinner from "$lib/components/ui/Spinner.svelte";
@@ -16,6 +17,7 @@
     import Repositories from "$lib/views/Repositories.svelte";
     import Dependencies from "$lib/views/Dependencies.svelte";
     import Git from "$lib/views/Git.svelte";
+    import Dotnet from "$lib/views/Dotnet.svelte";
     import Configuration from "$lib/views/Configuration.svelte";
     import Activity from "$lib/views/Activity.svelte";
     import Settings from "$lib/views/Settings.svelte";
@@ -44,6 +46,7 @@
             label: "Operations",
             items: [
                 { view: "git", label: "Git operations", icon: "refresh" },
+                { view: "dotnet", label: ".NET operations", icon: "gear" },
                 {
                     view: "activity",
                     label: "Command activity",
@@ -136,9 +139,7 @@
             onclick={() => (app.view = "overview")}
             aria-label="PACE overview"
         >
-            <span
-                class="size-8 bg-brand [mask-image:url('/pace.svg')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center]"
-            ></span>
+            <AppGlyph class="size-8" />
             <div>
                 <span class="text-title-medium tracking-wide">PACE</span><span
                     class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.16em] text-text-tertiary"
@@ -348,6 +349,7 @@
             {:else if app.view === "repositories"}<Repositories />
             {:else if app.view === "dependencies"}<Dependencies />
             {:else if app.view === "git"}<Git />
+            {:else if app.view === "dotnet"}<Dotnet />
             {:else if app.view === "configuration"}<Configuration />
             {:else if app.view === "activity"}<Activity />
             {:else if app.view === "settings"}<Settings />{/if}

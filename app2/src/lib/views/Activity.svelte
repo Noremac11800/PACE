@@ -11,11 +11,33 @@
     let output = $state<HTMLDivElement>();
     let follow = $state(true);
     const tools = [
-        { value: "--help", label: "CLI help" },
-        { value: "--version", label: "CLI version" },
-        { value: "--print-config", label: "Print selected configuration" },
-        { value: "--print-config-path", label: "Print configuration path" },
+        { value: "--help", label: "CLI help", args: ["--help"], scoped: false },
+        {
+            value: "--version",
+            label: "CLI version",
+            args: ["--version"],
+            scoped: false,
+        },
+        {
+            value: "--print-config",
+            label: "Print selected configuration",
+            args: ["--print-config"],
+            scoped: true,
+        },
+        {
+            value: "--print-config-path",
+            label: "Print configuration path",
+            args: ["--print-config-path"],
+            scoped: true,
+        },
+        {
+            value: "dotnet-info",
+            label: ".NET SDK information",
+            args: ["dotnet", "--info"],
+            scoped: false,
+        },
     ];
+    let selectedTool = $derived(tools.find((item) => item.value === tool)!);
     $effect(() => {
         const text = app.selectedRun?.output;
         if (text && follow)
@@ -70,16 +92,13 @@
         disabled={!desktop ||
             app.locked ||
             app.filtering ||
-            (tool.startsWith("--print") && (!app.workspace || app.dirty))}
+            (selectedTool.scoped && (!app.workspace || app.dirty))}
         onclick={() =>
-            app.run(
-                [tool],
-                tools.find((item) => item.value === tool)?.label ?? tool,
-                tool.startsWith("--print"),
-            )}>Run</Button
+            app.run(selectedTool.args, selectedTool.label, selectedTool.scoped)}
+        >Run</Button
     >
     <span class="ml-auto text-caption text-text-tertiary"
-        >Git commands are available in Git operations.</span
+        >Use Git or .NET operations to run workspace commands.</span
     >
 </section>
 <div
@@ -218,8 +237,8 @@
                 <p
                     class="mt-2 max-w-md text-body-small leading-relaxed text-text-secondary"
                 >
-                    Run a Git operation or use the CLI tools above. Output,
-                    errors, and exit codes will appear here.
+                    Run a Git or .NET operation, or use the CLI tools above.
+                    Output, errors, and exit codes will appear here.
                 </p>
             </div>
         {/if}

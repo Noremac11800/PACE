@@ -1,4 +1,6 @@
 import * as api from "$lib/services/desktop";
+import { dotnetForm } from "./dotnet.svelte";
+import { defaultDotnetOptions } from "$lib/domain/dotnet";
 import { cleanOutput, commandPreview, scopedArgs } from "$lib/domain/commands";
 import type {
     Diagnostic,
@@ -101,6 +103,10 @@ class App {
     }
 
     private apply(workspace: Workspace) {
+        if (dotnetForm.configPath !== workspace.path) {
+            dotnetForm.configPath = workspace.path;
+            dotnetForm.options = defaultDotnetOptions();
+        }
         this.filterGeneration++;
         this.workspace = workspace;
         this.draft = workspace.content;
@@ -284,6 +290,7 @@ class App {
             scoped && this.workspace
                 ? scopedArgs(this.workspace.path, this.from, this.to, args)
                 : args;
+        this.notice = null;
         const id = Date.now();
         this.runs.unshift({
             id,

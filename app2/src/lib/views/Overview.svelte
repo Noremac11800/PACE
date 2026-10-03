@@ -153,7 +153,26 @@
     </div>
     <section class="mt-7">
         <h2 class="mb-4 text-title-small">Keep work moving</h2>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <Card
+                heading="Build your solution"
+                description="Build, test, and inspect compiler warnings."
+                size="l"
+                thumbnail={false}
+                onclick={() => (app.view = "dotnet")}
+            >
+                {#snippet contextual()}<Icon
+                        name="gear"
+                        size={16}
+                        class="text-brand"
+                    /><span class="text-caption text-text-secondary"
+                        >.NET operations</span
+                    >{/snippet}
+                {#snippet status()}<Icon
+                        name="arrow-right"
+                        size={16}
+                    />{/snippet}
+            </Card>
             <Card
                 heading="Inspect repositories"
                 description="Run Git status across your workspace."
@@ -221,7 +240,7 @@
             : "Your desktop workspace starts here"}
         description={desktop
             ? "Open an existing PACE TOML configuration, or create one to organize your .NET repositories. If the CLI could not connect, check your Python runtime in Settings."
-            : "This browser preview shows the interface only. Launch the Tauri desktop app to connect to pacev2, open local configurations, and run Git commands."}
+            : "This browser preview shows the interface only. Launch the Tauri desktop app to connect to pacev2, open local configurations, and run Git and dotnet commands."}
     >
         {#snippet actions()}
             <Button
@@ -238,7 +257,7 @@
         {/snippet}
     </EmptyState>
     <div class="mt-6 grid grid-cols-3 gap-4">
-        {#each [{ title: "Organize", text: "Manage repositories and solution groups with a single TOML configuration." }, { title: "Understand", text: "Explore project dependencies and select an inclusive execution range." }, { title: "Execute", text: "Run parallel Git commands with live output and clear exit statuses." }] as feature}
+        {#each [{ title: "Organize", text: "Manage repositories and solution groups with a single TOML configuration." }, { title: "Understand", text: "Explore project dependencies and select an inclusive execution range." }, { title: "Execute", text: "Run Git and dotnet commands with live output and clear exit statuses." }] as feature}
             <div class="panel p-5">
                 <h2 class="mb-2 text-title-small">{feature.title}</h2>
                 <p class="text-body-small leading-relaxed text-text-secondary">

@@ -7,6 +7,7 @@
     } from "$lib/services/desktop";
     import PageHeader from "$lib/components/PageHeader.svelte";
     import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+    import AppGlyph from "$lib/components/AppGlyph.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Chip from "$lib/components/ui/Chip.svelte";
@@ -141,8 +142,8 @@
             <div>
                 <h2 class="text-title-small">Development tools</h2>
                 <p class="mt-1 text-caption text-text-tertiary">
-                    Git is required for repository operations. .NET is optional
-                    for the current UI.
+                    Git is required for Git operations. .NET SDK 9.0.200 or
+                    newer is required for solution-based .NET operations.
                 </p>
             </div>
             <Button
@@ -182,10 +183,7 @@
     <div
         class="flex items-center gap-3 px-1 pb-4 text-caption leading-relaxed text-text-tertiary"
     >
-        <span
-            aria-hidden="true"
-            class="size-8 shrink-0 bg-brand [mask-image:url('/pace.svg')] [mask-size:contain] [mask-repeat:no-repeat]"
-        ></span>
+        <AppGlyph class="size-8" />
         <p>
             PACE Desktop {app.appVersion}<br />Project Automation and
             Configuration Engine

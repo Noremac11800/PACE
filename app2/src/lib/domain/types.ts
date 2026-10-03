@@ -43,6 +43,7 @@ export type View =
     | "repositories"
     | "dependencies"
     | "git"
+    | "dotnet"
     | "configuration"
     | "activity"
     | "settings";

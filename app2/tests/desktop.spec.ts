@@ -33,7 +33,10 @@ test.beforeEach(async ({ page }) => {
                     ([name, group, dependencies]) =>
                         `[[projects]]\nname = "${name}"\ncsproj_path = "${name}/${name}.csproj"\nsln_group = "${group}"\nrepo_url = "https://example.invalid/${name}.git"\ndepends_on = ${JSON.stringify(dependencies)}\n`,
                 )
-                .join("\n"),
+                .join("\n") +
+            '\n[[build-props]]\nname = "DemoFeature"\ndatatype = "boolean"\ndefault = false\n' +
+            '\n[[build-props]]\nname = "DemoLabel"\ndatatype = "string"\ndefault = ""\n' +
+            '\n[[build-props]]\nname = "DemoOutputPath"\ndatatype = "path"\ndefault = ""\n',
     );
     mkdirSync(join(directory, ".pace"));
     writeFileSync(
@@ -53,9 +56,11 @@ test.beforeEach(async ({ page }) => {
         NO_COLOR: "1",
         PYTHONIOENCODING: "utf-8",
         TERM: "dumb",
+        DOTNET_CLI_HOME: directory,
+        DOTNET_NOLOGO: "1",
     };
 
-    // Only the native IPC transport is replaced. Config and Git requests use real pacev2.
+    // Only the native IPC transport is replaced. Commands use real pacev2.
     await page.exposeFunction(
         "testInvoke",
         (command: string, payload: Record<string, unknown>) => {
@@ -94,6 +99,12 @@ test.beforeEach(async ({ page }) => {
             }
             if (command === "plugin:event|listen") return 1;
             if (command === "plugin:event|unlisten") return null;
+            if (
+                command === "plugin:dialog|open" &&
+                (payload.options as { title?: string }).title ===
+                    "Open PACE configuration"
+            )
+                return configPath;
             throw new Error(`Unexpected native request: ${command}`);
         },
     );
@@ -163,6 +174,19 @@ test("desktop navigation, real scope filtering, and persistent light/dark themes
     await expect(
         page.getByRole("radio", { name: "Light", exact: true }),
     ).toHaveAttribute("aria-checked", "true");
+    const glyph = page
+        .getByRole("button", { name: "PACE overview" })
+        .locator("img");
+    await expect(glyph).toHaveAttribute("src", "/appglyph-dark.svg");
+    await expect
+        .poll(() =>
+            glyph.evaluate((image: HTMLImageElement) => image.naturalWidth),
+        )
+        .toBe(100);
+    await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+        "href",
+        /appicon\.svg$/,
+    );
     await page.screenshot({
         path: testInfo.outputPath("overview-light.png"),
         animations: "disabled",
@@ -171,6 +195,7 @@ test("desktop navigation, real scope filtering, and persistent light/dark themes
     await expect(
         page.getByRole("radio", { name: "Dark", exact: true }),
     ).toHaveAttribute("aria-checked", "true");
+    await expect(glyph).toHaveAttribute("src", "/appglyph.svg");
     await page.screenshot({
         path: testInfo.outputPath("overview-dark.png"),
         animations: "disabled",
@@ -206,6 +231,7 @@ test("desktop navigation, real scope filtering, and persistent light/dark themes
     });
     for (const name of [
         "Git operations",
+        ".NET operations",
         "Command activity",
         "Configuration",
         "Settings",
@@ -227,7 +253,12 @@ test("desktop navigation, real scope filtering, and persistent light/dark themes
             () => document.documentElement.scrollWidth <= window.innerWidth,
         ),
     ).toBe(true);
-    for (const name of ["Overview", "Repositories", "Git operations"]) {
+    for (const name of [
+        "Overview",
+        "Repositories",
+        "Git operations",
+        ".NET operations",
+    ]) {
         await page
             .getByRole("navigation")
             .getByRole("button", { name, exact: false })
@@ -296,6 +327,12 @@ test("unsaved edits survive navigation and invalid files cannot be saved", async
         page.getByRole("button", { name: "Check status", exact: true }),
     ).toBeDisabled();
     await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("button", { name: "Build solution", exact: true }),
+    ).toBeDisabled();
+    await page
         .getByRole("navigation")
         .getByRole("button", { name: "Configuration", exact: true })
         .click();
@@ -315,6 +352,235 @@ test("unsaved edits survive navigation and invalid files cannot be saved", async
     ).toBeVisible();
     expect(readFileSync(configPath, "utf8")).toContain(
         "# saved through the app",
+    );
+});
+
+function createDotnetProjects(): string {
+    const result = spawnSync("dotnet", ["--version"], { encoding: "utf8" });
+    test.skip(
+        !!result.error || result.status !== 0,
+        "A .NET SDK is required for dotnet UI tests.",
+    );
+    const version = result.stdout.trim().split(".");
+    const major = Number(version[0]);
+    test.skip(
+        major < 9 || (major === 9 && Number(version[2].split("-")[0]) < 200),
+        ".slnx requires SDK 9.0.200+.",
+    );
+    const framework = `net${major}.0`;
+    const projects = [
+        { name: "foundation", dependencies: [] },
+        { name: "services", dependencies: ["foundation"] },
+        { name: "desktop-client", dependencies: ["services"] },
+        { name: "web-client", dependencies: ["services"] },
+    ];
+    for (const project of projects) {
+        const root = join(directory, "repos", project.name, project.name);
+        mkdirSync(root, { recursive: true });
+        const references = project.dependencies
+            .map(
+                (dependency) =>
+                    `<ProjectReference Include="../../${dependency}/${dependency}/${dependency}.csproj" />`,
+            )
+            .join("");
+        writeFileSync(
+            join(root, `${project.name}.csproj`),
+            `<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>${framework}</TargetFramework></PropertyGroup><ItemGroup>${references}</ItemGroup></Project>`,
+        );
+        writeFileSync(
+            join(root, "Example.cs"),
+            `${["foundation", "services"].includes(project.name) ? "#warning Intentional UI test warning\n" : ""}public class Example { }`,
+        );
+    }
+    return framework;
+}
+
+test("dotnet form builds a real solution, summarizes warnings, and retains options", async ({
+    page,
+}, testInfo) => {
+    const framework = createDotnetProjects();
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await page
+        .getByRole("combobox", { name: "Build configuration" })
+        .selectOption("Release");
+    await page
+        .getByRole("textbox", {
+            name: "Target framework (optional)",
+            exact: true,
+        })
+        .fill(framework);
+    await page.getByRole("switch", { name: "Rebuild all outputs" }).click();
+    await page
+        .getByRole("switch", { name: "Summarize build warnings" })
+        .click();
+    await page
+        .getByRole("checkbox", { name: "DemoFeature", exact: true })
+        .check();
+    await page
+        .getByRole("combobox", { name: "DemoFeature value" })
+        .selectOption("true");
+    await page
+        .getByRole("checkbox", { name: "DemoLabel", exact: true })
+        .check();
+    await page
+        .getByRole("textbox", { name: "DemoLabel value", exact: true })
+        .fill("literal;comma,percent% with spaces");
+    await page
+        .getByRole("textbox", {
+            name: "Additional arguments (optional)",
+            exact: true,
+        })
+        .fill("--nologo --verbosity quiet");
+    const preview = page.getByTestId("dotnet-preview");
+    await expect(preview).toContainText(
+        `dotnet -w build -c Release -f ${framework} -t:Rebuild`,
+    );
+    await expect(preview).toContainText("-p:DemoFeature=true");
+    await expect(preview).toContainText(
+        "literal%3Bcomma%2Cpercent%25 with spaces",
+    );
+    await page.getByRole("radio", { name: "Light", exact: true }).click();
+    await page.screenshot({
+        path: testInfo.outputPath("dotnet-light.png"),
+        fullPage: true,
+        animations: "disabled",
+    });
+    await page
+        .getByRole("button", { name: "Rebuild solution", exact: true })
+        .click();
+    await page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Run command", exact: true })
+        .click();
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible({
+        timeout: 60_000,
+    });
+    const output = page.getByRole("region", { name: "Command output" });
+    await expect(output).toContainText("Total warnings: 2");
+    await expect(output).toContainText("Warning summary log:");
+    expect(readFileSync(join(directory, "repos/PACE.slnx"), "utf8")).toContain(
+        "desktop-client/desktop-client/desktop-client.csproj",
+    );
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("switch", { name: "Summarize build warnings" }),
+    ).toHaveAttribute("aria-checked", "true");
+    await expect(
+        page.getByRole("combobox", { name: "Build configuration" }),
+    ).toHaveValue("Release");
+    await expect(
+        page.getByRole("textbox", { name: "DemoLabel value", exact: true }),
+    ).toHaveValue("literal;comma,percent% with spaces");
+    await page.getByRole("switch", { name: "Skip restore" }).click();
+    await page
+        .getByRole("combobox", { name: "Dotnet task" })
+        .selectOption("restore");
+    await expect(preview).toContainText(
+        "dotnet -w restore -p:Configuration=Release",
+    );
+    await expect(preview).not.toContainText("--no-restore");
+    await expect(preview).not.toContainText("-f ");
+    await expect(preview).not.toContainText("-t:Rebuild");
+});
+
+test("dotnet custom commands surface failures, reject malformed quotes, and honor scope", async ({
+    page,
+}) => {
+    createDotnetProjects();
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await page
+        .getByRole("combobox", { name: "From", exact: true })
+        .selectOption("services");
+    await page
+        .getByRole("combobox", { name: "To", exact: true })
+        .selectOption("desktop-client");
+    await expect(page.getByText("2 of 4 repositories")).toBeVisible();
+    await page
+        .getByRole("combobox", { name: "Dotnet task" })
+        .selectOption("custom");
+    const input = page.getByRole("textbox", {
+        name: "Dotnet arguments",
+        exact: true,
+    });
+    await input.fill('build -p:Message="unfinished');
+    await expect(page.getByRole("alert")).toContainText(
+        "Close the quoted argument",
+    );
+    await expect(
+        page.getByRole("button", { name: "Run command", exact: true }),
+    ).toBeDisabled();
+    await input.fill("build -t:NotARealTarget --nologo");
+    await expect(page.getByTestId("dotnet-preview")).toContainText(
+        "--from services --to desktop-client dotnet build",
+    );
+    await page
+        .getByRole("button", { name: "Run command", exact: true })
+        .click();
+    await page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Run command", exact: true })
+        .click();
+    await expect(page.getByText("Failed", { exact: true })).toBeVisible({
+        timeout: 60_000,
+    });
+    await expect(
+        page.getByRole("region", { name: "Command output" }),
+    ).toContainText("NotARealTarget");
+    const solution = readFileSync(join(directory, "repos/PACE.slnx"), "utf8");
+    expect(solution.match(/<Project /g)).toHaveLength(2);
+});
+
+test("dotnet options reset when configurations change outside the dotnet view", async ({
+    page,
+}) => {
+    const alternate = join(directory, ".pace/configs/alternate.toml");
+    mkdirSync(join(directory, ".pace/configs"), { recursive: true });
+    writeFileSync(alternate, readFileSync(configPath, "utf8"));
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Reload from disk", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await page
+        .getByRole("combobox", { name: "Build configuration" })
+        .selectOption("Release");
+    await page
+        .getByRole("checkbox", { name: "DemoLabel", exact: true })
+        .check();
+    await page
+        .getByRole("textbox", { name: "DemoLabel value", exact: true })
+        .fill("original-only");
+    await page.getByRole("button", { name: "Overview", exact: true }).click();
+    const config = page.getByRole("combobox", {
+        name: "Configuration",
+        exact: true,
+    });
+    await config.selectOption({ label: "alternate" });
+    await expect(config).toHaveValue(/alternate\.toml$/);
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await expect(config).toHaveValue(/workspace\.toml$/);
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("combobox", { name: "Build configuration" }),
+    ).toHaveValue("Debug");
+    await expect(
+        page.getByRole("checkbox", { name: "DemoLabel", exact: true }),
+    ).not.toBeChecked();
+    await expect(page.getByTestId("dotnet-preview")).not.toContainText(
+        "original-only",
     );
 });
 

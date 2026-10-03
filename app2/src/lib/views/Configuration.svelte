@@ -105,9 +105,9 @@
                     >
                         Properties from the saved configuration. Edit <code
                             >[[build-props]]</code
-                        > in the TOML source to change them. Use pacev2 dotnet from
-                        the CLI to build. Generating Directory.Build.props is not
-                        yet implemented.
+                        > in the TOML source to change them. Enable property overrides
+                        in .NET operations to pass them to a command. Generating Directory.Build.props
+                        is not yet implemented.
                     </p>
                     <table class="mb-5 w-full">
                         <thead class="table-head"
