@@ -25,6 +25,7 @@
 - [Quick start](#quick-start)
 - [Commands](#commands)
 - [Working with part of your project graph](#working-with-part-of-your-project-graph)
+- [Desktop app](#desktop-app)
 - [Configuration reference](#configuration-reference)
 - [Troubleshooting](#troubleshooting)
 - [What's in this repository](#whats-in-this-repository)
@@ -237,6 +238,35 @@ common-lib  ──►  feature-module  ──►  sample-app
 | `pace --from common-lib --to feature-module git pull` | `common-lib`, `feature-module` (the path between them) |
 
 Both ends are included, and names are case-sensitive. To check what a filter selects before running anything, add `--print-config`.
+
+---
+
+## Desktop app
+
+If you'd rather not use the terminal, **PACE Desktop** gives you the same workflow in a window. You can browse your repositories and their dependencies, run Git and .NET operations with live per-project progress, and edit your configuration. It runs the next-generation `pacev2` CLI behind the scenes and uses the same config files.
+
+<p align="center">
+  <img src="./app2/screenshots/Overview.png" alt="PACE Desktop workspace overview, showing repository, solution group, and dependency counts alongside the active configuration" width="900">
+  <br>
+  <em>The workspace overview: your repositories, solution groups, and active configuration at a glance.</em>
+</p>
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="./app2/screenshots/Git.png" alt="Git operations view with clone, pull, and status actions and per-repository output">
+      <br>
+      <em>Git operations: clone, pull, or check status across every repository, with output for each one.</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="./app2/screenshots/Dotnet.png" alt=".NET operations view with build options, a from/to scope, and a per-project build progress table">
+      <br>
+      <em>.NET operations: pick a task and scope, then follow the build progress for each project.</em>
+    </td>
+  </tr>
+</table>
+
+The desktop app is still in development. To build and run it, see [`app2/README.md`](./app2/README.md#development).
 
 ---
 
