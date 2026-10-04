@@ -18,6 +18,7 @@
         scrollable?: boolean;
         /** default suits short messages; wide gives detail views and code room */
         width?: "default" | "wide";
+        dismissible?: boolean;
         actions?: Snippet;
         children?: Snippet;
         onclose?: () => void;
@@ -34,6 +35,7 @@
         actionsLayout = "horizontal",
         scrollable = false,
         width = "default",
+        dismissible = true,
         actions,
         children,
         onclose,
@@ -56,7 +58,10 @@
     aria-label={heading ? undefined : label}
     aria-describedby={description ? `${uid}-description` : undefined}
     onclose={() => ((open = false), onclose?.())}
-    onclick={(e) => e.target === dialog && (open = false)}
+    onclick={(e) => dismissible && e.target === dialog && (open = false)}
+    oncancel={(event) => {
+        if (!dismissible) event.preventDefault();
+    }}
     class={[
         "m-auto flex-col overflow-hidden rounded-lg bg-foreground-primary p-0 text-text-primary shadow-xl open:flex",
         width === "wide"

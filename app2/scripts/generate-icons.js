@@ -35,6 +35,8 @@ const names = [
     "file",
     "search",
     "plus",
+    "pencil",
+    "trash",
     "refresh",
     "save",
     "download",

@@ -35,6 +35,8 @@ bun run tauri build
 - Edit the original TOML without losing comments or formatting. Validate and
   save using the actual pacev2 Pydantic models. Invalid input and external file
   changes prevent saving. Copies never overwrite existing files.
+- Add, edit, and delete build properties and change workspace paths using
+  form editors that update the same TOML draft.
 - Browse and search repositories, inspect solution groups and project details,
   reveal checkout folders, and explore dependency layers.
 - Select inclusive `--from` / `--to` ranges, resolved by pacev2 itself.
@@ -67,6 +69,29 @@ configuration-print commands; table search/group filters are display-only.
 Commands run one at a time and must finish before closing the app. Session
 history retains 20 commands and the last 250,000 output characters per command;
 truncation is explicitly marked. History is not persisted after closing.
+
+## Configuration editing
+
+**Build properties** supports adding, renaming, changing the type/default, and
+deleting properties. String and path defaults may be empty; boolean defaults have
+a true/false selector, and path defaults have a directory picker. Property names
+must be unique, ignoring case. Deletion asks for confirmation.
+
+**Workspace paths** edits the repository directory and optional NuGet cache.
+Clear the cache field to use NuGet's default cache. Resolved paths reflect the
+current draft and CLI working directory. Editing paths does not move any files.
+The separate **Change working directory** action saves a device-wide runtime
+setting and reconnects, retaining the active configuration. Save or discard any
+configuration edits before changing this runtime setting.
+
+Choose **Apply to draft** in a form, then **Save changes** (or **Save a copy**) to
+write the file. Cancel leaves the draft untouched. Forms and TOML source share
+the same draft, which survives navigation. Invalid source must be repaired in
+the source editor before using forms. The desktop adapter uses `tomlkit` (included
+in the updated pacev2 dependencies) to preserve unrelated comments and formatting;
+it still uses pacev2's models for validation and existing file-conflict safeguards.
+Saving changed or deleted property definitions clears their .NET command overrides;
+unchanged definitions retain their overrides and other command options.
 
 ## Operation workspaces
 

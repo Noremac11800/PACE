@@ -3,6 +3,7 @@ import {
     defaultDotnetOptions,
     dotnetArguments,
     dotnetNeedsConfirmation,
+    retainPropertyOverrides,
     type BuildProperty,
 } from "./dotnet";
 import { scopedArgs } from "./commands";
@@ -14,6 +15,31 @@ const definitions: BuildProperty[] = [
 ];
 
 describe("dotnet commands", () => {
+    test("configuration edits clear changed and removed property overrides only", () => {
+        expect(
+            retainPropertyOverrides(
+                {
+                    DemoFeature: "true",
+                    DemoLabel: "override",
+                    OutputPath: "/build",
+                    Removed: "old",
+                },
+                definitions,
+                [
+                    { name: "DemoFeature", datatype: "boolean", default: true },
+                    definitions[1],
+                    { name: "OutputPath", datatype: "string", default: "" },
+                ],
+            ),
+        ).toEqual({ DemoLabel: "override" });
+        expect(
+            retainPropertyOverrides(
+                { DemoFeature: "true" },
+                definitions,
+                definitions,
+            ),
+        ).toEqual({ DemoFeature: "true" });
+    });
     test("places PACE options, warning summaries, and dotnet options in the correct order", () => {
         const options = {
             ...defaultDotnetOptions(),

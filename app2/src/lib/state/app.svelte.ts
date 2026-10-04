@@ -1,7 +1,10 @@
 import * as api from "$lib/services/desktop";
 import { dotnetForm } from "./dotnet.svelte";
 import { gitForm } from "./git.svelte";
-import { defaultDotnetOptions } from "$lib/domain/dotnet";
+import {
+    defaultDotnetOptions,
+    retainPropertyOverrides,
+} from "$lib/domain/dotnet";
 import {
     cleanOutput,
     commandPreview,
@@ -160,6 +163,12 @@ class App {
             gitForm.customArgs = "status --short --branch";
             gitForm.customOpen = false;
             gitForm.selectedRepository = "";
+        } else if (this.workspace) {
+            dotnetForm.options.properties = retainPropertyOverrides(
+                dotnetForm.options.properties,
+                this.workspace.config.build_props,
+                workspace.config.build_props,
+            );
         }
         this.filterGeneration++;
         this.workspace = workspace;
@@ -432,24 +441,31 @@ class App {
     }
 
     async connect(options: RuntimeOptions) {
-        if (this.locked || !(await this.canReplace())) return;
+        if (this.locked || !(await this.canReplace())) return false;
         this.busy = true;
         this.notice = null;
         try {
             const checked = await api.request<Diagnostic[]>(options, {
                 action: "diagnostics",
             });
+            const loaded = await api.request<Workspace>(options, {
+                action: "workspace",
+                ...(this.workspace ? { path: this.workspace.path } : {}),
+            });
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(options));
             this.options = options;
             this.diagnostics = checked.data;
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify(options));
-            this.workspace = null;
-            this.draft = "";
-            this.apply(await this.call<Workspace>({ action: "workspace" }));
-            if (checked.warnings) this.notify(checked.warnings, "info");
+            this.apply(loaded.data);
+            const warnings = [checked.warnings, loaded.warnings]
+                .filter(Boolean)
+                .join("\n");
+            if (warnings) this.notify(warnings, "info");
             else if (!this.notice)
                 this.notify("Connected to pacev2.", "success");
+            return true;
         } catch (error) {
             this.error(error);
+            return false;
         } finally {
             this.busy = false;
         }

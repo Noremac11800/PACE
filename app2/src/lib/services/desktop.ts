@@ -47,8 +47,8 @@ export const chooseSavePath = () =>
         defaultPath: "workspace.toml",
         filters: [{ name: "TOML configuration", extensions: ["toml"] }],
     });
-export const chooseDirectory = () =>
-    open({ title: "Working directory", directory: true, multiple: false });
+export const chooseDirectory = (title = "Working directory") =>
+    open({ title, directory: true, multiple: false });
 export const choosePython = () =>
     open({ title: "Python executable containing pacev2", multiple: false });
 export const reveal = (path: string) => revealItemInDir(path);

@@ -28,6 +28,27 @@ export interface Workspace {
     version: string;
 }
 
+export interface ConfigurationFields extends Pick<
+    PaceConfig,
+    "repodir" | "nuget_cache_path" | "build_props"
+> {
+    repoRoot: string;
+    nugetCacheRoot: string | null;
+}
+
+export type ConfigurationEdit =
+    | {
+          kind: "build-property";
+          index: number | null;
+          property: PaceConfig["build_props"][number];
+      }
+    | { kind: "delete-build-property"; index: number }
+    | {
+          kind: "paths";
+          repodir: string;
+          nuget_cache_path: string | null;
+      };
+
 export interface RuntimeOptions {
     python: string;
     directory: string;

@@ -3,6 +3,7 @@ import { execFileSync, spawn, spawnSync } from "node:child_process";
 import {
     mkdtempSync,
     mkdirSync,
+    realpathSync,
     readFileSync,
     rmSync,
     writeFileSync,
@@ -75,7 +76,8 @@ test.beforeEach(async ({ page }) => {
                     {
                         input: JSON.stringify(payload.request),
                         encoding: "utf8",
-                        cwd: directory,
+                        cwd: (payload.options as { directory: string })
+                            .directory,
                         env,
                     },
                 );
@@ -93,7 +95,8 @@ test.beforeEach(async ({ page }) => {
                         python,
                         ["-u", "-m", "pacev2", ...args],
                         {
-                            cwd: directory,
+                            cwd: (payload.options as { directory: string })
+                                .directory,
                             env,
                             stdio: ["ignore", "pipe", "pipe"],
                         },
@@ -149,6 +152,14 @@ test.beforeEach(async ({ page }) => {
                     "Open PACE configuration"
             )
                 return configPath;
+            if (
+                command === "plugin:dialog|open" &&
+                (payload.options as { directory?: boolean }).directory
+            ) {
+                const picked = join(directory, "picked directory");
+                mkdirSync(picked, { recursive: true });
+                return picked;
+            }
             throw new Error(`Unexpected native request: ${command}`);
         },
     );
@@ -418,6 +429,308 @@ test("unsaved edits survive navigation and invalid files cannot be saved", async
     expect(readFileSync(configPath, "utf8")).toContain(
         "# saved through the app",
     );
+});
+
+test("build properties can be added, edited, and deleted without losing the configuration draft", async ({
+    page,
+}, testInfo) => {
+    const original = readFileSync(configPath, "utf8");
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await page
+        .getByText("MSBuild properties (0 enabled)", { exact: true })
+        .click();
+    await page
+        .getByRole("checkbox", { name: "DemoFeature", exact: true })
+        .check();
+    await page
+        .getByRole("checkbox", { name: "DemoLabel", exact: true })
+        .check();
+    await page.getByLabel("DemoLabel value", { exact: true }).fill("retain me");
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    await page
+        .getByRole("tab", { name: "Build properties", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Edit DemoFeature", exact: true })
+        .click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Property name").fill("RenamedFeature");
+    await dialog.getByLabel("Default value").selectOption("true");
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(dialog).not.toBeVisible();
+    await expect(
+        page.getByText("Unsaved changes", { exact: true }),
+    ).toBeVisible();
+    expect(readFileSync(configPath, "utf8")).toBe(original);
+
+    await page
+        .getByRole("button", { name: "Edit DemoOutputPath", exact: true })
+        .click();
+    await dialog.getByLabel("Property type").selectOption("string");
+    await dialog
+        .getByLabel("Default value")
+        .fill('value with "quotes"; percent%');
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(
+        page.getByRole("cell", {
+            name: 'value with "quotes"; percent%',
+            exact: true,
+        }),
+    ).toBeVisible();
+    await page
+        .getByRole("button", { name: "Add property", exact: true })
+        .click();
+    await dialog.getByLabel("Property name").fill("DEMOLABEL");
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(dialog.getByRole("alert")).toContainText("unique");
+    await dialog.getByLabel("Property name").fill("ArtifactPath");
+    await dialog.getByLabel("Property type").selectOption("path");
+    await dialog
+        .getByRole("button", {
+            name: "Browse for property directory",
+            exact: true,
+        })
+        .click();
+    await expect(dialog.getByLabel("Default value")).toHaveValue(
+        join(directory, "picked directory"),
+    );
+    await page.screenshot({
+        path: testInfo.outputPath("edit-build-property.png"),
+    });
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(dialog).not.toBeVisible();
+    await page
+        .getByRole("button", { name: "Delete DemoOutputPath", exact: true })
+        .click();
+    await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(
+        page.getByRole("button", { name: "Edit DemoOutputPath", exact: true }),
+    ).toBeVisible();
+    await page
+        .getByRole("button", { name: "Delete DemoOutputPath", exact: true })
+        .click();
+    await dialog
+        .getByRole("button", { name: "Delete property", exact: true })
+        .click();
+    await expect(
+        page.getByRole("button", { name: "Edit DemoOutputPath", exact: true }),
+    ).not.toBeVisible();
+
+    await page.getByRole("button", { name: "Overview", exact: true }).click();
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    const source = await page
+        .getByLabel("TOML configuration source")
+        .inputValue();
+    expect(source).toContain("RenamedFeature");
+    expect(source).toContain("default = true");
+    expect(source).toContain("ArtifactPath");
+    expect(source).not.toContain("DemoOutputPath");
+    expect(
+        source.startsWith(
+            original.slice(0, original.indexOf("[[build-props]]")),
+        ),
+    ).toBe(true);
+    await page
+        .getByRole("button", { name: "Save changes", exact: true })
+        .click();
+    await expect(
+        page.getByText("Configuration saved and loaded."),
+    ).toBeVisible();
+    expect(readFileSync(configPath, "utf8")).toBe(source);
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("checkbox", { name: "RenamedFeature", exact: true }),
+    ).not.toBeChecked();
+    await expect(
+        page.getByRole("checkbox", { name: "DemoLabel", exact: true }),
+    ).toBeChecked();
+    await expect(
+        page.getByLabel("DemoLabel value", { exact: true }),
+    ).toHaveValue("retain me");
+    await page
+        .getByRole("checkbox", { name: "RenamedFeature", exact: true })
+        .check();
+    await expect(page.getByTestId("dotnet-preview")).toContainText(
+        "-p:RenamedFeature=true",
+    );
+    await expect(
+        page.getByRole("checkbox", { name: "DemoOutputPath", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+        page.getByRole("checkbox", { name: "ArtifactPath", exact: true }),
+    ).toBeVisible();
+});
+
+test("workspace path edits preserve source and reconnect the runtime without losing the active config", async ({
+    page,
+}, testInfo) => {
+    const original = readFileSync(configPath, "utf8");
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    await page
+        .getByLabel("TOML configuration source")
+        .fill(original + "\n# unsaved source note\n");
+    await page
+        .getByRole("tab", { name: "Workspace paths", exact: true })
+        .click();
+    await page.getByRole("button", { name: "Edit paths", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog
+        .getByRole("textbox", { name: "Repository directory" })
+        .fill("./new repos");
+    await dialog
+        .getByRole("button", {
+            name: "Browse for NuGet cache directory",
+            exact: true,
+        })
+        .click();
+    await expect(
+        dialog.getByLabel("NuGet cache directory (optional)"),
+    ).toHaveValue(join(directory, "picked directory"));
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(dialog).not.toBeVisible();
+    await expect(
+        page.getByText(join(realpathSync(directory), "new repos"), {
+            exact: true,
+        }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole("button", {
+            name: "Change working directory",
+            exact: true,
+        }),
+    ).toBeDisabled();
+    expect(readFileSync(configPath, "utf8")).toBe(original);
+    await page
+        .getByRole("button", { name: "Save changes", exact: true })
+        .click();
+    await expect(
+        page.getByText("Configuration saved and loaded."),
+    ).toBeVisible();
+    expect(readFileSync(configPath, "utf8")).toContain("# unsaved source note");
+    expect(readFileSync(configPath, "utf8")).toContain(
+        'repodir = "./new repos"',
+    );
+    expect(readFileSync(configPath, "utf8")).toContain("nuget_cache_path");
+    await page.getByRole("button", { name: "Edit paths", exact: true }).click();
+    await dialog.getByLabel("NuGet cache directory (optional)").fill("");
+    await dialog
+        .getByRole("button", { name: "Apply to draft", exact: true })
+        .click();
+    await expect(
+        page.getByText("Default NuGet cache", { exact: true }),
+    ).toBeVisible();
+    await page
+        .getByRole("button", { name: "Save changes", exact: true })
+        .click();
+    await expect(
+        page.getByRole("button", { name: "Save changes", exact: true }),
+    ).toBeDisabled();
+    expect(readFileSync(configPath, "utf8")).not.toContain("nuget_cache_path");
+
+    const runtimeDirectory = join(directory, "runtime directory");
+    mkdirSync(runtimeDirectory);
+    const saved = readFileSync(configPath, "utf8");
+    await page
+        .getByRole("button", { name: "Change working directory", exact: true })
+        .click();
+    await dialog.getByLabel("CLI working directory").fill(runtimeDirectory);
+    writeFileSync(configPath, "invalid = [");
+    await dialog
+        .getByRole("button", { name: "Save & reconnect", exact: true })
+        .click();
+    await expect(dialog.getByRole("alert")).toBeVisible();
+    expect(
+        await page.evaluate(() => localStorage.getItem("pace.desktop.runtime")),
+    ).toBeNull();
+    writeFileSync(configPath, saved);
+    await dialog
+        .getByRole("button", { name: "Save & reconnect", exact: true })
+        .click();
+    await expect(dialog).not.toBeVisible();
+    await expect(
+        page.getByText(join(realpathSync(runtimeDirectory), "new repos"), {
+            exact: true,
+        }),
+    ).toHaveCount(2);
+    await expect(page.getByRole("alert")).not.toBeVisible();
+    expect(readFileSync(configPath, "utf8")).toBe(saved);
+    expect(
+        JSON.parse(
+            (await page.evaluate(() =>
+                localStorage.getItem("pace.desktop.runtime"),
+            )) ?? "{}",
+        ).directory,
+    ).toBe(runtimeDirectory);
+    await page.screenshot({ path: testInfo.outputPath("workspace-paths.png") });
+    await page.reload();
+    await expect(page.getByText("CLI connected")).toBeVisible();
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
+    await expect(
+        page.getByLabel("Working directory", { exact: true }),
+    ).toHaveValue(runtimeDirectory);
+});
+
+test("structured configuration fields follow source edits and refuse invalid TOML without discarding it", async ({
+    page,
+}) => {
+    const original = readFileSync(configPath, "utf8");
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    const editor = page.getByLabel("TOML configuration source");
+    await editor.fill(original + "\ninvalid = [");
+    await page
+        .getByRole("tab", { name: "Build properties", exact: true })
+        .click();
+    await expect(page.getByRole("alert")).toContainText(
+        "Unable to read the configuration draft",
+    );
+    await expect(
+        page.getByRole("button", { name: "Add property", exact: true }),
+    ).not.toBeVisible();
+    await page.getByRole("tab", { name: "TOML source", exact: true }).click();
+    await expect(editor).toHaveValue(original + "\ninvalid = [");
+    const changed = original.replace(
+        'name = "DemoLabel"',
+        'name = "SourceLabel"',
+    );
+    await editor.fill(changed);
+    await page
+        .getByRole("tab", { name: "Build properties", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Edit SourceLabel", exact: true })
+        .click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Default value").fill("not applied");
+    await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+    await page.getByRole("tab", { name: "TOML source", exact: true }).click();
+    await expect(editor).toHaveValue(changed);
+    expect(readFileSync(configPath, "utf8")).toBe(original);
 });
 
 function createDotnetProjects(): string {

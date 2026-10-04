@@ -5,12 +5,13 @@
     import Chip from "$lib/components/ui/Chip.svelte";
     import Tabs from "$lib/components/ui/Tabs.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import ConfigurationEditor from "$lib/components/ConfigurationEditor.svelte";
     let tab = $state("source");
 </script>
 
 <PageHeader
     title="Configuration"
-    description="Edit the TOML source directly. Validation uses pacev2's models, including dependency and schema checks."
+    description="Edit build properties, workspace paths, or TOML source. All changes share one draft and are validated by pacev2 before saving."
 >
     {#snippet actions()}
         <Button
@@ -99,61 +100,12 @@
                             >
                         </div>
                     </div>
-                {:else if value === "properties"}
-                    <p
-                        class="mb-4 text-body-small leading-relaxed text-text-secondary"
-                    >
-                        Properties from the saved configuration. Edit <code
-                            >[[build-props]]</code
-                        > in the TOML source to change them. Enable property overrides
-                        in .NET operations to pass them to a command. Generating Directory.Build.props
-                        is not yet implemented.
-                    </p>
-                    <table class="mb-5 w-full">
-                        <thead class="table-head"
-                            ><tr
-                                ><th class="px-4 py-3">Property</th><th
-                                    class="px-4 py-3">Type</th
-                                ><th class="px-4 py-3">Default value</th></tr
-                            ></thead
-                        ><tbody>
-                            {#each app.workspace?.config.build_props ?? [] as property}
-                                <tr
-                                    ><td class="table-cell mono"
-                                        >{property.name}</td
-                                    ><td class="table-cell"
-                                        ><Chip
-                                            label={property.datatype}
-                                            scale="s"
-                                            appearance="none"
-                                        /></td
-                                    ><td class="table-cell mono break-all"
-                                        >{String(property.default) ||
-                                            "(empty)"}</td
-                                    ></tr
-                                >
-                            {:else}<tr
-                                    ><td
-                                        colspan="3"
-                                        class="p-6 text-center text-body-small text-text-tertiary"
-                                        >No build properties configured.</td
-                                    ></tr
-                                >{/each}
-                        </tbody>
-                    </table>
                 {:else}
-                    <dl class="space-y-6 pb-6">
-                        {#each [{ label: "Repository directory", value: app.workspace?.config.repodir }, { label: "Resolved repository directory", value: app.workspace?.repoRoot }, { label: "Custom NuGet cache", value: app.workspace?.config.nuget_cache_path || "Not configured" }, { label: "CLI working directory", value: app.options.directory }] as path}
-                            <div>
-                                <dt class="eyebrow mb-2">{path.label}</dt>
-                                <dd
-                                    class="mono break-all text-body-small leading-relaxed"
-                                >
-                                    {path.value}
-                                </dd>
-                            </div>
-                        {/each}
-                    </dl>
+                    <ConfigurationEditor
+                        section={value === "properties"
+                            ? "properties"
+                            : "paths"}
+                    />
                 {/if}
             {/snippet}
         </Tabs>

@@ -69,6 +69,25 @@ export function defaultDotnetOptions(): DotnetOptions {
     };
 }
 
+export function retainPropertyOverrides(
+    values: Record<string, string>,
+    previous: BuildProperty[],
+    current: BuildProperty[],
+): Record<string, string> {
+    return Object.fromEntries(
+        Object.entries(values).filter(([name]) => {
+            const before = previous.find((property) => property.name === name);
+            const after = current.find((property) => property.name === name);
+            return (
+                before &&
+                after &&
+                before.datatype === after.datatype &&
+                before.default === after.default
+            );
+        }),
+    );
+}
+
 export function supportsFramework(task: DotnetTask): boolean {
     return ["build", "test", "publish", "clean"].includes(task);
 }

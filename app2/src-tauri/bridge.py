@@ -10,8 +10,10 @@ import tomllib
 from importlib.metadata import version
 from pathlib import Path
 
+import tomlkit
 from pacev2.config import ConfigStore
-from pacev2.models import Config
+from pacev2.models import BuildProp, Config
+from tomlkit.items import AoT
 
 
 def workspace(path: str | None = None) -> dict:
@@ -61,6 +63,87 @@ def save_config(request: dict) -> dict:
     return workspace(str(path))
 
 
+def configuration_fields(content: str) -> dict:
+    raw = tomllib.loads(content)
+    config = Config.model_validate(raw)
+    properties = raw.get("build-props", raw.get("build_props", []))
+    return {
+        "repodir": raw.get("repodir", "."),
+        "nuget_cache_path": raw.get("nuget_cache_path"),
+        "build_props": [
+            {
+                **validated.model_dump(mode="json"),
+                **(
+                    {"default": original["default"]}
+                    if isinstance(original.get("default"), (str, bool))
+                    else {}
+                ),
+            }
+            for original, validated in zip(properties, config.build_props, strict=True)
+        ],
+        "repoRoot": str(config.repodir.resolve()),
+        "nugetCacheRoot": (
+            str(config.nuget_cache_path.resolve()) if config.nuget_cache_path else None
+        ),
+    }
+
+
+def edit_configuration(request: dict) -> str:
+    document = tomlkit.parse(request["content"])
+    Config.model_validate(document.unwrap())
+    change = request["change"]
+    kind = change["kind"]
+    if kind == "paths":
+        if document.get("repodir") != change["repodir"]:
+            document["repodir"] = change["repodir"]
+        if change["nuget_cache_path"] is None:
+            document.pop("nuget_cache_path", None)
+        elif document.get("nuget_cache_path") != change["nuget_cache_path"]:
+            document["nuget_cache_path"] = change["nuget_cache_path"]
+    elif kind in {"build-property", "delete-build-property"}:
+        key = "build_props" if "build_props" in document else "build-props"
+        properties = document.get(key, [])
+        index = change["index"]
+        if (kind == "delete-build-property" or index is not None) and (
+            type(index) is not int or not 0 <= index < len(properties)
+        ):
+            raise ValueError("This build property no longer exists. Reopen the editor.")
+        if kind == "delete-build-property":
+            del properties[index]
+        else:
+            property_data = change["property"]
+            property_model = BuildProp.model_validate(property_data)
+            if any(
+                item["name"].casefold() == property_model.name.casefold()
+                for position, item in enumerate(properties)
+                if position != index
+            ):
+                raise ValueError(
+                    "Build property names must be unique (case-insensitive)."
+                )
+            if index is None:
+                if key not in document:
+                    document[key] = tomlkit.aot()
+                properties = document[key]
+                item = (
+                    tomlkit.table()
+                    if isinstance(properties, AoT)
+                    else tomlkit.inline_table()
+                )
+                item.update(property_data)
+                properties.append(item)
+            else:
+                item = properties[index]
+                for field, value in property_data.items():
+                    if item.get(field) != value:
+                        item[field] = value
+    else:
+        raise ValueError(f"Unknown configuration edit: {kind}")
+    content = tomlkit.dumps(document)
+    Config.model_validate(tomllib.loads(content))
+    return content
+
+
 def diagnostics() -> list[dict]:
     results = [
         {"name": "Python", "version": sys.version.split()[0], "available": True},
@@ -98,6 +181,10 @@ def dispatch(request: dict):
     if action == "validate":
         config = Config.model_validate(tomllib.loads(request["content"]))
         return config.model_dump(mode="json")
+    if action == "configuration-fields":
+        return configuration_fields(request["content"])
+    if action == "edit-configuration":
+        return edit_configuration(request)
     if action == "verify":
         if Path(request["path"]).read_text(encoding="utf-8") != request["expected"]:
             raise ValueError(
