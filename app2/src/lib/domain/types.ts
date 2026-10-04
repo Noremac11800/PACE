@@ -1,3 +1,5 @@
+import type { MonitorState } from "./monitor";
+
 export interface Project {
     name: string;
     csproj_path: string;
@@ -49,6 +51,15 @@ export type View =
     | "settings";
 export interface Run {
     id: number;
+    kind: "git" | "dotnet" | "tool";
+    operation: string;
+    context: {
+        path: string;
+        repoRoot: string;
+        from: string;
+        to: string;
+        projects: Project[];
+    } | null;
     label: string;
     command: string;
     started: Date;
@@ -58,5 +69,9 @@ export interface Run {
     output: string;
     truncated: boolean;
     progress: MonitorState;
+    repositoryLogs: {
+        entries: { projectId: string; text: string }[];
+        size: number;
+        truncated: boolean;
+    };
 }
-import type { MonitorState } from "./monitor";

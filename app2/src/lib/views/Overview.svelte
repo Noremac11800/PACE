@@ -212,7 +212,7 @@
                     />{/snippet}
             </Card>
             <Card
-                heading="Review command output"
+                heading="Review command history"
                 description="A clear history of this session's work."
                 size="l"
                 thumbnail={false}

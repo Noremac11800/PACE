@@ -45,8 +45,8 @@ bun run tauri build
   and custom commands with configuration/framework options and warning summaries.
 - Stream command output, inspect exit codes, copy results, and run CLI help,
   version, and configuration-printing commands.
-- Use `--monitor` automatically for Git and dotnet commands. Command activity
-  shows live per-project statuses and observed .NET stages above the readable log.
+- Use `--monitor` automatically for Git and dotnet commands. Each operation
+  workspace owns its live results; starting or finishing a command never changes views.
 - Switch between system, light, and dark themes; inspect runtime/tool versions.
 
 The separate PACE clean, upload, and update commands remain unimplemented. The
@@ -68,11 +68,42 @@ Commands run one at a time and must finish before closing the app. Session
 history retains 20 commands and the last 250,000 output characters per command;
 truncation is explicitly marked. History is not persisted after closing.
 
+## Operation workspaces
+
+The layout follows the original app's in-place operation workflow, without
+duplicating its CLI or inferring progress from terminal output.
+
+**Git operations** puts Check status, Clone missing, and Pull latest in a compact
+toolbar. Repositories are grouped by solution group, including an Ungrouped
+section. Select a repository to see its own streamed output and operation status;
+these statuses describe the command, not an inferred clean/dirty working tree.
+Custom Git arguments are available in an expandable section and survive navigation,
+as does the selected repository. The full command log remains available below.
+
+**.NET operations** keeps command options in a left column and the current/last
+run, live project-stage matrix, and log in the right column. MSBuild properties
+are expandable, leaving common controls readily accessible. Missing stage events
+are shown as not reported, rather than invented progress. Restore/Pack/Clean and
+other commands without project events still show their live output in place.
+
+Git and .NET each have their own recent-command selector. A run captures its
+configuration, selected repositories, dependency range, and executed command.
+Changing options or scope prepares the **next** command; it does not relabel
+existing results. Results from another configuration do not appear in the active
+workspace. A navigation indicator and a clickable running-command footer let you
+return to an operation after navigating elsewhere, without automatic tab changes.
+
+**Command history** is a secondary archive and home for CLI help, version, config,
+and SDK-information tools. Opening an archived run in its matching workspace is
+explicit. Clearing history also clears inline results, without resetting form
+options. In addition to the shared output limit, Git's repository-specific logs
+share a 250,000-character buffer per command; truncation is marked.
+
 ## .NET operations
 
 Requires the updated pacev2 module and .NET SDK **9.0.200 or newer**, with any
 SDKs/workloads your projects need. Check availability in Settings, or run
-**.NET SDK information** from Command activity.
+**.NET SDK information** from Command history.
 
 The form supports Build, Test, Restore, Pack, Publish, Clean, and Custom command.
 Choose Debug/Release, an optional target framework, and the options supported by
@@ -82,7 +113,7 @@ that task. Restore uses `-p:Configuration=...`; it does not receive build-only
 **Rebuild all outputs** adds `-t:Rebuild` rather than deleting `bin`/`obj` manually
 or calling the unimplemented PACE clean command. It is useful with **Summarize
 build warnings**, which places `-w` before the dotnet subcommand. Summaries and
-the log filename appear in Command activity; pacev2 writes the log under
+the log filename appear beside the .NET options; pacev2 writes the log under
 `~/.pace/logs`. Incremental builds may not re-emit existing compiler warnings.
 
 Configured MSBuild properties are opt-in. Enable a property to pass its value
@@ -98,11 +129,11 @@ the warning-summary switch. Do not supply a project/solution target: pacev2
 supplies `PACE.slnx`. Rebuild, Clean, Publish, custom commands, and commands with
 additional arguments require confirmation.
 
-Options survive navigation to Command activity and back during the session.
+Options and results survive navigation during the session.
 Reset options restores defaults; changing the active config resets options and
 property overrides. Configuration edits must be saved before execution.
-The shared runner uses pacev2's versioned JSON Lines monitor protocol. Command
-activity shows queued/running/succeeded/failed/skipped/incomplete projects, plus
+The shared runner uses pacev2's versioned JSON Lines monitor protocol. The .NET
+workspace shows queued/running/succeeded/failed/skipped/incomplete projects, plus
 observed restore, compile, build, publish, and test stages for build/publish/test.
 Stage counts update while the command runs, even at quiet verbosity. Referenced
 projects discovered by MSBuild appear too. Projects remain in progress until

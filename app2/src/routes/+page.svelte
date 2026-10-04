@@ -49,7 +49,7 @@
                 { view: "dotnet", label: ".NET operations", icon: "gear" },
                 {
                     view: "activity",
-                    label: "Command activity",
+                    label: "Command history",
                     icon: "console",
                 },
             ],
@@ -250,7 +250,7 @@
                                         >{app.workspace.config.projects
                                             .length}</span
                                     >{/if}
-                                {#if item.view === "activity" && app.running}<Spinner
+                                {#if app.activeRun && item.view === (app.activeRun.kind === "tool" ? "activity" : app.activeRun.kind)}<Spinner
                                         scale="s"
                                     />{/if}
                             </button>
@@ -358,13 +358,22 @@
     <footer
         class="col-span-2 flex items-center gap-4 border-t border-border-tertiary bg-foreground-primary px-4 text-caption text-text-tertiary"
     >
-        <span class="flex shrink-0 items-center gap-1.5"
-            >{#if app.locked}<Spinner scale="s" />{app.running
-                    ? "Command running"
-                    : "Working..."}{:else}<span
-                    class="size-1.5 rounded-full bg-brand"
-                ></span>{desktop ? "Ready" : "Preview only"}{/if}</span
-        >
+        {#if app.activeRun}
+            <button
+                class="flex shrink-0 items-center gap-1.5 text-brand"
+                onclick={() => {
+                    if (app.activeRun) app.showRun(app.activeRun);
+                }}
+            >
+                <Spinner scale="s" />{app.activeRun.label} running · Show
+            </button>
+        {:else}
+            <span class="flex shrink-0 items-center gap-1.5"
+                >{#if app.busy}<Spinner scale="s" />Working…{:else}<span
+                        class="size-1.5 rounded-full bg-brand"
+                    ></span>{desktop ? "Ready" : "Preview only"}{/if}</span
+            >
+        {/if}
         <span class="truncate"
             >{app.workspace?.repoRoot ??
                 "Project Automation and Configuration Engine"}</span

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { app } from "$lib/state/app.svelte";
+    import { gitForm } from "$lib/state/git.svelte";
     import {
         commandPreview,
         monitoredArgs,
@@ -11,7 +12,12 @@
     import Button from "$lib/components/ui/Button.svelte";
     import Input from "$lib/components/ui/Input.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
-    let custom = $state("status --short --branch");
+    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import RunSummary from "$lib/components/RunSummary.svelte";
+    import GitResults from "$lib/components/GitResults.svelte";
+    import CommandLog from "$lib/components/CommandLog.svelte";
+    let current = $derived(app.operationRun("git"));
+    let running = $derived(app.activeRun?.kind === "git");
     let unavailable = $derived(
         app.locked || app.filtering || !app.selectedNames.length || app.dirty,
     );
@@ -22,7 +28,10 @@
                     app.workspace?.path ?? "",
                     app.from,
                     app.to,
-                    monitoredArgs(["git", ...parseArguments(custom)]),
+                    monitoredArgs([
+                        "git",
+                        ...parseArguments(gitForm.customArgs),
+                    ]),
                 ),
             );
         } catch {
@@ -45,7 +54,7 @@
 
     async function runCustom() {
         try {
-            const args = parseArguments(custom);
+            const args = parseArguments(gitForm.customArgs);
             if (!args.length) throw new Error("Enter a Git subcommand first.");
             await run(args, "Custom Git command", true);
         } catch (error) {
@@ -55,10 +64,44 @@
 </script>
 
 <PageHeader
+    compact
     eyebrow="Operations"
     title="Git operations"
-    description="Run Git across your selected repositories in parallel. Every command uses pacev2's non-interactive batch runner."
-/>
+    description="Repositories, actions, and output in one place."
+>
+    {#snippet actions()}
+        <Button
+            scale="s"
+            kind="neutral"
+            appearance="outline-fill"
+            iconStart="download"
+            disabled={unavailable}
+            onclick={() => run(["clone"], "Clone repositories", true)}
+            >Clone missing</Button
+        >
+        <Button
+            scale="s"
+            kind="neutral"
+            appearance="outline-fill"
+            iconStart="refresh"
+            disabled={unavailable}
+            onclick={() =>
+                run(["pull", "--ff-only"], "Pull latest changes", true)}
+            >Pull latest</Button
+        >
+        <Button
+            scale="s"
+            disabled={unavailable}
+            onclick={() =>
+                run(["status", "--short", "--branch"], "Check status")}
+        >
+            {#if running}<Spinner scale="s" />Running…{:else}<Icon
+                    name="list"
+                    size={16}
+                />Check status{/if}
+        </Button>
+    {/snippet}
+</PageHeader>
 <ScopeBar />
 {#if app.dirty}<p
         role="status"
@@ -66,81 +109,72 @@
     >
         Save or discard your configuration edits before running commands.
     </p>{/if}
-<div class="mb-6 grid grid-cols-3 gap-4">
-    {#each [{ title: "Check status", eyebrow: "Inspect", icon: "list" as const, description: "Review branches and local changes without modifying repositories.", command: ["status", "--short", "--branch"], confirm: false, button: "Check status" }, { title: "Clone repositories", eyebrow: "Set up", icon: "download" as const, description: "Clone configured remotes. Existing checkouts are safely skipped.", command: ["clone"], confirm: true, button: "Clone missing" }, { title: "Pull latest changes", eyebrow: "Sync", icon: "refresh" as const, description: "Fast-forward each checkout. Diverged branches fail rather than merge.", command: ["pull", "--ff-only"], confirm: true, button: "Pull latest" }] as action}
-        <section class="panel flex flex-col p-5">
-            <div class="mb-5 flex items-center justify-between">
-                <span class="eyebrow">{action.eyebrow}</span><Icon
-                    name={action.icon}
-                    class="text-brand"
-                    size={24}
+<div class="space-y-4">
+    <details class="panel" bind:open={gitForm.customOpen}>
+        <summary class="cursor-pointer px-4 py-3 text-label-medium"
+            >Custom Git command</summary
+        >
+        <form
+            class="space-y-3 border-t border-border-tertiary p-4"
+            onsubmit={(event) => {
+                event.preventDefault();
+                runCustom();
+            }}
+        >
+            <div class="flex items-end gap-3">
+                <Input
+                    label="Git arguments"
+                    variant="general"
+                    bind:value={gitForm.customArgs}
+                    disabled={app.locked}
+                    placeholder={'checkout -b "feature/my-change"'}
+                    clearable={false}
+                    class="min-w-0 flex-1"
                 />
+                <Button
+                    type="submit"
+                    iconStart="play"
+                    disabled={unavailable || !gitForm.customArgs.trim()}
+                    >Run command</Button
+                >
             </div>
-            <h2 class="text-title-medium">{action.title}</h2>
-            <p
-                class="mt-2 mb-6 flex-1 text-body-small leading-relaxed text-text-secondary"
-            >
-                {action.description}
-            </p>
-            <Button
-                width="full"
-                appearance={action.confirm ? "outline-fill" : "solid"}
-                disabled={unavailable}
-                onclick={() =>
-                    run(action.command, action.title, action.confirm)}
-                >{action.button}</Button
-            >
-        </section>
-    {/each}
-</div>
-<section class="panel">
-    <div class="panel-heading">
-        <div>
-            <h2 class="text-title-small">Custom Git command</h2>
-            <p class="mt-1 text-caption text-text-tertiary">
-                Arguments are passed directly to Git, never through a shell.
-            </p>
-        </div>
-        <Icon name="console" class="text-text-tertiary" />
-    </div>
-    <form
-        class="space-y-4 p-5"
-        onsubmit={(event) => {
-            event.preventDefault();
-            runCustom();
-        }}
-    >
-        <div class="flex items-end gap-3">
-            <span class="mono pb-3 text-body-small text-text-tertiary">git</span
-            ><Input
-                label="Git arguments"
-                variant="general"
-                bind:value={custom}
-                placeholder={'checkout -b "feature/my-change"'}
-                clearable={false}
-                class="flex-1"
-            /><Button
-                type="submit"
-                iconStart="play"
-                disabled={unavailable || !custom.trim()}>Run command</Button
-            >
-        </div>
-        <div class="rounded bg-foreground-secondary p-4">
-            <p class="eyebrow mb-2">Command preview</p>
             <code
-                class="block break-all text-caption leading-relaxed text-text-secondary"
+                class="block break-all rounded bg-foreground-secondary p-3 text-caption leading-relaxed"
                 >{preview}</code
             >
-        </div>
-    </form>
-</section>
-<div
-    class="mt-5 flex items-start gap-3 text-body-small leading-relaxed text-text-secondary"
->
-    <Icon name="information" size={18} class="mt-0.5 text-status-info" />
-    <p>
-        Commands run on the selected dependency range. Missing checkouts and
-        projects without remotes are reported by pacev2. Interactive prompts,
-        editors, and credential input are disabled.
+        </form>
+    </details>
+    {#if current}
+        <RunSummary
+            run={current}
+            runs={app.operationRuns("git")}
+            onselect={(id) => (app.operationSelection.git = id)}
+        />
+    {/if}
+    <GitResults
+        run={current}
+        projects={current?.context?.projects ?? app.selectedProjects}
+        repoRoot={current?.context?.repoRoot ?? app.workspace?.repoRoot ?? ""}
+    />
+    {#if current}
+        <details class="panel" open={current.status === "failed"}>
+            <summary class="cursor-pointer px-4 py-3 text-label-small"
+                >Full command log</summary
+            >
+            {#key current.id}
+                <CommandLog
+                    text={current.output}
+                    running={current.status === "running"}
+                    truncated={current.truncated}
+                    empty="Command completed without output."
+                />
+            {/key}
+        </details>
+    {/if}
+    <p class="text-caption leading-relaxed text-text-tertiary">
+        Clone and pull ask for confirmation. Git runs without interactive
+        prompts or editors.
+        {#if current}Results show the saved run scope above; changing the scope
+            applies to your next command.{/if}
     </p>
 </div>

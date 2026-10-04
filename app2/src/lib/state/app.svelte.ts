@@ -1,5 +1,6 @@
 import * as api from "$lib/services/desktop";
 import { dotnetForm } from "./dotnet.svelte";
+import { gitForm } from "./git.svelte";
 import { defaultDotnetOptions } from "$lib/domain/dotnet";
 import {
     cleanOutput,
@@ -12,6 +13,13 @@ import {
     closeMonitor,
     newMonitorState,
 } from "$lib/domain/monitor";
+import {
+    appendRepositoryLog,
+    commandKind,
+    commandOperation,
+    OUTPUT_LIMIT,
+    workspaceRuns,
+} from "$lib/domain/runs";
 import type {
     Diagnostic,
     PaceConfig,
@@ -22,7 +30,6 @@ import type {
 } from "$lib/domain/types";
 
 const SETTINGS_KEY = "pace.desktop.runtime";
-const OUTPUT_LIMIT = 250_000;
 
 class App {
     view = $state<View>("overview");
@@ -38,6 +45,10 @@ class App {
     filtering = $state(false);
     runs = $state<Run[]>([]);
     selectedRunId = $state<number | null>(null);
+    operationSelection = $state<{ git: number | null; dotnet: number | null }>({
+        git: null,
+        dotnet: null,
+    });
     diagnostics = $state<Diagnostic[]>([]);
     notice = $state<{
         tone: "error" | "success" | "info";
@@ -56,6 +67,35 @@ class App {
     }
     get running() {
         return this.runs.some((run) => run.status === "running");
+    }
+    get activeRun() {
+        return this.runs.find((run) => run.status === "running") ?? null;
+    }
+    operationRuns(kind: "git" | "dotnet") {
+        return workspaceRuns(this.runs, kind, this.workspace?.path);
+    }
+    operationRun(kind: "git" | "dotnet") {
+        const runs = this.operationRuns(kind);
+        return (
+            runs.find((run) => run.id === this.operationSelection[kind]) ??
+            runs[0] ??
+            null
+        );
+    }
+    showRun(run: Run) {
+        if (run.kind !== "tool" && run.context?.path === this.workspace?.path) {
+            this.operationSelection[run.kind] = run.id;
+            this.view = run.kind;
+        } else {
+            this.selectedRunId = run.id;
+            this.view = "activity";
+        }
+    }
+    clearHistory() {
+        if (this.running) return;
+        this.runs = [];
+        this.selectedRunId = null;
+        this.operationSelection = { git: null, dotnet: null };
     }
     get locked() {
         return this.busy || this.running;
@@ -116,6 +156,10 @@ class App {
         if (dotnetForm.configPath !== workspace.path) {
             dotnetForm.configPath = workspace.path;
             dotnetForm.options = defaultDotnetOptions();
+            dotnetForm.propertiesOpen = false;
+            gitForm.customArgs = "status --short --branch";
+            gitForm.customOpen = false;
+            gitForm.selectedRepository = "";
         }
         this.filterGeneration++;
         this.workspace = workspace;
@@ -307,8 +351,21 @@ class App {
                 : monitoredArgs(args);
         this.notice = null;
         const id = Date.now();
+        const kind = commandKind(args, scoped);
         this.runs.unshift({
             id,
+            kind,
+            operation: commandOperation(args),
+            context:
+                scoped && this.workspace
+                    ? {
+                          path: this.workspace.path,
+                          repoRoot: this.workspace.repoRoot,
+                          from: this.from,
+                          to: this.to,
+                          projects: $state.snapshot(this.selectedProjects),
+                      }
+                    : null,
             label,
             command: commandPreview(allArgs),
             started: new Date(),
@@ -318,10 +375,11 @@ class App {
             output: "",
             truncated: false,
             progress: newMonitorState(),
+            repositoryLogs: { entries: [], size: 0, truncated: false },
         });
         this.runs = this.runs.slice(0, 20);
         this.selectedRunId = id;
-        this.view = "activity";
+        if (kind !== "tool") this.operationSelection[kind] = id;
         const run = this.runs[0];
         try {
             if (scoped && this.workspace)
@@ -338,7 +396,15 @@ class App {
                     if (output.length > OUTPUT_LIMIT) run.truncated = true;
                     run.output = output.slice(-OUTPUT_LIMIT);
                 },
-                (event) => applyMonitorEvent(run.progress, event),
+                (event) => {
+                    applyMonitorEvent(run.progress, event);
+                    if (
+                        run.kind === "git" &&
+                        event.event === "log" &&
+                        event.project_id
+                    )
+                        appendRepositoryLog(run, event.project_id, event.text);
+                },
             );
             run.code = result.code;
             if (result.monitorError) throw result.monitorError;

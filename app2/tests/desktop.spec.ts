@@ -297,7 +297,7 @@ test("desktop navigation, real scope filtering, and persistent light/dark themes
     for (const name of [
         "Git operations",
         ".NET operations",
-        "Command activity",
+        "Command history",
         "Configuration",
         "Settings",
     ]) {
@@ -481,6 +481,9 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
         .getByRole("switch", { name: "Summarize build warnings" })
         .click();
     await page
+        .getByText("MSBuild properties (0 enabled)", { exact: true })
+        .click();
+    await page
         .getByRole("checkbox", { name: "DemoFeature", exact: true })
         .check();
     await page
@@ -497,7 +500,7 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
             name: "Additional arguments (optional)",
             exact: true,
         })
-        .fill("--nologo --verbosity quiet");
+        .fill("--nologo --verbosity quiet -m:1");
     const preview = page.getByTestId("dotnet-preview");
     await expect(preview).toContainText(
         `dotnet -w build -c Release -f ${framework} -t:Rebuild`,
@@ -522,6 +525,12 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
     await expect(page.getByText("Completed", { exact: true })).toBeVisible({
         timeout: 60_000,
     });
+    await expect(
+        page.getByRole("heading", { name: ".NET operations", exact: true }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole("heading", { name: "Command history", exact: true }),
+    ).not.toBeVisible();
     const output = page.getByRole("region", { name: "Command output" });
     await expect(output).toContainText("Total warnings: 2");
     await expect(output).toContainText("Warning summary log:");
@@ -539,8 +548,15 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
         "desktop-client/desktop-client/desktop-client.csproj",
     );
     await page
+        .getByRole("button", { name: "Git operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("region", { name: "Project progress" }),
+    ).not.toBeVisible();
+    await page
         .getByRole("button", { name: ".NET operations", exact: true })
         .click();
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
     await expect(
         page.getByRole("switch", { name: "Summarize build warnings" }),
     ).toHaveAttribute("aria-checked", "true");
@@ -560,6 +576,32 @@ test("dotnet form builds a real solution, summarizes warnings, and retains optio
     await expect(preview).not.toContainText("--no-restore");
     await expect(preview).not.toContainText("-f ");
     await expect(preview).not.toContainText("-t:Rebuild");
+    await expect(
+        progress.getByRole("heading", { name: "Build progress", exact: true }),
+    ).toBeVisible();
+
+    await page
+        .getByRole("button", { name: "Command history", exact: true })
+        .click();
+    await page
+        .getByRole("combobox", { name: "CLI command" })
+        .selectOption("--version");
+    await page.getByRole("button", { name: "Run", exact: true }).click();
+    await expect(
+        page.getByRole("heading", { name: "Command history", exact: true }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole("region", { name: "Command output" }),
+    ).toContainText("pacev2 ");
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(
+        page.getByRole("region", { name: "Command output" }),
+    ).toContainText("Total warnings: 2");
+    await expect(
+        page.getByRole("combobox", { name: "Dotnet task" }),
+    ).toHaveValue("restore");
 });
 
 test("dotnet custom commands surface failures, reject malformed quotes, and honor scope", async ({
@@ -607,6 +649,9 @@ test("dotnet custom commands surface failures, reject malformed quotes, and hono
         },
     );
     await expect(
+        page.getByRole("heading", { name: ".NET operations", exact: true }),
+    ).toBeVisible();
+    await expect(
         page.getByRole("region", { name: "Command output" }),
     ).toContainText("NotARealTarget");
     const solution = readFileSync(join(directory, "repos/PACE.slnx"), "utf8");
@@ -633,6 +678,9 @@ test("dotnet options reset when configurations change outside the dotnet view", 
         .getByRole("combobox", { name: "Build configuration" })
         .selectOption("Release");
     await page
+        .getByText("MSBuild properties (0 enabled)", { exact: true })
+        .click();
+    await page
         .getByRole("checkbox", { name: "DemoLabel", exact: true })
         .check();
     await page
@@ -653,6 +701,9 @@ test("dotnet options reset when configurations change outside the dotnet view", 
     await expect(
         page.getByRole("combobox", { name: "Build configuration" }),
     ).toHaveValue("Debug");
+    await page
+        .getByText("MSBuild properties (0 enabled)", { exact: true })
+        .click();
     await expect(
         page.getByRole("checkbox", { name: "DemoLabel", exact: true }),
     ).not.toBeChecked();
@@ -672,13 +723,38 @@ test("Git status and a failed custom command report real CLI results", async ({
         .click();
     await expect(page.getByText("Completed", { exact: true })).toBeVisible();
     await expect(
-        page.getByRole("region", { name: "Command output" }),
-    ).toContainText("foundation");
+        page.getByRole("heading", { name: "Git operations", exact: true }),
+    ).toBeVisible();
+    const repositories = page.getByRole("region", {
+        name: "Git repository results",
+    });
+    await expect(
+        repositories.locator('[data-project="foundation"]'),
+    ).toContainText("Checked");
+    await expect(
+        page.getByRole("region", { name: "Repository output" }),
+    ).toContainText("##");
+    await page
+        .getByRole("button", { name: "Repository services", exact: true })
+        .click();
+    await expect(
+        page.getByRole("region", { name: "Repository output" }),
+    ).toContainText("not cloned");
     await page.screenshot({ path: testInfo.outputPath("command-output.png") });
+    await page.getByText("Custom Git command", { exact: true }).click();
+    await page.getByLabel("Git arguments").fill("not-a-real-git-command");
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
     await page
         .getByRole("button", { name: "Git operations", exact: true })
         .click();
-    await page.getByLabel("Git arguments").fill("not-a-real-git-command");
+    await expect(page.getByLabel("Git arguments")).toHaveValue(
+        "not-a-real-git-command",
+    );
+    await expect(
+        page.getByRole("button", { name: "Repository services", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
     await page
         .getByRole("button", { name: "Run command", exact: true })
         .click();
@@ -692,6 +768,19 @@ test("Git status and a failed custom command report real CLI results", async ({
     await expect(
         page.getByRole("region", { name: "Command output" }),
     ).toContainText("not-a-real-git-command");
+    await expect(
+        page.getByRole("heading", { name: "Git operations", exact: true }),
+    ).toBeVisible();
+    await page
+        .getByRole("combobox", { name: "Recent Git commands" })
+        .selectOption({ index: 1 });
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+    await page
+        .getByRole("button", { name: "Repository foundation", exact: true })
+        .click();
+    await expect(
+        page.getByRole("region", { name: "Repository output" }),
+    ).toContainText("##");
 });
 
 test("project stages update live before a quiet build can finish", async ({
@@ -743,6 +832,9 @@ test("project stages update live before a quiet build can finish", async ({
         ).toContainText("Compile: Succeeded", { timeout: 30_000 });
         await expect(page.getByText("Running", { exact: true })).toBeVisible();
         await expect(
+            page.getByRole("heading", { name: ".NET operations", exact: true }),
+        ).toBeVisible();
+        await expect(
             page.getByText("Completed", { exact: true }),
         ).not.toBeVisible();
         await page.screenshot({
@@ -754,13 +846,136 @@ test("project stages update live before a quiet build can finish", async ({
                 .locator("main")
                 .evaluate((main) => main.scrollWidth <= main.clientWidth),
         ).toBe(true);
+        await page
+            .getByRole("button", { name: "Git operations", exact: true })
+            .click();
+        await expect(
+            page.getByRole("button", { name: "Check status", exact: true }),
+        ).toBeDisabled();
+        await page
+            .getByRole("button", {
+                name: ".NET build running · Show",
+                exact: true,
+            })
+            .click();
+        await expect(
+            page.getByRole("heading", { name: ".NET operations", exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole("textbox", {
+                name: "Additional arguments (optional)",
+                exact: true,
+            }),
+        ).toHaveValue("--verbosity quiet");
+        await page
+            .getByRole("button", { name: "Overview", exact: true })
+            .click();
     } finally {
         writeFileSync(acknowledged, "");
     }
-    await expect(page.getByText("Completed", { exact: true })).toBeVisible({
-        timeout: 30_000,
-    });
+    await expect(
+        page.getByRole("button", {
+            name: ".NET build running · Show",
+            exact: true,
+        }),
+    ).not.toBeVisible({ timeout: 30_000 });
+    await expect(
+        page.getByRole("heading", { name: "Workspace overview", exact: true }),
+    ).toBeVisible();
+    await page
+        .getByRole("button", { name: ".NET operations", exact: true })
+        .click();
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
     await expect(
         page.getByRole("region", { name: "Project progress" }),
     ).toContainText("4 succeeded");
+});
+
+test("Git results retain their run scope and stay isolated by configuration", async ({
+    page,
+}) => {
+    const alternate = join(directory, ".pace/configs/alternate.toml");
+    mkdirSync(join(directory, ".pace/configs"), { recursive: true });
+    writeFileSync(alternate, readFileSync(configPath, "utf8"));
+    await page
+        .getByRole("navigation")
+        .getByRole("button", { name: "Configuration", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Reload from disk", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Git operations", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Check status", exact: true })
+        .click();
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+    await page
+        .getByRole("combobox", { name: "To", exact: true })
+        .selectOption("foundation");
+    await expect(
+        page.getByText("1 of 4 repositories", { exact: true }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole("region", { name: "Command status", exact: true }),
+    ).toContainText("Run scope: 4 repositories");
+    await expect(
+        page
+            .getByRole("region", { name: "Repository list", exact: true })
+            .getByRole("button"),
+    ).toHaveCount(4);
+    await page
+        .getByRole("button", { name: "Check status", exact: true })
+        .click();
+    await expect(
+        page.getByRole("region", { name: "Command status", exact: true }),
+    ).toContainText("Run scope: 1 repository");
+    await expect(
+        page
+            .getByRole("region", { name: "Repository list", exact: true })
+            .getByRole("button"),
+    ).toHaveCount(1);
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+    await page
+        .getByRole("combobox", { name: "Recent Git commands" })
+        .selectOption({ index: 1 });
+    await expect(
+        page
+            .getByRole("region", { name: "Repository list", exact: true })
+            .getByRole("button"),
+    ).toHaveCount(4);
+
+    await page
+        .getByRole("combobox", { name: "Configuration", exact: true })
+        .selectOption({ label: "alternate" });
+    await expect(
+        page.getByText("Completed", { exact: true }),
+    ).not.toBeVisible();
+    await expect(page.getByText("Not checked", { exact: true })).toHaveCount(4);
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+
+    await page
+        .getByRole("button", { name: "Command history", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Open in Git workspace", exact: true })
+        .click();
+    await expect(
+        page.getByRole("heading", { name: "Git operations", exact: true }),
+    ).toBeVisible();
+    await page
+        .getByRole("button", { name: "Command history", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Clear history", exact: true })
+        .click();
+    await page
+        .getByRole("button", { name: "Git operations", exact: true })
+        .click();
+    await expect(
+        page.getByText("Completed", { exact: true }),
+    ).not.toBeVisible();
+    await expect(page.getByText("Not checked", { exact: true })).toHaveCount(4);
 });

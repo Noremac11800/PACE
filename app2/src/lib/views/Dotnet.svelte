@@ -21,7 +21,14 @@
     import Input from "$lib/components/ui/Input.svelte";
     import Switch from "$lib/components/ui/Switch.svelte";
     import Icon from "$lib/components/ui/Icon.svelte";
+    import Spinner from "$lib/components/ui/Spinner.svelte";
+    import RunSummary from "$lib/components/RunSummary.svelte";
+    import CommandLog from "$lib/components/CommandLog.svelte";
+    import DotnetProgress from "$lib/components/DotnetProgress.svelte";
+    import { commandOperation } from "$lib/domain/runs";
 
+    let current = $derived(app.operationRun("dotnet"));
+    let running = $derived(app.activeRun?.kind === "dotnet");
     let options = $derived(dotnetForm.options);
     let task = $derived(
         dotnetTasks.find((task) => task.value === options.task)!,
@@ -56,6 +63,9 @@
             app.dirty ||
             !!command.error,
     );
+    let operation = $derived(
+        current?.operation ?? commandOperation(command.args),
+    );
 
     async function run() {
         if (unavailable) return;
@@ -78,9 +88,10 @@
 </script>
 
 <PageHeader
+    compact
     eyebrow="Operations"
     title=".NET operations"
-    description="Build and manage your solution through pacev2. MSBuild handles dependency ordering and parallel execution."
+    description="Options, project stages, and output in one place."
 >
     {#snippet actions()}
         <Button
@@ -92,23 +103,13 @@
             disabled={app.locked}
             onclick={() => (dotnetForm.options = defaultDotnetOptions())}
         />
-        <Button
-            scale="s"
-            kind="neutral"
-            appearance="transparent"
-            iconStart="console"
-            onclick={() => (app.view = "activity")}>View activity</Button
-        >
-        <Button
-            type="submit"
-            form="dotnet-command"
-            iconStart="play"
-            disabled={unavailable}
-            >{options.task === "custom"
-                ? "Run command"
-                : options.task === "build" && options.rebuild
-                  ? "Rebuild solution"
-                  : `${task.label} solution`}</Button
+        <Button type="submit" form="dotnet-command" disabled={unavailable}
+            >{#if running}<Spinner scale="s" />Running…
+            {:else}<Icon name="play" size={18} />{options.task === "custom"
+                    ? "Run command"
+                    : options.task === "build" && options.rebuild
+                      ? "Rebuild solution"
+                      : `${task.label} solution`}{/if}</Button
         >
     {/snippet}
 </PageHeader>
@@ -120,171 +121,199 @@
         Save or discard your configuration edits before running commands.
     </p>{/if}
 
-<form
-    id="dotnet-command"
-    class="space-y-5"
-    onsubmit={(event) => {
-        event.preventDefault();
-        run();
-    }}
+<div
+    class="grid items-start gap-5 grid-cols-[260px_minmax(0,1fr)] 2xl:grid-cols-[300px_minmax(0,1fr)]"
 >
-    <section class="panel">
-        <div class="panel-heading">
-            <div>
-                <h2 class="text-title-small">Command options</h2>
-                <p class="mt-1 text-caption text-text-tertiary">
-                    {task.description}
-                </p>
+    <form
+        id="dotnet-command"
+        class="max-h-[calc(100dvh-300px)] min-w-0 space-y-4 overflow-y-auto pr-1"
+        onsubmit={(event) => {
+            event.preventDefault();
+            run();
+        }}
+    >
+        <section class="panel">
+            <div class="px-4 py-3">
+                <div>
+                    <h2 class="text-title-small">Next command options</h2>
+                    <p class="mt-1 text-caption text-text-tertiary">
+                        {task.description}
+                    </p>
+                </div>
             </div>
-            <Icon name="gear" class="text-brand" />
-        </div>
-        <div class="space-y-5 p-5">
-            <div class="grid gap-5 lg:grid-cols-2">
-                <label class="space-y-2 text-body-small text-text-secondary">
-                    <span class="block">Task</span>
-                    <select
-                        class="field-select"
-                        aria-label="Dotnet task"
-                        bind:value={dotnetForm.options.task}
-                        disabled={app.locked}
-                    >
-                        {#each dotnetTasks as item}<option value={item.value}
-                                >{item.label}</option
-                            >{/each}
-                    </select>
-                </label>
-                {#if options.task !== "custom"}
+            <div class="space-y-4 border-t border-border-tertiary p-4">
+                <div class="grid gap-4">
                     <label
                         class="space-y-2 text-body-small text-text-secondary"
                     >
-                        <span class="block">Build configuration</span>
+                        <span class="block">Task</span>
                         <select
                             class="field-select"
-                            aria-label="Build configuration"
-                            bind:value={dotnetForm.options.configuration}
+                            aria-label="Dotnet task"
+                            bind:value={dotnetForm.options.task}
                             disabled={app.locked}
                         >
-                            <option value="Debug">Debug</option><option
-                                value="Release">Release</option
-                            >
+                            {#each dotnetTasks as item}<option
+                                    value={item.value}>{item.label}</option
+                                >{/each}
                         </select>
                     </label>
-                {/if}
-            </div>
-            {#if options.task === "custom"}
-                <Input
-                    label="Dotnet arguments"
-                    variant="general"
-                    bind:value={dotnetForm.options.customArgs}
-                    disabled={app.locked}
-                    clearable={false}
-                    placeholder="build -c Release -t:Rebuild"
-                    hint="Enter the arguments after dotnet. Do not supply a project or solution; pacev2 supplies PACE.slnx."
-                />
-            {:else}
-                {#if supportsFramework(options.task)}
+                    {#if options.task !== "custom"}
+                        <label
+                            class="space-y-2 text-body-small text-text-secondary"
+                        >
+                            <span class="block">Build configuration</span>
+                            <select
+                                class="field-select"
+                                aria-label="Build configuration"
+                                bind:value={dotnetForm.options.configuration}
+                                disabled={app.locked}
+                            >
+                                <option value="Debug">Debug</option><option
+                                    value="Release">Release</option
+                                >
+                            </select>
+                        </label>
+                    {/if}
+                </div>
+                {#if options.task === "custom"}
                     <Input
-                        label="Target framework (optional)"
+                        label="Dotnet arguments"
                         variant="general"
-                        bind:value={dotnetForm.options.framework}
+                        bind:value={dotnetForm.options.customArgs}
                         disabled={app.locked}
                         clearable={false}
-                        placeholder="For example, net10.0 or net10.0-windows"
-                        hint="Leave empty to use all configured targets. pacev2 evaluates compatibility when a framework is specified."
+                        placeholder="build -c Release -t:Rebuild"
+                        hint="Enter the arguments after dotnet. Do not supply a project or solution; pacev2 supplies PACE.slnx."
+                    />
+                {:else}
+                    {#if supportsFramework(options.task)}
+                        <Input
+                            label="Target framework (optional)"
+                            variant="general"
+                            bind:value={dotnetForm.options.framework}
+                            disabled={app.locked}
+                            clearable={false}
+                            placeholder="For example, net10.0 or net10.0-windows"
+                        />
+                    {/if}
+                    {#if supportsNoRestore(options.task) || options.task === "build"}<div
+                            class="grid gap-4 border-t border-border-tertiary pt-4"
+                        >
+                            {#if supportsNoRestore(options.task)}<Switch
+                                    label="Skip restore"
+                                    bind:checked={dotnetForm.options.noRestore}
+                                    disabled={app.locked}
+                                />{/if}
+                            {#if options.task === "build"}<Switch
+                                    label="Rebuild all outputs"
+                                    bind:checked={dotnetForm.options.rebuild}
+                                    disabled={app.locked}
+                                />{/if}
+                        </div>{/if}
+                    {#if options.task === "build" && options.rebuild}<p
+                            class="text-caption leading-relaxed text-text-secondary"
+                        >
+                            Uses <code>-t:Rebuild</code> to clean and build again.
+                            This also reproduces compiler warnings that an incremental
+                            build would skip.
+                        </p>{/if}
+                    <Input
+                        label="Additional arguments (optional)"
+                        variant="general"
+                        bind:value={dotnetForm.options.additionalArgs}
+                        disabled={app.locked}
+                        clearable={false}
+                        placeholder="--verbosity minimal"
                     />
                 {/if}
-                {#if supportsNoRestore(options.task) || options.task === "build"}<div
-                        class="grid gap-4 border-t border-border-tertiary pt-5 lg:grid-cols-2"
-                    >
-                        {#if supportsNoRestore(options.task)}<Switch
-                                label="Skip restore"
-                                bind:checked={dotnetForm.options.noRestore}
-                                disabled={app.locked}
-                            />{/if}
-                        {#if options.task === "build"}<Switch
-                                label="Rebuild all outputs"
-                                bind:checked={dotnetForm.options.rebuild}
-                                disabled={app.locked}
-                            />{/if}
-                    </div>{/if}
-                {#if options.task === "build" && options.rebuild}<p
-                        class="text-caption leading-relaxed text-text-secondary"
-                    >
-                        Uses <code>-t:Rebuild</code> to clean and build again. This
-                        also reproduces compiler warnings that an incremental build
-                        would skip.
-                    </p>{/if}
-                <Input
-                    label="Additional arguments (optional)"
-                    variant="general"
-                    bind:value={dotnetForm.options.additionalArgs}
-                    disabled={app.locked}
-                    clearable={false}
-                    placeholder="--verbosity minimal"
-                    hint="Appended after the form options. Quote arguments containing spaces; shell operators are not executed."
-                />
-            {/if}
-            <div class="border-t border-border-tertiary pt-5">
-                <Switch
-                    label="Summarize build warnings"
-                    bind:checked={dotnetForm.options.summarizeWarnings}
-                    disabled={app.locked}
-                />
-                <p
-                    class="mt-2 text-caption leading-relaxed text-text-secondary"
-                >
-                    Adds <code>-w</code> before the dotnet subcommand. Summaries
-                    appear in command output and are saved by pacev2 under
-                    <code>~/.pace/logs</code>.
-                </p>
+                <div class="border-t border-border-tertiary pt-5">
+                    <Switch
+                        label="Summarize build warnings"
+                        bind:checked={dotnetForm.options.summarizeWarnings}
+                        disabled={app.locked}
+                    />
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    {#if options.task !== "custom" && properties.length}
-        <DotnetProperties
-            {properties}
-            bind:values={dotnetForm.options.properties}
-            disabled={app.locked}
-        />
-    {/if}
-
-    <section class="panel overflow-hidden">
-        <div class="panel-heading">
-            <h2 class="text-title-small">Command preview</h2>
-            <span class="text-caption text-text-tertiary"
-                >pacev2 · PACE.slnx</span
-            >
-        </div>
-        <div class="bg-foreground-secondary p-5">
-            {#if command.error}<p
-                    role="alert"
-                    class="text-body-small text-status-danger"
+        {#if options.task !== "custom" && properties.length}
+            <details class="panel" bind:open={dotnetForm.propertiesOpen}>
+                <summary class="cursor-pointer px-4 py-3 text-label-medium"
+                    >MSBuild properties ({Object.keys(options.properties)
+                        .length} enabled)</summary
                 >
-                    {command.error}
+                <DotnetProperties
+                    {properties}
+                    bind:values={dotnetForm.options.properties}
+                    disabled={app.locked}
+                    compact
+                />
+            </details>
+        {/if}
+
+        <section class="panel overflow-hidden">
+            <div class="px-4 py-3">
+                <h2 class="text-label-medium">Next command</h2>
+            </div>
+            <div class="bg-foreground-secondary p-4">
+                {#if command.error}<p
+                        role="alert"
+                        class="text-body-small text-status-danger"
+                    >
+                        {command.error}
+                    </p>
+                {:else}<code
+                        data-testid="dotnet-preview"
+                        class="block whitespace-pre-wrap break-all text-caption leading-relaxed text-text-secondary"
+                        >{preview}</code
+                    >{/if}
+            </div>
+        </section>
+    </form>
+    <div class="min-w-0 space-y-4">
+        {#if current}
+            <RunSummary
+                run={current}
+                runs={app.operationRuns("dotnet")}
+                onselect={(id) => (app.operationSelection.dotnet = id)}
+            />
+        {:else}
+            <section class="panel p-4">
+                <h2 class="text-title-small">
+                    Ready to {options.task === "custom" ? "run" : options.task}
+                </h2>
+                <p
+                    class="mt-2 text-body-small leading-relaxed text-text-secondary"
+                >
+                    Choose your options and run the command. Progress and output
+                    will stay in this workspace.
                 </p>
-            {:else}<code
-                    data-testid="dotnet-preview"
-                    class="block whitespace-pre-wrap break-all text-caption leading-relaxed text-text-secondary"
-                    >{preview}</code
-                >{/if}
+            </section>
+        {/if}
+        {#if ["build", "publish", "test"].includes(operation)}
+            <DotnetProgress
+                run={current}
+                projects={current?.context?.projects ?? app.selectedProjects}
+                {operation}
+            />
+        {/if}
+        <div class="panel overflow-hidden">
+            {#key current?.id ?? "idle"}
+                <CommandLog
+                    text={current?.output ?? ""}
+                    running={current?.status === "running"}
+                    truncated={current?.truncated}
+                    empty={current
+                        ? "Command completed without output."
+                        : "Build messages, test results, warnings, and errors appear here."}
+                />
+            {/key}
         </div>
-        <div
-            class="flex flex-wrap items-center justify-between gap-4 border-t border-border-tertiary p-4"
-        >
-            <p class="text-caption text-text-secondary">
-                Output and exit status will appear in Command activity.
-            </p>
-        </div>
-    </section>
-</form>
-<div
-    class="mt-5 flex items-start gap-3 text-body-small leading-relaxed text-text-secondary"
->
-    <Icon name="information" size={18} class="mt-0.5 text-status-info" />
-    <p>
-        Scope controls the direct members of <code>PACE.slnx</code>, not every
-        project MSBuild may build. Referenced projects outside the scope can
-        still run. .NET SDK 9.0.200 or newer is required for solution support.
-    </p>
+        <p class="text-caption leading-relaxed text-text-tertiary">
+            MSBuild may also process references outside the selected scope.
+            Options and scope changes apply to the next command; the displayed
+            run keeps its original settings. Requires .NET SDK 9.0.200+.
+        </p>
+    </div>
 </div>

@@ -10,10 +10,12 @@
         properties,
         values = $bindable<Record<string, string>>({}),
         disabled = false,
+        compact = false,
     }: {
         properties: BuildProperty[];
         values?: Record<string, string>;
         disabled?: boolean;
+        compact?: boolean;
     } = $props();
 
     function enable(property: BuildProperty, enabled: boolean) {
@@ -36,21 +38,25 @@
     }
 </script>
 
-<section class="panel">
-    <div class="panel-heading">
-        <div>
-            <h2 class="text-title-small">MSBuild properties</h2>
-            <p class="mt-1 text-caption leading-relaxed text-text-tertiary">
-                Enable a property to pass it explicitly to this command.
-                Disabled properties use the project's own settings.
-            </p>
+<section class={compact ? "border-t border-border-tertiary" : "panel"}>
+    {#if !compact}
+        <div class="panel-heading">
+            <div>
+                <h2 class="text-title-small">MSBuild properties</h2>
+                <p class="mt-1 text-caption leading-relaxed text-text-tertiary">
+                    Enable a property to pass it explicitly to this command.
+                    Disabled properties use the project's own settings.
+                </p>
+            </div>
         </div>
-    </div>
+    {/if}
     <div class="divide-y divide-border-tertiary">
         {#each properties as property, index (`${index}-${property.name}`)}
             {@const enabled = Object.hasOwn(values, property.name)}
             <div
-                class="grid items-center gap-4 p-5 lg:grid-cols-[minmax(180px,1fr)_minmax(0,1.5fr)]"
+                class={compact
+                    ? "grid gap-3 p-4"
+                    : "grid items-center gap-4 p-5 lg:grid-cols-[minmax(180px,1fr)_minmax(0,1.5fr)]"}
             >
                 <div class="min-w-0">
                     <Checkbox
